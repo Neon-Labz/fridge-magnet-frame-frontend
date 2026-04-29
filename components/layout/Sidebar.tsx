@@ -1,12 +1,11 @@
 'use client';
 
-import { LayoutGrid, ShoppingCart, Users, UserCog, LogOut } from 'lucide-react';
+import { ShoppingCart, Users, UserCog, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { label: 'Products', icon: LayoutGrid, href: '/products' },
   { label: 'Orders', icon: ShoppingCart, href: '/orders' },
   { label: 'Customers', icon: Users, href: '/customers' },
   { label: 'Account', icon: UserCog, href: '/account' },
@@ -27,7 +26,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         className="flex items-center justify-center flex-shrink-0"
         style={{ height: 89, borderBottom: '1px solid #F1F5F9', padding: '0 24px' }}
       >
-        <Link href="/products">
+        <Link href="/orders">
           <Image src="/logo.png" alt="Magnify" width={140} height={48} priority />
         </Link>
       </div>

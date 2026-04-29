@@ -110,9 +110,9 @@ export default function DashboardPage() {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Recent Products</h2>
-            <a href="/admin/products/create" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800">
+            <a href="/orders" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800">
               <SquarePlus className="w-4 h-4" />
-              Add Product
+              View Orders
             </a>
           </div>
         </div>
@@ -154,10 +154,10 @@ export default function DashboardPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <a href={`/admin/products/${product.id}`} className="text-primary-700 hover:text-primary-900 p-2 hover:bg-gray-200 rounded">
+                      <a href="/orders" className="text-primary-700 hover:text-primary-900 p-2 hover:bg-gray-200 rounded">
                         <Eye className="w-4 h-4" />
                       </a>
-                      <a href={`/admin/products/${product.id}/edit`} className="text-primary-700 hover:text-primary-900 p-2 hover:bg-gray-200 rounded">
+                      <a href="/orders" className="text-primary-700 hover:text-primary-900 p-2 hover:bg-gray-200 rounded">
                         Edit
                       </a>
                       <button className="text-red-600 hover:text-red-900 p-2 hover:bg-gray-200 rounded">
