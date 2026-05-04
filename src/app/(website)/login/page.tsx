@@ -2,7 +2,7 @@
 
   import React from 'react'
   import { useAuthModal } from '@/hooks/useAuthModal'
-  import AuthModal from '@/components/(authentication)/AuthModal'
+    import AuthModal from '@/components/auth/AuthModal'
 
 export default function LoginPage() {
   const { openModal } = useAuthModal()

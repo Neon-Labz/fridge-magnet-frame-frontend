@@ -3,10 +3,10 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { useAuthModal, AuthModalView } from '@/hooks/useAuthModal'
-import LoginForm from '@/components/(authentication)/LoginForm'
-import RegisterForm from '@/components/(authentication)/RegisterForm'
-import ForgotPasswordForm from '@/components/(authentication)/ForgotPasswordForm'
-import ResetPasswordForm from '@/components/(authentication)/ResetPasswordForm'
+import LoginForm from '@/components/auth/LoginForm'
+import RegisterForm from '@/components/auth/RegisterForm'
+import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
+import ResetPasswordForm from '@/components/auth/ResetPasswordForm'
 
 export default function AuthModal() {
   const { isOpen, view, closeModal } = useAuthModal()

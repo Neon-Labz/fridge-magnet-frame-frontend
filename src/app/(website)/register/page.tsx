@@ -1,15 +1,15 @@
-'use client'
+    'use client'
 
-import React from 'react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import AuthModal from '@/components/(authentication)/AuthModal'
+  import React from 'react'
+  import { useAuthModal } from '@/hooks/useAuthModal'
+    import AuthModal from '@/components/auth/AuthModal'
 
-export default function ResetPasswordPage() {
+export default function RegisterPage() {
   const { openModal } = useAuthModal()
 
-  // Open reset password modal when page loads
+  // Open register modal when page loads
   React.useEffect(() => {
-    openModal('reset-password')
+    openModal('register')
   }, [openModal])
 
   return (
@@ -31,10 +31,10 @@ export default function ResetPasswordPage() {
 
         {/* Shop Now Button */}
         <button
-          onClick={() => openModal('reset-password')}
+          onClick={() => openModal('register')}
           className="bg-red-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          Reset Password
+          Create Account
         </button>
 
         {/* Features Preview */}
