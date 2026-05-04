@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useAuthModal } from '@/hooks/useAuthModal'
-import AuthModal from '@/components/AuthModal'
+import AuthModal from '@/components/auth/AuthModal'
 
 export default function ResetPasswordPage() {
   const { openModal } = useAuthModal()

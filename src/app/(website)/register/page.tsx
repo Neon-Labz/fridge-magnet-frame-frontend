@@ -1,15 +1,15 @@
     'use client'
 
-import React from 'react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import AuthModal from '@/components/AuthModal'
+  import React from 'react'
+  import { useAuthModal } from '@/hooks/useAuthModal'
+    import AuthModal from '@/components/auth/AuthModal'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { openModal } = useAuthModal()
 
-  // Open login modal when page loads
+  // Open register modal when page loads
   React.useEffect(() => {
-    openModal('login')
+    openModal('register')
   }, [openModal])
 
   return (
@@ -31,10 +31,10 @@ export default function LoginPage() {
 
         {/* Shop Now Button */}
         <button
-          onClick={() => openModal('login')}
+          onClick={() => openModal('register')}
           className="bg-red-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          Sign In
+          Create Account
         </button>
 
         {/* Features Preview */}
