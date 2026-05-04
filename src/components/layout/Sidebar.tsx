@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { label: 'Products', icon: Package, href: '/products' },
-  { label: 'Orders', icon: ShoppingCart, href: '/orders' },
-  { label: 'Customers', icon: Users, href: '/customers' },
-  { label: 'Account', icon: UserCog, href: '/account' },
+  { label: 'Products', icon: Package, href: '/dashboard/products' },
+  { label: 'Orders', icon: ShoppingCart, href: '/dashboard/orders' },
+  { label: 'Customers', icon: Users, href: '/dashboard/customers' },
+  { label: 'Account', icon: UserCog, href: '/dashboard/account' },
 ] as const;
 
 export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {

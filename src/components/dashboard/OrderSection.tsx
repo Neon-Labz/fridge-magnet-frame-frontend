@@ -101,7 +101,7 @@ function StatCard({
 }
 
 /* ── Page ── */
-export default function OrdersPage() {
+export default function OrderSection() {
   const [orders, setOrders] = useState<Order[]>(ORDERS);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
