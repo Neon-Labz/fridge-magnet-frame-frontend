@@ -1,14 +1,12 @@
 
 'use client'
 import { useState } from 'react'
-
-
-
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, Lock, User } from 'lucide-react'
 import { useAuthModal } from '@/hooks/useAuthModal'
+import { apiClient } from '@/lib/api'
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -32,12 +30,20 @@ function GoogleIcon() {
 
 function InputField({
   type = 'text',
-  placeholder,
+  placeholder = '',
   icon,
-  error,
+  error = '',
   register,
-  name,
-  autoComplete,
+  name = '',
+  autoComplete = '',
+}: {
+  type?: string
+  placeholder?: string
+  icon: React.ReactNode
+  error?: string
+  register: any
+  name: string
+  autoComplete?: string
 }) {
   return (
     <div className="mb-5 w-full">

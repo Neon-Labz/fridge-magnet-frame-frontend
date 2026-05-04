@@ -1,8 +1,8 @@
     'use client'
 
-import React from 'react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import AuthModal from '@/components/AuthModal'
+  import React from 'react'
+  import { useAuthModal } from '@/hooks/useAuthModal'
+  import AuthModal from '@/components/(authentication)/AuthModal'
 
 export default function ForgotPasswordPage() {
   const { openModal } = useAuthModal()
