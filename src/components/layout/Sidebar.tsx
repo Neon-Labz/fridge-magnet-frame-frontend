@@ -1,12 +1,12 @@
 'use client';
 
-import { LayoutGrid, ShoppingCart, Users, UserCog, LogOut } from 'lucide-react';
+import { Package, ShoppingCart, Users, UserCog, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { label: 'Products', icon: LayoutGrid, href: '/products' },
+  { label: 'Products', icon: Package, href: '/products' },
   { label: 'Orders', icon: ShoppingCart, href: '/orders' },
   { label: 'Customers', icon: Users, href: '/customers' },
   { label: 'Account', icon: UserCog, href: '/account' },

@@ -122,7 +122,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex flex-col h-full px-4 sm:px-8 pt-6 sm:pt-8 pb-0" style={{ maxWidth: 1280 }}>
+      <div className="flex flex-col h-full w-full px-4 sm:px-8 pt-6 sm:pt-8 pb-0">
 
         {/* ── Page header ── */}
         <section className="flex-shrink-0 flex items-end justify-between gap-6 mb-5">

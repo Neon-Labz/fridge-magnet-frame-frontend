@@ -15,8 +15,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: 'Magnify — Product Management',
-  description: 'Premium gallery product management dashboard',
+  title: 'Magnify — Order Management',
+  description: 'Premium gallery order management dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
