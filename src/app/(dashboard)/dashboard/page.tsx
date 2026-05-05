@@ -27,6 +27,7 @@ export default function DashboardPage() {
             <p className="text-sm font-medium text-gray-500">Customers</p>
             <p className="mt-3 text-3xl font-semibold text-gray-900">3,241</p>
           </div>
+          
         </section>
       </div>
     </main>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -15,10 +16,16 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-export default function LoginForm() {
+type LoginFormProps = {
+  redirectTo?: string
+  tokenKey?: string
+}
+
+export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { switchView } = useAuthModal()
+  const router = useRouter()
 
   const {
     register,
@@ -36,9 +43,19 @@ export default function LoginForm() {
       const response = await apiClient.login(data)
       
       if (response.success) {
-        // Handle successful login
-        console.log('Login successful:', response.data)
-        // You might want to redirect or close modal here
+        const token =
+          response.data?.token ||
+          response.data?.accessToken ||
+          response.data?.data?.token
+
+        if (token) {
+          localStorage.setItem(tokenKey, token)
+          document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
+        }
+
+        if (redirectTo) {
+          router.replace(redirectTo)
+        }
       } else {
         setError(response.error || 'Login failed')
       }
