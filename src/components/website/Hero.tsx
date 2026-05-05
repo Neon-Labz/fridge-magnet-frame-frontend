@@ -15,7 +15,7 @@ export const Hero = () => {
     >
       <div className="absolute inset-0">
         <Image
-          src="https://res.cloudinary.com/avplantations/image/upload/v1775207120/472498951_122218526744196803_2522232841400099127_n_f75t26.jpg?w=1920&q=80"
+          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
           alt="Luxury Home"
           width={1920}
           height={1080}

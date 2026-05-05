@@ -27,7 +27,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         className="flex items-center justify-center flex-shrink-0"
         style={{ height: 89, borderBottom: '1px solid #F1F5F9', padding: '0 24px' }}
       >
-        <Link href="/products">
+        <Link href="/dashboard/products">
           <Image src="/logo.png" alt="Magnify" width={140} height={48} priority />
         </Link>
       </div>

@@ -2,14 +2,15 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       fontFamily: {
         inter: ["var(--font-inter)", "Inter", "sans-serif"],
         manrope: ["var(--font-manrope)", "Manrope", "sans-serif"],
-        playfair: ["Playfair Display", "serif"]
+        playfair: ["Playfair Display", "serif"],
       },
       colors: {
         brand: {
@@ -31,11 +32,11 @@ const config: Config = {
           900: "#172554",
         },
         accent: "#c8956c",
-        dark: "#0f172a"
-      }
-    }
+        dark: "#0f172a",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
 
 export default config;

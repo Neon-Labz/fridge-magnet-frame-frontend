@@ -76,7 +76,7 @@ export default function Navbar() {
             </div> */}
 
               <img
-                src="/logo-black.png"
+                src="/logo.png"
                 alt="Tranquille Real Estate Logo"
                 className="w-25 h-18 object-cover rounded-xl group-hover:rotate-12 transition-transform"
               />

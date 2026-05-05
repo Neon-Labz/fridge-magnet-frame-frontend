@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AddProductModal from '@/components/AddProductModal';
+import AddProductModal from '@/components/modals/AddProductModal';
 
 export default function CreateProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
