@@ -20,40 +20,104 @@ const STATS = [
 
 function ProductThumb({ gradient }: { gradient: string }) {
   return (
-    <div className="relative flex-shrink-0 overflow-hidden rounded-lg" style={{ width: 64, height: 64, border: '1px solid #E2E8F0', background: '#F1F5F9' }}>
-      <div className={`absolute inset-1 rounded-md bg-gradient-to-br ${gradient}`} />
-      <div className="absolute inset-[14px] rounded-sm border border-white/30 bg-white/10" />
-    </div>
+    <>
+      <style jsx>{`
+        .product-thumb {
+          width: 64px;
+          height: 64px;
+          border: 1px solid #E2E8F0;
+          background: #F1F5F9;
+        }
+      `}</style>
+      <div className="relative flex-shrink-0 overflow-hidden rounded-lg product-thumb">
+        <div className={`absolute inset-1 rounded-md bg-gradient-to-br ${gradient}`} />
+        <div className="absolute inset-[14px] rounded-sm border border-white/30 bg-white/10" />
+      </div>
+    </>
   );
 }
 
 function StockBadge({ status, count }: { status: StockStatus; count: number }) {
-  if (status === 'in-stock') return (
-    <div className="flex items-center gap-2">
-      <span className="rounded-full flex-shrink-0" style={{ width: 8, height: 10, background: '#10B981' }} />
-      <span className="inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold" style={{ background: '#ECFDF5', color: '#047857' }}>In Stock ({count})</span>
-    </div>
-  );
-  if (status === 'low-stock') return (
-    <div className="flex items-center gap-2">
-      <span className="rounded-full flex-shrink-0" style={{ width: 8, height: 10, background: '#BC0000' }} />
-      <span className="inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold" style={{ background: '#FEF2F2', color: '#BC0000' }}>Low Stock ({count})</span>
-    </div>
-  );
   return (
-    <div className="flex items-center gap-2">
-      <span className="rounded-full flex-shrink-0" style={{ width: 8, height: 10, background: '#CBD5E1' }} />
-      <span className="inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold" style={{ background: '#F1F5F9', color: '#64748B' }}>Out of Stock</span>
-    </div>
+    <>
+      <style jsx>{`
+        .badge-indicator {
+          width: 8px;
+          height: 10px;
+          border-radius: 9999px;
+          flex-shrink: 0;
+        }
+        .badge-in-stock {
+          background: #10B981;
+        }
+        .badge-low-stock {
+          background: #BC0000;
+        }
+        .badge-out-of-stock {
+          background: #CBD5E1;
+        }
+        .badge-text {
+          display: inline-flex;
+          align-items: center;
+          border-radius: 9999px;
+          padding: 6px 12px;
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .badge-text-in-stock {
+          background: #ECFDF5;
+          color: #047857;
+        }
+        .badge-text-low-stock {
+          background: #FEF2F2;
+          color: #BC0000;
+        }
+        .badge-text-out-of-stock {
+          background: #F1F5F9;
+          color: #64748B;
+        }
+      `}</style>
+      {status === 'in-stock' && (
+        <div className="flex items-center gap-2">
+          <span className="badge-indicator badge-in-stock" />
+          <span className="badge-text badge-text-in-stock">In Stock ({count})</span>
+        </div>
+      )}
+      {status === 'low-stock' && (
+        <div className="flex items-center gap-2">
+          <span className="badge-indicator badge-low-stock" />
+          <span className="badge-text badge-text-low-stock">Low Stock ({count})</span>
+        </div>
+      )}
+      {status === 'out-of-stock' && (
+        <div className="flex items-center gap-2">
+          <span className="badge-indicator badge-out-of-stock" />
+          <span className="badge-text badge-text-out-of-stock">Out of Stock</span>
+        </div>
+      )}
+    </>
   );
 }
 
 function PageBtn({ children, active = false, onClick }: { children: ReactNode; active?: boolean; onClick?: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center justify-center rounded-lg text-sm font-bold transition"
-      style={{ width: 36, height: 36, background: active ? '#002B73' : 'transparent', color: active ? '#fff' : '#475569' }}>
-      {children}
-    </button>
+    <>
+      <style jsx>{`
+        .page-btn {
+          width: 36px;
+          height: 36px;
+          background: transparent;
+          color: #475569;
+        }
+        .page-btn.active {
+          background: #002B73;
+          color: #fff;
+        }
+      `}</style>
+      <button onClick={onClick} className={`flex items-center justify-center rounded-lg text-sm font-bold transition page-btn ${active ? 'active' : ''}`}>
+        {children}
+      </button>
+    </>
   );
 }
 
