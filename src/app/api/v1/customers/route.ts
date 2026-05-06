@@ -53,9 +53,10 @@ export async function POST(request: NextRequest) {
     mockCustomers.unshift(newCustomer);
 
     return NextResponse.json(newCustomer, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error creating customer:', error);
     return NextResponse.json(
-      { message: 'Failed to create customer' },
+      { message: error instanceof Error ? error.message : 'Failed to process request' },
       { status: 500 }
     );
   }
@@ -99,9 +100,10 @@ export async function PATCH(request: NextRequest) {
     mockCustomers[customerIndex] = updatedCustomer;
 
     return NextResponse.json(updatedCustomer, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error('Error updating customer:', error);
     return NextResponse.json(
-      { message: 'Failed to update customer' },
+      { message: error instanceof Error ? error.message : 'Failed to process request' },
       { status: 500 }
     );
   }
@@ -129,9 +131,10 @@ export async function DELETE(request: NextRequest) {
 
     const deletedCustomer = mockCustomers.splice(index, 1)[0];
     return NextResponse.json({ message: 'Customer deleted', data: deletedCustomer }, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error('Error deleting customer:', error);
     return NextResponse.json(
-      { message: 'Failed to delete customer' },
+      { message: error instanceof Error ? error.message : 'Failed to process request' },
       { status: 500 }
     );
   }
