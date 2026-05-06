@@ -73,7 +73,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add customer.');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSubmitting(false);
     }

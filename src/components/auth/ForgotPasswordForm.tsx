@@ -40,7 +40,7 @@ export default function ForgotPasswordForm() {
         setSuccess(true)
         console.log('Reset link sent:', response.data)
       } else {
-        setError(response.error || 'Failed to send reset link')
+        setError(response.error || 'An error occurred')
       }
     } catch {
       setError('An unexpected error occurred')

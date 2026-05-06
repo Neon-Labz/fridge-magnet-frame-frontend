@@ -352,7 +352,7 @@ const CustomerTable = () => {
       setCustomerToDelete(null);
       await refresh();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete customer.');
+      setDeleteError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setDeleting(false);
     }
