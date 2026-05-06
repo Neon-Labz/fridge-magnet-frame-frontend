@@ -42,7 +42,7 @@ function InputField({
   icon: React.ReactNode
   error?: string
   register: UseFormRegister<RegisterFormData>
-  name: keyof RegisterFormData
+  name: string
   autoComplete?: string
 }) {
   return (
