@@ -48,7 +48,7 @@ export default function ResetPasswordForm() {
       } else {
         setError(response.error || 'Failed to reset password')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)

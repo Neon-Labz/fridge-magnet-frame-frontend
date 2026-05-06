@@ -6,6 +6,7 @@ import {
   Send,
   ArrowRight,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
 
@@ -75,10 +76,13 @@ export default function Footer() {
                 <Home className="text-white w-6 h-6" />
               </div> */}
 
-              <img
+              <Image
                 src="/logo.png"
                 alt="Tranquille Real Estate Logo"
-                className="w-30 h-25 object-cover rounded-xl group-hover:rotate-12 transition-transform"
+                width={120}
+                height={100}
+                className="object-cover rounded-xl group-hover:rotate-12 transition-transform"
+                style={{ width: 'auto', height: 'auto' }}
               />
             </a>
             <p className="text-gray-400 leading-relaxed mb-6">

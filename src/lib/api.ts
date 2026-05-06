@@ -22,6 +22,14 @@ interface ForgotPasswordData {
   email: string
 }
 
+type AuthResponseData = {
+  token?: string
+  accessToken?: string
+  data?: {
+    token?: string
+  }
+}
+
 class ApiClient {
   private async request<T>(
     endpoint: string,
@@ -38,12 +46,23 @@ class ApiClient {
         ...options,
       })
 
-      const data = await response.json()
+      const contentType = response.headers.get('content-type') || ''
+      const rawBody = contentType.includes('application/json')
+        ? await response.json()
+        : await response.text()
+
+      const data =
+        typeof rawBody === 'string'
+          ? { message: rawBody.slice(0, 200) }
+          : rawBody
 
       if (!response.ok) {
         return {
           success: false,
-          error: data.message || data.error || 'Request failed',
+          error:
+            data?.message ||
+            data?.error ||
+            `Request failed with status ${response.status}`,
         }
       }
 
@@ -59,41 +78,41 @@ class ApiClient {
     }
   }
 
-  async login(credentials: LoginData): Promise<ApiResponse<any>> {
+  async login(credentials: LoginData): Promise<ApiResponse<AuthResponseData>> {
     return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     })
   }
 
-  async register(userData: RegisterData): Promise<ApiResponse<any>> {
+  async register(userData: RegisterData): Promise<ApiResponse<unknown>> {
     return this.request('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     })
   }
 
-  async forgotPassword(emailData: ForgotPasswordData): Promise<ApiResponse<any>> {
+  async forgotPassword(emailData: ForgotPasswordData): Promise<ApiResponse<unknown>> {
     return this.request('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify(emailData),
     })
   }
 
-  async resetPassword(token: string, password: string): Promise<ApiResponse<any>> {
+  async resetPassword(token: string, password: string): Promise<ApiResponse<unknown>> {
     return this.request('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     })
   }
 
-  async logout(): Promise<ApiResponse<any>> {
+  async logout(): Promise<ApiResponse<unknown>> {
     return this.request('/auth/logout', {
       method: 'POST',
     })
   }
 
-  async getProfile(): Promise<ApiResponse<any>> {
+  async getProfile(): Promise<ApiResponse<unknown>> {
     return this.request('/auth/profile', {
       method: 'GET',
     })

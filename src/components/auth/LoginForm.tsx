@@ -16,6 +16,14 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
+type LoginResponseData = {
+  token?: string
+  accessToken?: string
+  data?: {
+    token?: string
+  }
+}
+
 type LoginFormProps = {
   redirectTo?: string
   tokenKey?: string
@@ -43,23 +51,28 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
       const response = await apiClient.login(data)
       
       if (response.success) {
+        const responseData = response.data as LoginResponseData | undefined
         const token =
-          response.data?.token ||
-          response.data?.accessToken ||
-          response.data?.data?.token
+          responseData?.token ||
+          responseData?.accessToken ||
+          responseData?.data?.token
 
         if (token) {
-          localStorage.setItem(tokenKey, token)
-          document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
-        }
+          setTimeout(() => {
+            localStorage.setItem(tokenKey, token)
+            document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
 
-        if (redirectTo) {
+            if (redirectTo) {
+              router.replace(redirectTo)
+            }
+          }, 0)
+        } else if (redirectTo) {
           router.replace(redirectTo)
         }
       } else {
         setError(response.error || 'Login failed')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)
@@ -231,7 +244,7 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
       {/* Register Link */}
       <div className="text-center mt-1">
         <span style={{ fontSize: '13px', color: '#6B7280' }}>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <button
             onClick={() => switchView('register')}
             style={{

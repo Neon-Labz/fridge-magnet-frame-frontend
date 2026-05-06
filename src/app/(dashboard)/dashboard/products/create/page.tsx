@@ -1,18 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { ProductFormData } from '@/types/product';
 import AddProductModal from '@/components/modals/AddProductModal';
 
 export default function CreateProductPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: ProductFormData) => {
     try {
       // Here you would typically send the data to your API
       console.log('Product created:', formData);

@@ -28,7 +28,14 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         style={{ height: 89, borderBottom: '1px solid #F1F5F9', padding: '0 24px' }}
       >
         <Link href="/dashboard/products">
-          <Image src="/logo.png" alt="Magnify" width={140} height={48} priority />
+          <Image
+            src="/logo.png"
+            alt="Magnify"
+            width={140}
+            height={48}
+            priority
+            style={{ width: 'auto', height: 'auto' }}
+          />
         </Link>
       </div>
 

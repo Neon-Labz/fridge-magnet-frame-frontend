@@ -145,7 +145,7 @@ export default function ProductsPage() {
 
         {/* ── Stat cards ── */}
         <section className="flex-shrink-0 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-5">
-          {STATS.map(({ label, value, icon: Icon, iconBg, iconColor, valueColor }) => (
+          {STATS.map(({ label, value, icon: Icon, iconBg, iconColor }) => (
             <article key={label} className="flex items-center gap-5 bg-white flex-1"
               style={{ padding: '20px 24px', border: '1px solid #C3C6D4', borderRadius: 12, boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' }}>
               <div className="flex items-center justify-center flex-shrink-0 rounded-lg" style={{ width: 48, height: 48, background: iconBg }}>

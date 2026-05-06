@@ -1,7 +1,7 @@
 
 'use client'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormRegister } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, Lock, User } from 'lucide-react'
@@ -34,15 +34,15 @@ function InputField({
   icon,
   error = '',
   register,
-  name = '',
+  name,
   autoComplete = '',
 }: {
   type?: string
   placeholder?: string
   icon: React.ReactNode
   error?: string
-  register: any
-  name: string
+  register: UseFormRegister<RegisterFormData>
+  name: keyof RegisterFormData
   autoComplete?: string
 }) {
   return (
@@ -96,7 +96,7 @@ export default function RegisterForm() {
       } else {
         setError(response.error || 'Registration failed')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)

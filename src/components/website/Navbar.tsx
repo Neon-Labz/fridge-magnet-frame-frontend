@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Phone, Mail, Clock, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -75,10 +76,13 @@ export default function Navbar() {
               <Home className="text-white w-6 h-6" />
             </div> */}
 
-              <img
+              <Image
                 src="/logo.png"
                 alt="Tranquille Real Estate Logo"
-                className="w-25 h-18 object-cover rounded-xl group-hover:rotate-12 transition-transform"
+                width={100}
+                height={72}
+                className="object-cover rounded-xl group-hover:rotate-12 transition-transform"
+                style={{ width: 'auto', height: 'auto' }}
               />
             </Link>
           ) : (
@@ -87,10 +91,13 @@ export default function Navbar() {
               <Home className="text-white w-6 h-6" />
             </div> */}
 
-              <img
+              <Image
                 src="/logo.png"
                 alt="Tranquille Real Estate Logo"
-                className="w-25 h-25 object-contain rounded-xl group-hover:rotate-12 transition-transform"
+                width={100}
+                height={100}
+                className="object-contain rounded-xl group-hover:rotate-12 transition-transform"
+                style={{ width: 'auto', height: 'auto' }}
               />
             </Link>
           )}
