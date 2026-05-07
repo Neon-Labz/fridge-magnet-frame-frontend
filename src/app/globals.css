@@ -1,26 +1,39 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 :root {
+  color-scheme: light;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  margin: 0;
+  font-family: var(--font-inter), Inter, Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(30, 58, 138, 0.08), transparent 28%),
+    linear-gradient(180deg, #fbfbff 0%, #f8f9fe 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-manrope), var(--font-inter), sans-serif;
+}
+
+button,
+input {
+  font: inherit;
 }
