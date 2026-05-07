@@ -1,7 +1,7 @@
-import Header from "@/src/components/website/Header";
-import Hero from "@/src/components/website/Hero";
-import ProductSection from "@/src/components/website/ProductSection";
-import Footer from "@/src/components/website/Footer";
+import Header from "@/components/website/Header";
+import Hero from "@/components/website/Hero";
+import ProductSection from "@/components/website/ProductSection";
+import Footer from "@/components/website/Footer";
 
 export default function Home() {
   return (

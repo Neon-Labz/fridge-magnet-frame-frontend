@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -15,18 +15,18 @@ export default function Footer() {
             />
           </div>
 
-          <p className="mt-9.5 font-inter text-[22.5px] leading-9.25 text-[#64748B]">
+          <p className="mt-9.5 font-inter text-[20px] leading-9.25 text-[#64748B]">
             © 2024 Magnify. Premium photo framing for curated memories.
             Elevating everyday moments into lasting legacies.
           </p>
         </div>
 
           <div>
-            <h4 className="font-manrope text-[22.5px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
               Navigation
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[22.5px] text-[#64748B]">
+            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
               <li>Privacy Policy</li>
               <li>Terms of Service</li>
               <li>Shipping Policy</li>
@@ -34,11 +34,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-manrope text-[22.5px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
               Connect
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[22.5px] text-[#64748B]">
+            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
               <li>Contact Us</li>
               <li>About Our Craft</li>
               <li className="font-semibold">Sustainability</li>
@@ -46,11 +46,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-manrope text-[22.5px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
               Newsletter
             </h4>
 
-            <p className="mt-[28px] font-inter text-[22.5px] leading-[30px] text-[#64748B]">
+            <p className="mt-[28px] font-inter text-[20px] leading-[30px] text-[#64748B]">
               Join our list for exclusive gallery <br />
               updates and styling tips.
             </p>
@@ -59,10 +59,10 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-[210px] px-[18px] font-inter text-[22.5px] outline-none"
+                className="w-[210px] px-[18px] font-inter text-[20px] outline-none"
               />
-              <button className="w-[66px] bg-[#002B73] text-[22.5px] text-white">
-                →
+              <button className="w-[66px] bg-[#002B73] text-[20px] text-white">
+                ?
               </button>
             </div>
           </div>
