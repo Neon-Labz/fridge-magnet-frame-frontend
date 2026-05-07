@@ -15,6 +15,20 @@ interface AddCustomerModalProps {
   } | null;
 }
 
+/**
+ * AddCustomerModal
+ *
+ * Modal used to create or edit a customer profile.
+ * - Prevents body scroll when open.
+ * - Initializes form with `initialData` when provided.
+ * - Validates required fields (name, email) and posts to `/api/v1/customers`.
+ *
+ * Props:
+ * - `isOpen`: controls visibility
+ * - `onClose`: invoked to close the modal
+ * - `onSuccess`: optional callback invoked after successful create/update
+ * - `initialData`: optional customer object used to pre-fill the form when editing
+ */
 const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData = null }: AddCustomerModalProps) => {
   const [form, setForm] = useState({
     name: '',
@@ -31,7 +45,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Reset form when modal opens
+  // Reset form when modal opens (or when `initialData` changes)
   useEffect(() => {
     if (isOpen) {
       queueMicrotask(() => {
@@ -46,10 +60,13 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
     }
   }, [initialData, isOpen]);
 
+  // Update a single field in the local form state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Validate inputs and POST/PATCH to the customers API endpoint.
+  // On success, call `onSuccess` (if provided) and close the modal.
   const handleSubmit = async () => {
     if (!form.name.trim() || !form.email.trim()) {
       setError('Name and email are required.');
@@ -70,6 +87,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.message ?? `Server error: ${res.status}`);
       }
+      // Refresh parent list and close modal
       onSuccess();
       onClose();
     } catch (err) {
@@ -79,6 +97,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
     }
   };
 
+  // Do not render modal markup when not open
   if (!isOpen) return null;
 
   return (
