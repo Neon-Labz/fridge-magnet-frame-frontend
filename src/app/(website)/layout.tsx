@@ -60,16 +60,6 @@ export default function WebsiteLayout({
             
             {/* Brand Column */}
             <div className="col-span-1">
-              <Link href="/" className="flex items-center mb-6">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/logo-removebg-preview.png"
-                  alt="Magnify Logo"
-                  width={130}
-                  height={52}
-                  className="object-contain"
-                />
-              </Link>
               <p className="text-sm text-slate-500 leading-relaxed">
                 Dedicated to preserving your most precious moments through exquisite framing craftsmanship and museum-grade materials.
               </p>
