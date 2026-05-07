@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import AddCustomerModal from '../dashboard/AddCustomerModal';
+import AddCustomerModal from '../dashboard/Customer/AddCustomerModal';
 
 const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

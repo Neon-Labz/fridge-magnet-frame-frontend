@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ProductFormData } from '@/types/product';
-import AddProductModal from '@/components/modals/AddProductModal';
+import AddProductModal from '@/components/dashboard/products/AddProductModal';
 
 export default function CreateProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
