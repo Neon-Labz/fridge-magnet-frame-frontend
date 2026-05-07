@@ -1,230 +1,88 @@
-import {
- 
-  MapPin,
-  Phone,
-  Mail,
-  Send,
-  ArrowRight,
-} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+const quickLinks = [
+  { title: "Shop All Frames", href: "/shop" },
+  { title: "Frame Customizer", href: "/customizer" },
+  { title: "Gallery Inspiration", href: "/gallery" },
+];
+
+const supportLinks = [
+  { title: "Privacy Policy", href: "/privacy" },
+  { title: "Terms of Service", href: "/terms" },
+  { title: "Shipping & Returns", href: "/shipping" },
+  { title: "Contact Us", href: "/contact" },
+];
 
 export default function Footer() {
-
-  const QuickLink = [
-    {
-      title: 'About Us',
-      path: '/about-us'
-    },
-    {
-      title: 'Our Properties',
-      path: '/properties'
-    },
-    {
-      title: 'New Projects',
-      path: 'projects'
-    },
-    {
-      title: 'Our Agents',
-      path: '/our-agents'
-    },
-    {
-      title: 'Blog & News',
-      path: '/blogs'
-    },
-    {
-      title: 'Careers',
-      path: '/careers'
-    }
-   ]
-
-  const PropertyTypes = [
-    {
-      title: 'Buying home guide',
-      path: '/blogs/ultimate-guide-buying-first-home-2024'
-    },
-    {
-      title: 'Neighborhood guide',
-      path: '/blogs/top-10-neighborhoods-families'
-    },
-    {
-      title: 'Property selling tips',
-      path: '/blogs/home-staging-tips-sell-faster'
-    },
-    {
-      title: 'Investment',
-      path: '/blogs/real-estate-investment-strategies-beginners'
-    },
-    {
-      title: 'Sustainable home',
-      path: '/blogs/sustainable-homes-future-living'
-    },
-    {
-      title: 'Market Analysis',
-      path: '/blogs/understanding-real-estate-market-trends-2024'
-    }
-  ]
-  
-
   return (
-    <footer id="contact" className="bg-dark pt-10 pb-8 text-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* Company Info */}
-          <div>
-            <a href="#" className="flex items-center gap-3 mb-6">
-              {/* <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-                <Home className="text-white w-6 h-6" />
-              </div> */}
-
-              <img
-                src="/logo.png"
-                alt="Tranquille Real Estate Logo"
-                className="w-30 h-25 object-cover rounded-xl group-hover:rotate-12 transition-transform"
-              />
-            </a>
-            <p className="text-gray-400 leading-relaxed mb-6">
-           Tranquille Real Estate, we specialize in connecting you to the finest homes, lands, and investments across Sri Lanka.
-            </p>
-            <div className="flex gap-3">
-              {/* {Socialmedias.map((media) => (
-                <a
-                  key={media.name}
-                  href={media.link}
-                  className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition"
-                >
-                  <media.icon className="w-5 h-5" />
-                </a>
-              ))} */}
+    <footer className="bg-[#f8f9fa] text-[#64748B]">
+      <div className="mx-auto w-full px-6 lg:px-8" style={{ maxWidth: '1600px' }}>
+        <div style={{ paddingTop: '60px', paddingBottom: '40px' }}>
+          <div className="flex justify-between gap-16 flex-wrap lg:flex-nowrap">
+            <div className="flex flex-col gap-4 w-full lg:w-auto min-w-[200px]">
+              <div className="h-[42px] w-[109px] -translate-y-1">
+                <Image
+                  src="/logo.png"
+                  alt="Magnify Logo"
+                  width={109}
+                  height={42}
+                  className="object-contain"
+                />
+              </div>
+              <p className="text-sm leading-[23px] max-w-[280px]">
+                Preserving your most precious moments in artisanal frames that last a lifetime.
+              </p>
             </div>
-          </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6">Quick Links</h3>
-            <ul className="space-y-3 text-gray-400">
-              {QuickLink.map((link) => (
-                <li key={link.title}>
-                  <a
-                    href={link.path}
-                    className="hover:text-primary-400 transition flex items-center gap-2"
-                  >
-                    <ArrowRight className="w-3 h-3 text-primary-400" /> {link.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="flex flex-col gap-6 w-full lg:w-auto min-w-[180px]">
+              <h3 className="text-base font-semibold text-[#1A1C1F]">Quick Links</h3>
+              <div className="flex flex-col gap-3 text-sm">
+                {quickLinks.map((link) => (
+                  <Link key={link.title} href={link.href} className="text-[#64748B] hover:text-[#003399]">
+                    {link.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
-          {/* Property Types */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6">
-              Our Blogs
-            </h3>
-            <ul className="space-y-3 text-gray-400">
-              {PropertyTypes.map((item) => (
-                <li key={item.title}>
-                  <a
-                    href={item.path}
-                    className="hover:text-primary-400 transition flex items-center gap-2"
-                  >
-                    <ArrowRight className="w-3 h-3 text-primary-400" /> {item.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="flex flex-col gap-6 w-full lg:w-auto min-w-[180px]">
+              <h3 className="text-base font-semibold text-[#1A1C1F]">Support</h3>
+              <div className="flex flex-col gap-3 text-sm">
+                {supportLinks.map((link) => (
+                  <Link key={link.title} href={link.href} className="text-[#64748B] hover:text-[#003399]">
+                    {link.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6">Contact Us</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MapPin className="text-primary-400 w-5 h-5" />
-                </div>
-                <span className="text-gray-400">
-                 Alwis Town , Wattala,
-                  <br />Sri Lanka
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Phone className="text-primary-400 w-5 h-5" />
-                </div>
-                <div>
-                  <a
-                    href="tel:+94778019399"
-                    className="text-gray-400 hover:text-primary-400 transition block"
-                  >
-                    +94 (77) 801 9399
-                  </a>
-                </div>
-              </li>
-              <li className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Mail className="text-primary-400 w-5 h-5" />
-                </div>
-                <a
-                  href="mailto:info@tranquilleproperty.lk"
-                  className="text-gray-400 hover:text-primary-400 transition"
-                >
-                  info@tranquilleproperty.lk
-                </a>
-              </li>
-            </ul>
-
-            <div className="mt-6">
-              <p className="text-white font-semibold mb-3">Newsletter</p>
-              <div className="flex gap-2">
+            <div className="flex flex-col gap-4 w-full lg:w-auto min-w-[280px]">
+              <h3 className="text-base font-semibold text-[#1A1C1F]">Join Our Studio</h3>
+              <p className="text-sm leading-5">
+                Get 10% off your next frame by joining our newsletter.
+              </p>
+              <div className="relative h-[38px] w-full">
                 <input
                   type="email"
-                  placeholder="Your email"
-                  className="flex-1 px-4 py-3 bg-white/10 rounded-xl border border-white/10 text-white placeholder-gray-500 focus:border-primary-400 outline-none transition text-sm"
+                  placeholder="Email address"
+                  className="h-full w-full rounded-l-lg border border-[#C3C6D4] bg-white px-4 text-sm text-[#64748B] outline-none"
                 />
-                <button className="bg-primary-400 hover:bg-primary-500 text-dark px-4 py-3 rounded-xl font-bold transition">
-                  <Send className="w-5 h-5" />
+                <button className="absolute right-0 top-0 flex h-full w-[43px] items-center justify-center rounded-r-lg bg-[#0040A1] text-white">
+                  <ArrowRight className="h-3 w-3" />
                 </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Bottom Footer */}
-        <div className="border-t border-white/10 pt-0">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-300 text-sm flex items-center gap-1">
-              © 2026 Tranquille Real Estate. All rights reserved. {" "}
-              <a
-                href="https://ventrax.lk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-400 hover:text-primary-300 transition"
-              >
-                Ventrax.lk
-              </a>
+          <div className="mt-12 border-t border-[#C3C6D4] pt-8">
+            <p className="text-center text-sm text-[#64748B]">
+              © 2026 Magnify Photo Frames. Curated Memories.
             </p>
-            <div className="flex gap-6">
-              <a
-                href="/privacy-policy"
-                className="text-gray-300 hover:text-primary-400 text-sm transition"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="/terms-of-service"
-                className="text-gray-300 hover:text-primary-400 text-sm transition"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="/branches"
-                className="text-gray-300 hover:text-primary-400 text-sm transition"
-              >
-                Braches
-              </a>
-            </div>
           </div>
         </div>
       </div>
     </footer>
   );
-};
+}
