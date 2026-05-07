@@ -24,7 +24,6 @@ export default function ShopViewProductDetailsSection({
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
   const [quantity, setQuantity] = useState(4);
-  const [selectedColor, setSelectedColor] = useState<'black' | 'white'>('black');
   const [personalization, setPersonalization] = useState<PersonalizationState>({
     option: 'with-frame',
     frameColor: 'black',
@@ -171,47 +170,7 @@ export default function ShopViewProductDetailsSection({
             <PersonalizationSection onChange={setPersonalization} />
           </div>
 
-          {/* Color Selection */}
-          <div className="mb-6">
-            <label className="block text-[15px] text-slate-800 mb-3">Select Color</label>
-            <div className="flex gap-4">
-              {(['black', 'white'] as const).map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className="flex flex-col items-center gap-1 group"
-                >
-                  <div
-                    className={[
-                      'w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all',
-                      selectedColor === color
-                        ? 'border-[#1A2B5E]'
-                        : 'border-transparent group-hover:border-slate-300',
-                    ].join(' ')}
-                  >
-                    <div
-                      className={[
-                        'w-[22px] h-[22px] rounded-full',
-                        color === 'black'
-                          ? 'bg-[#111]'
-                          : 'bg-white border border-slate-200 shadow-sm',
-                      ].join(' ')}
-                    />
-                  </div>
-                  <span
-                    className={[
-                      'text-xs font-semibold capitalize',
-                      selectedColor === color ? 'text-[#1A2B5E]' : 'text-slate-500',
-                    ].join(' ')}
-                  >
-                    {color}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
 
-          {/* Quantity */}
           <div className="mb-10">
             <label className="block text-[15px] text-slate-800 mb-3">Quantity</label>
             <div className="flex items-center border border-slate-200 rounded-[4px] w-fit">

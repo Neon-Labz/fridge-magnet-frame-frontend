@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-export type PersonalizationOption = 'without-frame' | 'with-frame';
+export type PersonalizationOption = 'with-frame' | 'without-frame';
 export type FrameColor = 'black' | 'white';
 
 export interface PersonalizationState {
@@ -14,32 +14,38 @@ interface PersonalizationSectionProps {
   onChange?: (state: PersonalizationState) => void;
 }
 
-const MAIN_OPTIONS: { id: PersonalizationOption; label: string; description: string }[] = [
-  {
-    id: 'with-frame',
-    label: 'With Frame',
-    description: 'Add a premium frame to your print',
-  },
-  {
-    id: 'without-frame',
-    label: 'Without Frame',
-    description: 'Print only, no frame included',
-  },
+const OPTIONS: { id: PersonalizationOption; label: string }[] = [
+  { id: 'with-frame', label: 'With Frame' },
+  { id: 'without-frame', label: 'Without Frame' },
 ];
 
-const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
-  { id: 'black', label: 'Black Frame', swatch: 'bg-[#111]' },
-  { id: 'white', label: 'White Frame', swatch: 'bg-white border border-slate-300' },
+const FRAME_COLORS: { id: FrameColor; label: string }[] = [
+  { id: 'black', label: 'Black' },
+  { id: 'white', label: 'White' },
 ];
 
 export default function PersonalizationSection({ onChange }: PersonalizationSectionProps) {
   const [selectedOption, setSelectedOption] = useState<PersonalizationOption>('with-frame');
   const [selectedFrame, setSelectedFrame] = useState<FrameColor>('black');
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleOptionChange = (option: PersonalizationOption) => {
-    setSelectedOption(option);
+  /* Close dropdown when clicking outside */
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleOptionSelect = (opt: PersonalizationOption) => {
+    setSelectedOption(opt);
+    setIsOpen(false);
     const state: PersonalizationState =
-      option === 'with-frame' ? { option, frameColor: selectedFrame } : { option };
+      opt === 'with-frame' ? { option: opt, frameColor: selectedFrame } : { option: opt };
     onChange?.(state);
   };
 
@@ -48,109 +54,99 @@ export default function PersonalizationSection({ onChange }: PersonalizationSect
     onChange?.({ option: 'with-frame', frameColor: frame });
   };
 
+  const selectedLabel = OPTIONS.find((o) => o.id === selectedOption)?.label ?? '';
+
   return (
     <div className="w-full">
-      <h3 className="text-[15px] font-semibold text-slate-800 mb-3">Personalization</h3>
+      {/* ── Personalization Dropdown ─────────────────────────────── */}
+      <label className="block text-[15px] text-slate-700 mb-3">Personalization</label>
 
-      {/* Main Option Cards */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        {MAIN_OPTIONS.map((opt) => {
-          const isSelected = selectedOption === opt.id;
-          return (
-            <button
-              key={opt.id}
-              onClick={() => handleOptionChange(opt.id)}
-              className={[
-                'flex-1 flex items-start gap-3 px-4 py-3 rounded-lg border-2 text-left transition-all duration-200',
-                isSelected
-                  ? 'border-[#1A2B5E] bg-[#1A2B5E]/5'
-                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {/* Custom Radio */}
-              <span
+      <div className="relative" ref={dropdownRef}>
+        {/* Trigger button */}
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="w-full flex items-center justify-between px-5 py-3.5 rounded-full border-2 border-[#1A2B5E] bg-[#F0F2F8] text-[15px] font-semibold text-slate-800 hover:bg-[#E8EBFA] transition-colors"
+        >
+          <span>{selectedLabel}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className={[
+              'w-5 h-5 text-slate-700 transition-transform duration-200',
+              isOpen ? 'rotate-180' : 'rotate-0',
+            ].join(' ')}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
+
+        {/* Dropdown list */}
+        {isOpen && (
+          <div className="absolute z-20 top-[calc(100%+6px)] left-0 w-full bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+            {OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => handleOptionSelect(opt.id)}
                 className={[
-                  'mt-0.5 flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors',
-                  isSelected ? 'border-[#1A2B5E]' : 'border-slate-300',
+                  'w-full text-left px-5 py-3.5 text-[15px] font-medium transition-colors',
+                  selectedOption === opt.id
+                    ? 'bg-[#F0F2F8] text-[#1A2B5E] font-semibold'
+                    : 'text-slate-700 hover:bg-slate-50',
                 ].join(' ')}
               >
-                {isSelected && (
-                  <span className="w-2 h-2 rounded-full bg-[#1A2B5E]" />
-                )}
-              </span>
-
-              <span className="flex flex-col">
-                <span
-                  className={[
-                    'text-sm font-semibold',
-                    isSelected ? 'text-[#1A2B5E]' : 'text-slate-700',
-                  ].join(' ')}
-                >
-                  {opt.label}
-                </span>
-                <span className="text-xs text-slate-400 mt-0.5">{opt.description}</span>
-              </span>
-            </button>
-          );
-        })}
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Sub-option: Frame Color (only when "With Frame" selected) */}
+      {/* ── Color Swatches (only when With Frame) ────────────────── */}
       {selectedOption === 'with-frame' && (
-        <div className="border border-slate-200 rounded-lg p-4 bg-slate-50 transition-all duration-200">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-            Choose Frame Color
-          </p>
-          <div className="flex gap-3">
+        <div className="mt-6">
+          <p className="text-[15px] text-slate-700 mb-4">Select Color</p>
+          <div className="flex items-start gap-6">
             {FRAME_COLORS.map((fc) => {
               const isActive = selectedFrame === fc.id;
               return (
                 <button
                   key={fc.id}
                   onClick={() => handleFrameChange(fc.id)}
-                  className={[
-                    'flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-all duration-200',
-                    isActive
-                      ? 'border-[#1A2B5E] bg-white shadow-sm text-[#1A2B5E]'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
-                  ].join(' ')}
+                  className="flex flex-col items-center gap-2 group"
                 >
-                  {/* Swatch circle */}
+                  {/* Outer ring */}
+                  <div
+                    className={[
+                      'w-14 h-14 rounded-full flex items-center justify-center border-[3px] transition-all duration-200',
+                      isActive ? 'border-[#1A2B5E]' : 'border-transparent group-hover:border-slate-300',
+                    ].join(' ')}
+                  >
+                    {/* Inner swatch */}
+                    <div
+                      className={[
+                        'w-10 h-10 rounded-full transition-transform duration-200 group-hover:scale-105',
+                        fc.id === 'black'
+                          ? 'bg-[#0D1B40]'
+                          : 'bg-[#E8EAF0] border border-slate-200',
+                      ].join(' ')}
+                    />
+                  </div>
+                  {/* Label */}
                   <span
                     className={[
-                      'w-4 h-4 rounded-full flex-shrink-0',
-                      fc.swatch,
+                      'text-sm font-semibold',
+                      isActive ? 'text-[#1A2B5E]' : 'text-slate-400',
                     ].join(' ')}
-                  />
-                  {fc.label}
-                  {isActive && (
-                    <span className="ml-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="w-4 h-4 text-[#1A2B5E]"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                  )}
+                  >
+                    {fc.label}
+                  </span>
                 </button>
               );
             })}
           </div>
-
-          {/* Selection summary */}
-          <p className="mt-3 text-xs text-slate-400">
-            Selected:{' '}
-            <span className="font-semibold text-[#1A2B5E] capitalize">
-              {selectedFrame} frame
-            </span>
-          </p>
         </div>
       )}
     </div>
