@@ -62,7 +62,7 @@ function CartItem({
         {/* Title Row */}
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', padding: 0, width: '100%', flexGrow: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '6px', flexGrow: 1 }}>
-            <h3 style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '26px', lineHeight: '32px', color: '#002B73', margin: 0, flex: 'none' }}>
+            <h3 style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', letterSpacing: '0px', verticalAlign: 'middle', color: '#002B73', margin: 0, flex: 'none' }}>
               {item.title}
             </h3>
             <p style={{ fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 400, fontSize: '14px', lineHeight: '20px', color: '#747784', margin: 0, flex: 'none' }}>
@@ -109,7 +109,7 @@ function CartItem({
 
           {/* Price - Far Right */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', padding: 0, flex: 'none', marginLeft: 'auto', height: '40px' }}>
-            <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 700, fontSize: '30px', lineHeight: '40px', color: '#002B73', textAlign: 'right' }}>
+            <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '30px', lineHeight: '40px', color: '#1D2128', textAlign: 'right' }}>
               Rs{(item.price * item.quantity).toFixed(2)}
             </div>
           </div>

@@ -54,7 +54,7 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '4px', width: '235.41px', height: '56px', flex: 'none', order: 0, flexGrow: 0 }}>
             {/* Title */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, width: '235.41px', height: '32px', flex: 'none', order: 0, alignSelf: 'stretch', flexGrow: 0 }}>
-              <h3 style={{ width: '235.41px', height: '32px', fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', display: 'flex', alignItems: 'center', color: '#002B73', flex: 'none', order: 0, flexGrow: 0, margin: 0 }}>
+              <h3 style={{ width: '235.41px', height: '32px', fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', letterSpacing: '0px', verticalAlign: 'middle', display: 'flex', alignItems: 'center', color: '#002B73', flex: 'none', order: 0, flexGrow: 0, margin: 0 }}>
                 {name}
               </h3>
             </div>
@@ -97,7 +97,7 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
 
             {/* Price */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', padding: 0, width: '111px', height: '34px', flex: 'none', order: 1, flexGrow: 0 }}>
-              <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', textAlign: 'right', color: '#1A1C1F' }}>
+              <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', textAlign: 'right', color: '#1D2128' }}>
                 Rs{(price * qty).toFixed(2)}
               </div>
             </div>
