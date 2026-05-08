@@ -51,6 +51,10 @@ export default function Header() {
           >
             Contact
           </Link>
+
+          <Link href="/price" className="text-[#475569]">
+            Price
+          </Link>
         </div>
 
         {/* RIGHT SIDE */}

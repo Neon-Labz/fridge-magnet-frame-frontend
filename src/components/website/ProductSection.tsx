@@ -6,7 +6,7 @@ import { useFrameStore } from "@/store/frameStore";
 
 const products = [
   {
-    title: "Magnate Frame",
+    title: "Magnet Frame",
     desc: "Sustainably sourced solid oak with museum-grade acrylic.",
     price: "Rs 500.00",
     img: "/product-1.png",
@@ -14,14 +14,14 @@ const products = [
     frameOption: "without-frame" as const,
   },
   {
-    title: "Magnate With Black Frame",
+    title: "Magnet With Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
     price: "Rs 1000.00",
     img: "/product-2.png",
     frameOption: "black-frame" as const,
   },
   {
-    title: "Magnate With White Frame",
+    title: "Magnet With White Frame",
     desc: "Brushed gold aluminum that brings warmth to any room.",
     price: "Rs 1000.00",
     img: "/product-3.png",
