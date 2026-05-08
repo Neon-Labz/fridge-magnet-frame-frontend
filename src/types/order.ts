@@ -8,4 +8,6 @@ export interface Order {
   customerId: string;
   qty: number;
   status: OrderStatus;
+  email?: string;
+  totalValue?: number;
 }
