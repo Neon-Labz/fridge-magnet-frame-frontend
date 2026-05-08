@@ -12,7 +12,7 @@ export default function VideoSection() {
           </h2>
           <div className="mt-[16px] h-[3px] w-[90px] bg-[#BC0000]"></div>
           
-          <p className="mt-[40px] max-w-[450px] font-inter text-[18px] leading-[32px] text-[#434652] lg:text-[22px] lg:leading-[36px]">
+          <p className="mt-[40px] max-w-[550px] font-inter text-[30px] font-normal leading-[37px] tracking-[1px] text-[#4B5563]">
             Your memories - printed, magnetised & displayed on premium tiles that stick straight to your fridge.
           </p>
         </div>
