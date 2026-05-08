@@ -16,19 +16,63 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
   const pathname = usePathname();
 
   return (
-    <aside
-      className={`fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
-        open ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}
-      style={{ width: 252, height: '100vh', borderRight: '1px solid #F1F5F9' }}
-    >
-      {/* Logo section — same height as TopAppBar */}
-      <div
-        className="flex items-center justify-center flex-shrink-0"
-        style={{ height: 89, borderBottom: '1px solid #F1F5F9', padding: '0 24px' }}
+    <>
+      <style>{`
+        .sidebar {
+          width: 252px;
+          height: 100vh;
+          border-right: 1px solid #F1F5F9;
+        }
+        .sidebar-logo {
+          height: 89px;
+          border-bottom: 1px solid #F1F5F9;
+          padding: 0 24px;
+        }
+        .nav-link {
+          background: transparent;
+          border-right: 4px solid transparent;
+        }
+        .nav-link.active {
+          background: #EFF6FF;
+          border-right: 4px solid #1E3A8A;
+        }
+        .nav-link-icon {
+          flex-shrink: 0;
+        }
+        .nav-link-text {
+          font-size: 14px;
+        }
+        .nav-link-text.active {
+          font-weight: 600;
+          color: #1E3A8A;
+        }
+        .nav-link-text.inactive {
+          font-weight: 500;
+          color: #475569;
+        }
+        .logout-btn {
+          transition: background 0.2s;
+        }
+        .logout-btn:hover {
+          background: #f1f5f9;
+        }
+      `}</style>
+      <aside
+        className={`sidebar fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
+          open ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
       >
+        {/* Logo section — same height as TopAppBar */}
+        <div className="sidebar-logo flex items-center justify-center flex-shrink-0">
         <Link href="/dashboard/products">
-          <Image src="/logo.png" alt="Magnify" width={140} height={48} priority />
+          <Image
+            src="/logo.png"
+            alt="Magnify"
+            width={140}
+            height={48}
+            priority
+            style={{ width: 'auto', height: 'auto' }}
+          />
         </Link>
       </div>
 
@@ -41,23 +85,15 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
               key={label}
               href={href}
               onClick={onClose}
-              className="flex items-center gap-3 px-6 py-4 w-full transition-colors"
-              style={{
-                background: isActive ? '#EFF6FF' : 'transparent',
-                borderRight: isActive ? '4px solid #1E3A8A' : '4px solid transparent',
-              }}
+              className={`nav-link flex items-center gap-3 px-6 py-4 w-full transition-colors ${isActive ? 'active' : ''}`}
             >
               <Icon
                 size={20}
                 color={isActive ? '#1E3A8A' : '#475569'}
-                style={{ flexShrink: 0 }}
+                className="nav-link-icon"
               />
               <span
-                className="text-sm"
-                style={{
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? '#1E3A8A' : '#475569',
-                }}
+                className={`nav-link-text ${isActive ? 'active' : 'inactive'}`}
               >
                 {label}
               </span>
@@ -69,7 +105,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
       {/* Logout */}
       <div className="px-4 py-4">
         <button
-          className="flex items-center gap-3 px-3 py-3 rounded-lg w-full transition hover:bg-slate-50"
+          className="logout-btn flex items-center gap-3 px-3 py-3 rounded-lg w-full transition hover:bg-slate-50"
         >
           <LogOut size={18} color="#475569" style={{ flexShrink: 0 }} />
           <span className="text-sm font-semibold" style={{ color: '#475569' }}>
@@ -78,5 +114,6 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
         </button>
       </div>
     </aside>
+    </>
   );
 }

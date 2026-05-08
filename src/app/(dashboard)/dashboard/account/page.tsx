@@ -2,13 +2,26 @@
 
 export default function AccountPage() {
   return (
-    <div className="p-6 sm:p-8">
-      <h1 className="text-3xl font-bold" style={{ color: '#002B73' }}>
-        Account
-      </h1>
-      <p className="mt-2 text-sm" style={{ color: '#64748B' }}>
-        Account page is ready for profile and admin account settings.
-      </p>
-    </div>
+    <>
+      <style>{`
+        .account-container {
+          padding: 2rem;
+        }
+        .account-title {
+          color: #002B73;
+        }
+        .account-description {
+          color: #64748B;
+        }
+      `}</style>
+      <div className="account-container">
+        <h1 className="text-3xl font-bold account-title">
+          Account
+        </h1>
+        <p className="mt-2 text-sm account-description">
+          Account settings page coming soon.
+        </p>
+      </div>
+    </>
   );
 }

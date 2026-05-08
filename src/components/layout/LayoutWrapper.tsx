@@ -9,25 +9,33 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="h-screen overflow-hidden bg-white">
-      <TopAppBar onMenuClick={() => setSidebarOpen(v => !v)} />
+    <>
+      <style>{`
+        .layout-main {
+          margin-top: 89px;
+          height: calc(100vh - 89px);
+          background-color: #FFFFFF;
+        }
+      `}</style>
+      <div className="h-screen overflow-hidden bg-white">
+        <TopAppBar onMenuClick={() => setSidebarOpen(v => !v)} />
 
-      {/* Mobile backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+        {/* Mobile backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main
-        className="flex flex-col overflow-hidden lg:ml-[252px]"
-        style={{ marginTop: 89, height: 'calc(100vh - 89px)', backgroundColor: '#FFFFFF' }}
-      >
-        {children}
-      </main>
-    </div>
+        <main
+          className="layout-main flex flex-col overflow-hidden lg:ml-[252px]"
+        >
+          {children}
+        </main>
+      </div>
+    </>
   );
 }
