@@ -34,7 +34,7 @@ function StatCard({
 
 export default function OrderStats() {
   return (
-    <div className="flex-shrink-0 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-5">
+    <div className="flex-shrink-0 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-5 ">
       <StatCard
         label="Total Orders"
         value={ORDER_STATS.totalOrders.value}

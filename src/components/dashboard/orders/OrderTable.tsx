@@ -1,6 +1,7 @@
 import { Trash2 } from 'lucide-react';
 import type { Order } from '@/types/order';
 import StatusBadge from './StatusBadge';
+import Link from "next/link";
 
 interface OrderTableProps {
   orders: Order[];
@@ -72,7 +73,12 @@ export default function OrderTable({ orders, onDelete }: OrderTableProps) {
               </td>
 
               <td className="px-6 py-[24.5px]">
-                <StatusBadge status={order.status} />
+                <Link
+                    href={`/dashboard/orders/${order.id}`}
+                    className="inline-flex"
+                  >
+                    <StatusBadge status={order.status} />
+                  </Link>            
               </td>
 
               <td className="px-6 py-[16.5px] text-right">

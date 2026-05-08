@@ -11,7 +11,7 @@ export default function StatusBadge({ status }: { status: OrderStatus }) {
   const { label, bg, color } = STATUS_MAP[status];
   return (
     <span
-      className="inline-flex items-center font-semibold text-xs uppercase"
+      className="inline-flex items-center font-semibold text-xs uppercase "
       style={{ background: bg, color, borderRadius: 9999, padding: '3.5px 12px', letterSpacing: '0.04em' }}
     >
       {label}

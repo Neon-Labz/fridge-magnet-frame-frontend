@@ -1,9 +1,16 @@
 'use client';
 
-import { Package, ShoppingCart, Users, UserCog, LogOut } from 'lucide-react';
+import {
+  Package,
+  ShoppingCart,
+  Users,
+  UserCog,
+  LogOut,
+} from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const NAV_ITEMS = [
   { label: 'Products', icon: Package, href: '/dashboard/products' },
@@ -12,58 +19,40 @@ const NAV_ITEMS = [
   { label: 'Account', icon: UserCog, href: '/dashboard/account' },
 ] as const;
 
-export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
+export default function Sidebar({
+  open = false,
+  onClose,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push('/');
+  };
 
   return (
-    <>
-      <style>{`
-        .sidebar {
-          width: 252px;
-          height: 100vh;
-          border-right: 1px solid #F1F5F9;
-        }
-        .sidebar-logo {
-          height: 89px;
-          border-bottom: 1px solid #F1F5F9;
-          padding: 0 24px;
-        }
-        .nav-link {
-          background: transparent;
-          border-right: 4px solid transparent;
-        }
-        .nav-link.active {
-          background: #EFF6FF;
-          border-right: 4px solid #1E3A8A;
-        }
-        .nav-link-icon {
-          flex-shrink: 0;
-        }
-        .nav-link-text {
-          font-size: 14px;
-        }
-        .nav-link-text.active {
-          font-weight: 600;
-          color: #1E3A8A;
-        }
-        .nav-link-text.inactive {
-          font-weight: 500;
-          color: #475569;
-        }
-        .logout-btn {
-          transition: background 0.2s;
-        }
-        .logout-btn:hover {
-          background: #f1f5f9;
-        }
-      `}</style>
-      <aside
-        className={`sidebar fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
-          open ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+    <aside
+      className={`fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
+        open ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0`}
+      style={{
+        width: 252,
+        height: '100vh',
+        borderRight: '1px solid #F1F5F9',
+      }}
+    >
+      {/* Logo section */}
+      <div
+        className="flex flex-shrink-0 items-center justify-center"
+        style={{
+          height: 89,
+          borderBottom: '1px solid #F1F5F9',
+          padding: '0 24px',
+        }}
       >
-        {/* Logo section — same height as TopAppBar */}
-        <div className="sidebar-logo flex items-center justify-center flex-shrink-0">
         <Link href="/dashboard/products">
           <Image
             src="/logo.png"
@@ -77,23 +66,36 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
       </div>
 
       {/* Nav items */}
-      <nav className="flex flex-col gap-1 pt-[25px] flex-1">
+      <nav className="flex flex-1 flex-col gap-1 pt-[25px]">
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
-          const isActive = pathname === href || pathname.startsWith(href + '/');
+          const isActive =
+            pathname === href || pathname.startsWith(href + '/');
+
           return (
             <Link
               key={label}
               href={href}
               onClick={onClose}
-              className={`nav-link flex items-center gap-3 px-6 py-4 w-full transition-colors ${isActive ? 'active' : ''}`}
+              className="flex w-full items-center gap-3 px-6 py-4 transition-colors"
+              style={{
+                background: isActive ? '#EFF6FF' : 'transparent',
+                borderRight: isActive
+                  ? '4px solid #1E3A8A'
+                  : '4px solid transparent',
+              }}
             >
               <Icon
                 size={20}
                 color={isActive ? '#1E3A8A' : '#475569'}
-                className="nav-link-icon"
+                className="flex-shrink-0"
               />
+
               <span
-                className={`nav-link-text ${isActive ? 'active' : 'inactive'}`}
+                className="text-[14px]"
+                style={{
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? '#1E3A8A' : '#475569',
+                }}
               >
                 {label}
               </span>
@@ -105,15 +107,19 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
       {/* Logout */}
       <div className="px-4 py-4">
         <button
-          className="logout-btn flex items-center gap-3 px-3 py-3 rounded-lg w-full transition hover:bg-slate-50"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 transition hover:bg-slate-50"
         >
           <LogOut size={18} color="#475569" style={{ flexShrink: 0 }} />
-          <span className="text-sm font-semibold" style={{ color: '#475569' }}>
+
+          <span
+            className="text-[14px] font-semibold"
+            style={{ color: '#475569' }}
+          >
             Logout
           </span>
         </button>
       </div>
     </aside>
-    </>
   );
 }

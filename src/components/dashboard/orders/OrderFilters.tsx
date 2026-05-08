@@ -50,7 +50,7 @@ export default function OrderFilters({
   totalItems,
 }: OrderFiltersProps) {
   return (
-    <div className="flex-shrink-0 flex items-center justify-between px-6" style={{ height: 53, borderBottom: '1px solid #C3C6D4', background: 'rgba(248,250,252,0.5)', position: 'relative', zIndex: 20 }}>
+    <div className="flex-shrink-0 flex items-center justify-between px-6 " style={{ height: 53, borderBottom: '1px solid #C3C6D4', background: 'rgba(248,250,252,0.5)', position: 'relative', zIndex: 20 }}>
       <div className="flex items-center gap-4">
         <div className="relative">
           <button onClick={onFilterToggle}

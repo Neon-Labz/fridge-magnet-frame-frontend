@@ -86,3 +86,4 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
     </>
   );
 }
+
