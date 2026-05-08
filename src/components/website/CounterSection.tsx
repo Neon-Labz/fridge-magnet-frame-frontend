@@ -63,12 +63,13 @@ export default function GalleryOfferSection({
   const formatTime = (time: number) => time.toString().padStart(2, "0");
 
   return (
-    <section 
-      className="w-full flex justify-center px-[20px] py-[40px]"
+    <section
+      className="w-full flex justify-center px-[20px] py-[80px] lg:py-[120px]"
     >
-      <div 
-        className="w-full max-w-[1273px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
+      <div
+        className="w-full max-w-[1800px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
         style={{
+          minHeight: "420px",
           background: "linear-gradient(105deg, #071E54 75%, #133074 75%)",
           color: "white"
         }}
