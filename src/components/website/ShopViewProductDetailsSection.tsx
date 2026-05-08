@@ -5,6 +5,7 @@ import Image from 'next/image';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
+import { useFrameStore } from '@/store/frameStore';
 
 interface ShopViewProductDetailsSectionProps {
   title?: string;
@@ -24,11 +25,22 @@ export default function ShopViewProductDetailsSection({
   description =
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
+  const selectedFrame = useFrameStore((state) => state.selectedFrame);
   const [quantity, setQuantity] = useState(4);
-  const [personalization, setPersonalization] = useState<PersonalizationState>({
-    option: 'with-frame',
-    frameColor: 'black',
-  });
+
+  const getInitialPersonalization = () => {
+    if (selectedFrame === 'without-frame') {
+      return { option: 'without-frame' as const };
+    }
+    return {
+      option: 'with-frame' as const,
+      frameColor: selectedFrame === 'white-frame' ? ('white' as const) : ('black' as const),
+    };
+  };
+
+  const [personalization, setPersonalization] = useState<PersonalizationState>(
+    getInitialPersonalization()
+  );
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -57,6 +69,15 @@ export default function ShopViewProductDetailsSection({
         : 'Magnate picture with black frame';
     }
     return 'Magnate picture without frame';
+  };
+
+  const getDynamicTitle = () => {
+    if (personalization.option === 'with-frame') {
+      return personalization.frameColor === 'white'
+        ? 'Magnate picture with white frame'
+        : 'Magnate picture with black frame';
+    }
+    return 'Magnate frame';
   };
 
   return (
@@ -133,7 +154,7 @@ export default function ShopViewProductDetailsSection({
 
         {/* ── Right Column: Details ────────────────────────────────── */}
         <div className="flex flex-col pt-4">
-          <h1 className="text-[22px] text-slate-800 font-medium mb-3">{title}</h1>
+          <h1 className="text-[22px] text-slate-800 font-medium mb-3">{getDynamicTitle()}</h1>
 
           {/* Rating */}
           <div className="flex items-center gap-4 mb-6">
@@ -175,7 +196,11 @@ export default function ShopViewProductDetailsSection({
 
           {/* ── Personalization Section ─────────────────────────── */}
           <div className="mb-8">
-            <PersonalizationSection onChange={setPersonalization} />
+            <PersonalizationSection
+              onChange={setPersonalization}
+              initialOption={personalization.option}
+              initialFrameColor={personalization.frameColor}
+            />
           </div>
 
 

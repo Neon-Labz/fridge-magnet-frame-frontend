@@ -12,6 +12,8 @@ export interface PersonalizationState {
 
 interface PersonalizationSectionProps {
   onChange?: (state: PersonalizationState) => void;
+  initialOption?: PersonalizationOption;
+  initialFrameColor?: FrameColor;
 }
 
 const OPTIONS: { id: PersonalizationOption; label: string }[] = [
@@ -24,9 +26,9 @@ const FRAME_COLORS: { id: FrameColor; label: string }[] = [
   { id: 'white', label: 'White' },
 ];
 
-export default function PersonalizationSection({ onChange }: PersonalizationSectionProps) {
-  const [selectedOption, setSelectedOption] = useState<PersonalizationOption>('with-frame');
-  const [selectedFrame, setSelectedFrame] = useState<FrameColor>('black');
+export default function PersonalizationSection({ onChange, initialOption = 'with-frame', initialFrameColor = 'black' }: PersonalizationSectionProps) {
+  const [selectedOption, setSelectedOption] = useState<PersonalizationOption>(initialOption);
+  const [selectedFrame, setSelectedFrame] = useState<FrameColor>(initialFrameColor);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
