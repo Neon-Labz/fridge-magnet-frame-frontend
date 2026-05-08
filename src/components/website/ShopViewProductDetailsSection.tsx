@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
@@ -32,15 +33,31 @@ export default function ShopViewProductDetailsSection({
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  /* ── Frame visual helpers ─────────────────────────────────────── */
-  const showFrame = personalization.option === 'with-frame';
-  const frameColor = personalization.frameColor ?? 'black';
+  /* ── Image selection based on personalization ─────────────────── */
+  const getMainImageSource = () => {
+    if (personalization.option === 'with-frame') {
+      return personalization.frameColor === 'white'
+        ? '/white-frame-product.png'
+        : '/black-frame-product.jpg';
+    }
+    return '/without-frame.png';
+  };
 
-  const frameOuterClass = showFrame
-    ? frameColor === 'black'
-      ? 'bg-black'
-      : 'bg-white border-4 border-slate-200 shadow-md'
-    : 'bg-transparent';
+  const getThumbnailImageSource = (frameType: 'black' | 'white' | 'no-frame') => {
+    if (frameType === 'white') return '/white-frame-product.png';
+    if (frameType === 'no-frame') return '/without-frame.png';
+    return '/black-frame-product.jpg';
+  };
+
+  const mainImageSource = getMainImageSource();
+  const getMainImageAlt = () => {
+    if (personalization.option === 'with-frame') {
+      return personalization.frameColor === 'white'
+        ? 'Magnate picture with white frame'
+        : 'Magnate picture with black frame';
+    }
+    return 'Magnate picture without frame';
+  };
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,39 +68,14 @@ export default function ShopViewProductDetailsSection({
 
           {/* Main Image */}
           <div className="bg-[#F4F3ED] aspect-[4/5] rounded-sm flex items-center justify-center relative overflow-hidden">
-
-            {showFrame && frameColor === 'black' ? (
-              /* Real product photo — With Frame + Black */
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/black-frame-product.jpg"
-                alt="Magnate picture with black frame"
-                className="w-full h-full object-cover transition-opacity duration-300"
-              />
-            ) : (
-              /* Mockup panels for White Frame / Without Frame */
-              <div
-                className={[
-                  'absolute transition-all duration-300',
-                  showFrame ? 'inset-10 p-4' : 'inset-6 p-0',
-                  frameOuterClass,
-                ].join(' ')}
-              >
-                <div className="w-full h-full flex flex-wrap gap-2">
-                  <div className="w-[calc(50%-4px)] h-[calc(50%-4px)] bg-slate-200" />
-                  <div className="w-[calc(50%-4px)] h-[calc(50%-4px)] bg-slate-300" />
-                  <div className="w-[calc(50%-4px)] h-[calc(50%-4px)] bg-slate-400" />
-                  <div className="w-[calc(50%-4px)] h-[calc(50%-4px)] bg-slate-500" />
-                </div>
-              </div>
-            )}
-
-            {/* Frame label badge (only for white frame mockup) */}
-            {showFrame && frameColor === 'white' && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white text-slate-700 border border-slate-200">
-                White Frame
-              </div>
-            )}
+            <Image
+              src={mainImageSource}
+              alt={getMainImageAlt()}
+              width={500}
+              height={625}
+              className="w-full h-full object-cover transition-opacity duration-300"
+              priority
+            />
 
             {/* Zoom icon */}
             <button className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-sm hover:shadow-md transition-shadow z-10">
@@ -106,23 +98,35 @@ export default function ShopViewProductDetailsSection({
 
           {/* Thumbnails */}
           <div className="flex gap-4">
-            {/* Black frame thumbnail — real photo */}
+            {/* Black frame thumbnail */}
             <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/black-frame-product.jpg"
+              <Image
+                src={getThumbnailImageSource('black')}
                 alt="Black frame thumbnail"
+                width={128}
+                height={160}
                 className="w-full h-full object-cover"
               />
             </div>
             {/* White frame thumbnail */}
-            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm flex items-center justify-center p-3 border-2 border-transparent hover:border-slate-300 cursor-pointer transition-colors opacity-70 hover:opacity-100">
-              <div className="w-full h-full bg-white border border-slate-200 shadow-sm p-1 flex flex-wrap gap-1">
-                <div className="w-[calc(50%-2px)] h-[calc(50%-2px)] bg-slate-200" />
-                <div className="w-[calc(50%-2px)] h-[calc(50%-2px)] bg-slate-300" />
-                <div className="w-[calc(50%-2px)] h-[calc(50%-2px)] bg-slate-400" />
-                <div className="w-[calc(50%-2px)] h-[calc(50%-2px)] bg-slate-500" />
-              </div>
+            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
+              <Image
+                src={getThumbnailImageSource('white')}
+                alt="White frame thumbnail"
+                width={128}
+                height={160}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Without frame thumbnail */}
+            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
+              <Image
+                src={getThumbnailImageSource('no-frame')}
+                alt="Without frame thumbnail"
+                width={128}
+                height={160}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
