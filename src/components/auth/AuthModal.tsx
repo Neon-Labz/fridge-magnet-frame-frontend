@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
-import { useAuthModal, AuthModalView } from '@/hooks/useAuthModal'
+import { useAuthModal } from '@/hooks/useAuthModal'
 import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'

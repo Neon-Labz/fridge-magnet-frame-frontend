@@ -5,7 +5,11 @@ import type { ReactNode } from "react";
 import TopAppBar from "./TopAppBar";
 import Sidebar from "./Sidebar";
 
-export default function LayoutWrapper({ children }: { children: ReactNode }) {
+export default function LayoutWrapper({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -19,7 +23,10 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
         />
       )}
 
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <main
         className="flex flex-col overflow-hidden lg:ml-[252px]"

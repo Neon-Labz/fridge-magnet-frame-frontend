@@ -40,9 +40,9 @@ export default function ForgotPasswordForm() {
         setSuccess(true)
         console.log('Reset link sent:', response.data)
       } else {
-        setError(response.error || 'Failed to send reset link')
+        setError(response.error || 'An error occurred')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)
@@ -61,7 +61,7 @@ export default function ForgotPasswordForm() {
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Check Your Email</h2>
           <p className="text-gray-600">
-            We've sent password reset instructions to your email address.
+            We&apos;ve sent password reset instructions to your email address.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function ForgotPasswordForm() {
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h2>
         <p className="text-gray-600 text-sm">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
         </p>
       </div>
 

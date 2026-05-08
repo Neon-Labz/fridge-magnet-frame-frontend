@@ -1,9 +1,5 @@
-import { Hero } from '@/components/website/Hero';
+import HomePage from './(website)/home/page';
 
 export default function Page() {
-  return (
-    <main className="min-h-screen">
-      <Hero />
-    </main>
-  );
+  return <HomePage />;
 }

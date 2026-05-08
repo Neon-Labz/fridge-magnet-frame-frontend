@@ -29,7 +29,6 @@ export default function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
 
-  // ADD THIS
   const handleLogout = () => {
     router.push('/');
   };
@@ -40,7 +39,7 @@ export default function Sidebar({
         open ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}
       style={{
-        width: 300,
+        width: 252,
         height: '100vh',
         borderRight: '1px solid #F1F5F9',
       }}
@@ -61,6 +60,7 @@ export default function Sidebar({
             width={140}
             height={48}
             priority
+            style={{ width: 'auto', height: 'auto' }}
           />
         </Link>
       </div>
@@ -87,11 +87,11 @@ export default function Sidebar({
               <Icon
                 size={20}
                 color={isActive ? '#1E3A8A' : '#475569'}
-                style={{ flexShrink: 0 }}
+                className="flex-shrink-0"
               />
 
               <span
-                className="text-l font-bold"
+                className="text-[14px]"
                 style={{
                   fontWeight: isActive ? 600 : 500,
                   color: isActive ? '#1E3A8A' : '#475569',
@@ -113,7 +113,7 @@ export default function Sidebar({
           <LogOut size={18} color="#475569" style={{ flexShrink: 0 }} />
 
           <span
-            className="text-l font-semibold"
+            className="text-[14px] font-semibold"
             style={{ color: '#475569' }}
           >
             Logout

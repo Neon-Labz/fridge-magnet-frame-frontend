@@ -1,25 +1,20 @@
-import type { Metadata } from "next";
-import { Inter, Playfair_Display, Manrope } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Magnify | Premium Fridge Magnet Frames",
-  description: "Premium custom fridge magnet frames for your memories.",
+  title: 'Magnify',
+  description: 'Frames',
 };
 
 export default function RootLayout({
@@ -30,9 +25,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${manrope.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      data-scroll-behavior="smooth"
     >
-      <body className="font-inter antialiased">{children}</body>
+      <body className="min-h-full flex flex-col antialiased">
+        {children}
+      </body>
     </html>
   );
 }
