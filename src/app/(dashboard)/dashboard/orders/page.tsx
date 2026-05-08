@@ -1,8 +1,4 @@
-import OrderStatus from '@/src/components/dashboard/orders/OrderStatus';
 
-export default function Page() {
-  return <OrderStatus />;
-}
 'use client';
 
 import { useState } from 'react';
@@ -67,8 +63,7 @@ export default function OrdersPage() {
         onConfirm={confirmDelete}
       />
 
-      <div className="flex flex-col h-full w-full px-4 sm:px-8 pt-6 sm:pt-8 pb-0">
-        <OrderHeader />
+<div className="ml-[100px] flex h-full w-[calc(100%-100px)] flex-col px-4 pt-6 pb-0 sm:px-8 sm:pt-8">        <OrderHeader />
         
         <OrderStats />
 

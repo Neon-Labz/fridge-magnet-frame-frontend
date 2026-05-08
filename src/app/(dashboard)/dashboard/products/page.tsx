@@ -96,7 +96,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex flex-col h-full w-full px-4 sm:px-8 pt-6 sm:pt-8 pb-0">
+      <div className="ml-[100px] flex flex-col h-full  px-4 sm:px-8 pt-6 sm:pt-8 pb-0">
         <ProductHeader onAddClick={() => setAddOpen(true)} />
         
         <ProductStats />

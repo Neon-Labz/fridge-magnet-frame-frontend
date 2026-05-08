@@ -9,6 +9,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90122',
     qty: 3,
     status: 'shipped',
+    email: 'eleanor@example.com',
+    totalValue: 450,
   },
   {
     id: '2',
@@ -18,6 +20,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90455',
     qty: 1,
     status: 'pending',
+    email: 'julian@example.com',
+    totalValue: 150,
   },
   {
     id: '3',
@@ -27,6 +31,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-88120',
     qty: 5,
     status: 'processing',
+    email: 'sarah@example.com',
+    totalValue: 750,
   },
   {
     id: '4',
@@ -36,6 +42,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90566',
     qty: 2,
     status: 'shipped',
+    email: 'robert@example.com',
+    totalValue: 300,
   },
   {
     id: '5',
@@ -45,6 +53,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90101',
     qty: 1,
     status: 'cancelled',
+    email: 'marcus@example.com',
+    totalValue: 150,
   },
   {
     id: '6',
@@ -54,6 +64,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90210',
     qty: 2,
     status: 'shipped',
+    email: 'amanda@example.com',
+    totalValue: 300,
   },
   {
     id: '7',
@@ -63,6 +75,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90301',
     qty: 4,
     status: 'pending',
+    email: 'david@example.com',
+    totalValue: 600,
   },
   {
     id: '8',
@@ -72,6 +86,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-88205',
     qty: 1,
     status: 'processing',
+    email: 'priya@example.com',
+    totalValue: 150,
   },
   {
     id: '9',
@@ -81,6 +97,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90445',
     qty: 3,
     status: 'shipped',
+    email: 'james@example.com',
+    totalValue: 450,
   },
   {
     id: '10',
@@ -90,6 +108,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90502',
     qty: 2,
     status: 'cancelled',
+    email: 'sophie@example.com',
+    totalValue: 300,
   },
   {
     id: '11',
@@ -99,6 +119,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-88350',
     qty: 5,
     status: 'shipped',
+    email: 'carlos@example.com',
+    totalValue: 750,
   },
   {
     id: '12',
@@ -108,6 +130,8 @@ export const ORDERS: Order[] = [
     customerId: 'C-90600',
     qty: 1,
     status: 'pending',
+    email: 'nina@example.com',
+    totalValue: 150,
   },
 ];
 

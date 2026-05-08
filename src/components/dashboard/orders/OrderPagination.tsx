@@ -39,7 +39,7 @@ export default function OrderPagination({
       className="flex-shrink-0 flex items-center justify-between px-6"
       style={{ height: 53, borderTop: '1px solid #C3C6D4' }}
     >
-      <p className="text-sm font-medium" style={{ color: '#434652' }}>
+      <p className="text-sm font-medium " style={{ color: '#434652' }}>
         Showing {startItem}–{endItem} of {totalItems} orders
       </p>
       <div className="flex items-center gap-1">

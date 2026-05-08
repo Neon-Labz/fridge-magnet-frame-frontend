@@ -2,7 +2,7 @@
 
 export default function CustomersPage() {
   return (
-    <div className="p-6 sm:p-8">
+    <div className="p-6 sm:p-8 ml-[100px]">
       <h1 className="text-3xl font-bold" style={{ color: '#002B73' }}>
         Customers
       </h1>
