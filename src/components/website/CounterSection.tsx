@@ -67,9 +67,9 @@ export default function GalleryOfferSection({
       className="w-full flex justify-center px-[20px] py-[40px]"
     >
       <div 
-        className="w-full max-w-[1600px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
+        className="w-full max-w-[1273px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
         style={{
-          background: "linear-gradient(to right, #092055, #143274)",
+          background: "linear-gradient(105deg, #071E54 75%, #133074 75%)",
           color: "white"
         }}
       >
@@ -77,7 +77,7 @@ export default function GalleryOfferSection({
         <div className="flex flex-col items-start max-w-2xl z-10 space-y-4">
           <div 
             className="text-xs font-bold px-3 py-1 rounded-full tracking-wider"
-            style={{ backgroundColor: "#D30000", color: "white" }}
+            style={{ backgroundColor: "#BC0000", color: "white" }}
           >
             LIMITED RELEASE
           </div>
@@ -101,14 +101,14 @@ export default function GalleryOfferSection({
               <span className="text-xs font-medium tracking-widest mt-1 opacity-80">DAYS</span>
             </div>
             
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#D30000" }}>:</div>
+            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
             
             <div className="flex flex-col items-center">
               <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.hours)}</span>
               <span className="text-xs font-medium tracking-widest mt-1 opacity-80">HOURS</span>
             </div>
             
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#D30000" }}>:</div>
+            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
             
             <div className="flex flex-col items-center">
               <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.minutes)}</span>
@@ -119,7 +119,7 @@ export default function GalleryOfferSection({
           {/* Button */}
           <button 
             className="font-semibold text-sm md:text-base px-8 py-4 rounded shadow-lg transition-transform hover:scale-105"
-            style={{ backgroundColor: "white", color: "#092055" }}
+            style={{ backgroundColor: "white", color: "#071E54" }}
           >
             Claim<br/>Offer
           </button>
