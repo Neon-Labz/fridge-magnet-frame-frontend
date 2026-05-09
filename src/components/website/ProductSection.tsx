@@ -8,7 +8,7 @@ const products = [
   {
     title: "Magnet Frame",
     desc: "Sustainably sourced solid oak with museum-grade acrylic.",
-    price: "Rs 500.00",
+    price: "Rs 1500.00",
     img: "/product-1.png",
     badge: "New Arrival",
     frameOption: "without-frame" as const,
@@ -16,14 +16,14 @@ const products = [
   {
     title: "Magnet With Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
-    price: "Rs 1000.00",
+    price: "Rs 2500.00",
     img: "/product-2.png",
     frameOption: "black-frame" as const,
   },
   {
     title: "Magnet With White Frame",
     desc: "Brushed gold aluminum that brings warmth to any room.",
-    price: "Rs 1000.00",
+    price: "Rs 2500.00",
     img: "/product-3.png",
     frameOption: "white-frame" as const,
   },
@@ -39,7 +39,7 @@ export default function ProductsSection() {
   };
 
   return (
-    <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
+    <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[80px]">
       <div className="mx-auto max-w-[1800px] px-[20px]">
 
         {/* HEADER */}

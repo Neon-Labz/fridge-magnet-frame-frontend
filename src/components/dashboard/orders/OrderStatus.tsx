@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Order, OrderStatus as OrderStatusValue } from "@/types/order";
+import { mapApiOrder, statusToApi } from "@/lib/orders";
 import {
   CircleEllipsis,
   RefreshCw,
@@ -12,30 +14,57 @@ import {
   Check,
 } from "lucide-react";
 
-export default function OrderStatus({ order }: any) {
+type OrderStatusProps = {
+  order: Order;
+};
+
+export default function OrderStatus({ order }: OrderStatusProps) {
   const router = useRouter();
-  const [status, setStatus] = useState(order?.status || "PROCESSING");
+  const [currentOrder, setCurrentOrder] = useState(order);
+  const [status, setStatus] = useState<OrderStatusValue>(order.status || "processing");
+  const [adminNote, setAdminNote] = useState(order.adminNote || "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const statuses = [
-    { label: "PENDING", icon: CircleEllipsis },
-    { label: "PROCESSING", icon: RefreshCw },
-    { label: "SHIPPED", icon: Truck },
-    { label: "DELIVERED", icon: CheckCircle2 },
-    { label: "CANCELED", icon: XCircle },
+    { label: "PENDING", value: "pending", icon: CircleEllipsis },
+    { label: "PROCESSING", value: "processing", icon: RefreshCw },
+    { label: "SHIPPED", value: "shipped", icon: Truck },
+    { label: "DELIVERED", value: "delivered", icon: CheckCircle2 },
+    { label: "CANCELED", value: "canceled", icon: XCircle },
   ];
 
   const handleUpdate = async () => {
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${order.id}/status`, {
+      const response = await fetch(`/api/v1/orders/${currentOrder.id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({
+          status: statusToApi(status),
+          adminNote: adminNote.trim() || undefined,
+        }),
       });
 
-      alert("Order status updated");
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || `Update failed: ${response.status}`);
+      }
+
+      const updatedOrder = mapApiOrder(await response.json());
+      setCurrentOrder(updatedOrder);
+      setStatus(updatedOrder.status);
+      setAdminNote(updatedOrder.adminNote || "");
+      setSuccess("Order status updated");
     } catch (error) {
       console.error(error);
-      alert("Failed to update order status");
+      setError(error instanceof Error ? error.message : "Failed to update order status");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -53,7 +82,7 @@ export default function OrderStatus({ order }: any) {
           <div className="flex items-start justify-between px-12 py-12">
             <div>
               <h1 className="text-[36px] font-extrabold text-[#002B73]">
-                Order #{order?.orderId || "MAG-82910"}
+                Order #{currentOrder.orderId || "MAG-82910"}
               </h1>
               <p className="mt-2 max-w-[340px] text-[18px] leading-6 text-[#434652]">
                 Modify the current stage of this order fulfillment.
@@ -64,7 +93,7 @@ export default function OrderStatus({ order }: any) {
               <div className="rounded-full border border-[#C9D9F2] bg-[#EAF3FF] px-8 py-3 text-left text-m font-bold text-[#0052B4]">
                 Status:
                 <br />
-                {status.charAt(0) + status.slice(1).toLowerCase()}
+                {status.charAt(0).toUpperCase() + status.slice(1)}
               </div>
             </div>
           </div>
@@ -73,12 +102,16 @@ export default function OrderStatus({ order }: any) {
             <h2 className="text-lg font-bold text-[22px] text-[#1A1C1F]">Change Status</h2>
 
            <div className="mt-8 flex flex-wrap gap-10">
-              {statuses.map(({ label, icon: Icon }) => (
+              {statuses.map(({ label, value, icon: Icon }) => (
                 <button
                   key={label}
-                  onClick={() => setStatus(label)}
+                  onClick={() => {
+                    setStatus(value as OrderStatusValue);
+                    setSuccess(null);
+                    setError(null);
+                  }}
                   className={`flex h-[130px] w-[116px] flex-col items-center justify-center rounded-[20px] border transition ${
-                    status === label
+                    status === value
                       ? "border-[#003CC7] bg-[#F4F8FF] shadow-sm"
                       : "border-[#D9DEE8] bg-white"
                   }`}
@@ -87,13 +120,13 @@ export default function OrderStatus({ order }: any) {
                     size={30}
                     strokeWidth={1.5}
                     className={`mb-2 ${
-                      status === label ? "text-[#003CC7]" : "text-[#3D4451]"
+                      status === value ? "text-[#003CC7]" : "text-[#3D4451]"
                     }`}
                   />
 
                   <span
                     className={`text-[14px] font-black uppercase tracking-[1.5px] ${
-                      status === label ? "text-[#003CC7]" : "text-[#111827]"
+                      status === value ? "text-[#003CC7]" : "text-[#111827]"
                     }`}
                   >
                     {label}
@@ -108,10 +141,18 @@ export default function OrderStatus({ order }: any) {
                 Internal Admin Note
               </p>
               <textarea
+                value={adminNote}
+                onChange={(event) => setAdminNote(event.target.value)}
                 className="h-[170px] w-full resize-none rounded-[18px] border border-[#DDE2EC] px-6 py-5 text-m outline-none placeholder:text-[#C7CBD4]"
                 placeholder="Describe the reason for this status change or add fulfillment notes..."
               />
             </div>
+
+            {(error || success) && (
+              <p className={`mt-6 text-sm font-bold ${error ? "text-red-700" : "text-green-700"}`}>
+                {error || success}
+              </p>
+            )}
 
             <div className="mt-8 flex items-start gap-4 rounded-[16px] border border-[#EEF1F5] bg-[#F7F7FA] px-6 py-5">
               <div className="mt-1 flex h-5 w-5 items-center justify-center rounded bg-[#BC0000] text-white">
@@ -124,7 +165,7 @@ export default function OrderStatus({ order }: any) {
                 <p className="mt-1 text-s text-[#434652]">
                   Recipient:{" "}
                   <span className="text-[#002B73]">
-                    {order?.email || "eleanor.h@example.com"}
+                    {currentOrder.email || "eleanor.h@example.com"}
                   </span>
                 </p>
               </div>
@@ -141,9 +182,10 @@ export default function OrderStatus({ order }: any) {
 
             <button
               onClick={handleUpdate}
+              disabled={saving}
               className="h-[58px] w-[240px] rounded-[14px] bg-[#BC0000] font-bold text-l text-white shadow hover:bg-[#9f0000]"
             >
-              Update Order Status
+              {saving ? "Updating..." : "Update Order Status"}
             </button>
           </div>
         </section>
@@ -156,11 +198,11 @@ export default function OrderStatus({ order }: any) {
 
             <Detail
               label="Customer"
-              value={order?.customerName || "Eleanor Herbert"}
-              subValue={`ID: ${order?.customerId || "#CUST-9921"}`}
+              value={currentOrder.customerName || "Eleanor Herbert"}
+              subValue={`ID: ${currentOrder.customerId || "#CUST-9921"}`}
             />
 
-            <Detail label="Email Address" value={order?.email || "eleanor.h@example.com"} />
+            <Detail label="Email Address" value={currentOrder.email || "eleanor.h@example.com"} />
 
             <Detail label="Ordered On" value="Oct 24, 2023 · 14:32" />
 
@@ -171,7 +213,7 @@ export default function OrderStatus({ order }: any) {
                 VALUE
               </span>
               <span className="text-2xl font-extrabold text-[#002B73]">
-                ${order?.totalValue || "284.50"}
+                ${currentOrder.totalValue || "284.50"}
               </span>
             </div>
 
@@ -180,7 +222,7 @@ export default function OrderStatus({ order }: any) {
                 SHIPPING INFORMATION
               </h4>
               <p className="text-m leading-6 text-[#434652]">
-                {order?.shippingAddress || (
+                {currentOrder.shippingAddress || (
                   <>
                     4820 Memory Lane
                     <br />
@@ -200,7 +242,7 @@ export default function OrderStatus({ order }: any) {
 
           <div className="w-[450px] rounded-[22px] border border-[#E1E5EE] bg-white px-8 py-9">
             <h3 className="text-m font-extrabold tracking-[4px] text-[#002B73]">
-              ITEM SUMMARY ({order?.qty ?? 0})
+              ITEM SUMMARY ({currentOrder.qty ?? 0})
             </h3>
 
             <div className="relative mt-8 rounded-[22px] border border-[#EEF1F5] bg-white p-6 shadow-sm">
@@ -241,17 +283,17 @@ export default function OrderStatus({ order }: any) {
                       <div className="rounded-[14px] border border-[#DDE2EC] bg-[#F7F7FA] px-4 py-2 text-[18px] font-extrabold text-[#002B73]">
                         Qty:
                         <br />
-                        {order?.qty ?? 0}
+                        {currentOrder.qty ?? 0}
                       </div>
 
                       {/* PRICE */}
                       <div className="text-right">
                         <p className="text-[22px] font-extrabold text-[#1A1C1F]">
                           $
-                          {order?.totalValue
+                          {currentOrder.totalValue
                             ? (
-                                order.totalValue /
-                                Math.max(order.qty, 1)
+                                currentOrder.totalValue /
+                                Math.max(currentOrder.qty, 1)
                               ).toFixed(2)
                             : "0.00"}
                         </p>

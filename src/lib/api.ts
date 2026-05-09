@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'
+).replace(/\/$/, '')
 
 interface ApiResponse<T> {
   success: boolean
@@ -25,8 +27,11 @@ interface ForgotPasswordData {
 type AuthResponseData = {
   token?: string
   accessToken?: string
+  access_token?: string
   data?: {
     token?: string
+    accessToken?: string
+    access_token?: string
   }
 }
 
@@ -86,9 +91,11 @@ class ApiClient {
   }
 
   async register(userData: RegisterData): Promise<ApiResponse<unknown>> {
+    const { email, password } = userData
+
     return this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: JSON.stringify({ email, password }),
     })
   }
 
@@ -102,7 +109,7 @@ class ApiClient {
   async resetPassword(token: string, password: string): Promise<ApiResponse<unknown>> {
     return this.request('/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ token, newPassword: password }),
     })
   }
 
