@@ -21,13 +21,10 @@ export default function VideoSection() {
         <div className="flex w-full justify-center lg:w-1/2 lg:justify-start lg:pl-[40px]">
           <div className="w-full max-w-[680px] rounded-[24px] bg-[#F9F9FE] p-[16px] lg:p-[20px]">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[16px]">
-              <video
-                src="/homepage-video.mp4.mp4"
+              <img
+                src="/homepage-video.gif"
+                alt="Magnet Frame Demo"
                 className="h-full w-full object-cover"
-                autoPlay
-                loop
-                muted
-                playsInline
               />
             </div>
           </div>
