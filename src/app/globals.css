@@ -43,6 +43,7 @@ body {
     ),
     linear-gradient(180deg, #fbfbff 0%, #f8f9fe 100%);
   color: var(--foreground);
+}
 
 h1,
 h2,
