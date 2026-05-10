@@ -1,5 +1,5 @@
 {
-  "name": "magnet-frontend",
+  "name": "magnify-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,29 +10,24 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@nestjs/config": "^4.0.4",
-    "axios": "^1.15.2",
     "clsx": "^2.1.1",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-hook-form": "^7.74.0",
-    "react-icons": "^5.6.0",
+    "react-hook-form": "^7.75.0",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.4.1",
-    "zustand": "^5.0.12"
+    "zod": "^4.4.3",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10.5.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
-    "postcss": "^8.5.14",
-    "tailwindcss": "^4.2.4",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

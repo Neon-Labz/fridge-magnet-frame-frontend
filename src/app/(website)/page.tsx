@@ -1,5 +1,5 @@
-import OrderConfirmationScreen from "@/components/website/order-confirmation/OrderConfirmationScreen";
+import Hero from "@/components/website/Hero";
 
 export default function WebsiteHomePage() {
-  return <OrderConfirmationScreen />;
+  return <Hero />;
 }

@@ -1,7 +1,7 @@
 
 'use client'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormRegister } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, Lock, User } from 'lucide-react'
@@ -34,15 +34,15 @@ function InputField({
   icon,
   error = '',
   register,
-  name = '',
+  name,
   autoComplete = '',
 }: {
   type?: string
   placeholder?: string
   icon: React.ReactNode
   error?: string
-  register: any
-  name: string
+  register: UseFormRegister<RegisterFormData>
+  name: keyof RegisterFormData
   autoComplete?: string
 }) {
   return (
@@ -57,14 +57,7 @@ function InputField({
           name={name}
           autoComplete={autoComplete}
           placeholder={placeholder}
-          style={{
-            fontSize: '14px',
-            fontWeight: 600,
-            color: '#111827',
-            borderBottom: error ? '2px solid #ef4444' : '2px solid #374151',
-            paddingLeft: '40px',
-          }}
-          className={`w-full pr-3 py-3 bg-transparent focus:outline-none focus:border-gray-900 transition-colors ${error ? '' : ''}`}
+          className={`input-field w-full pr-3 py-3 bg-transparent focus:outline-none focus:border-gray-900 transition-colors ${error ? '' : ''}`}
         />
       </div>
       {error && <p className="text-xs text-red-600 mt-1 ml-1">{error}</p>}
@@ -96,7 +89,7 @@ export default function RegisterForm() {
       } else {
         setError(response.error || 'Registration failed')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)
@@ -109,108 +102,164 @@ export default function RegisterForm() {
   const lockIcon = <Lock className="h-5 w-5" style={{ color: '#111827' }} />
 
   return (
-    <div className="space-y-5">
-      {/* Title */}
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        <InputField
-          name="fullName"
-          type="text"
-          placeholder="Full Name"
-          icon={userIcon}
-          error={errors.fullName?.message}
-          register={register}
-          autoComplete="name"
-        />
-        <InputField
-          name="email"
-          type="email"
-          placeholder="Email"
-          icon={emailIcon}
-          error={errors.email?.message}
-          register={register}
-          autoComplete="email"
-        />
-        <InputField
-          name="password"
-          type="password"
-          placeholder="Password"
-          icon={lockIcon}
-          error={errors.password?.message}
-          register={register}
-          autoComplete="new-password"
-        />
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            {error}
-          </div>
-        )}
-
-        {/* Register Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-red-600 text-white py-4 px-4 rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? 'Creating account...' : 'Register'}
-        </button>
-      </form>
-
-      {/* Divider */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t" style={{ borderColor: '#E5E7EB' }} />
+    <>
+      <style>{`
+        .input-field {
+          font-size: 14px;
+          font-weight: 600;
+          color: #111827;
+          border-bottom: 2px solid #374151;
+          padding-left: 40px;
+        }
+        .input-field.error {
+          border-bottom-color: #ef4444;
+        }
+        .divider-container {
+          display: flex;
+          alignItems: center;
+          margin: 16px 0;
+        }
+        .divider-line {
+          flex: 1;
+          border-top: 1px solid #E5E7EB;
+        }
+        .divider-text {
+          padding: 0 8px;
+          font-size: 12px;
+          color: #6B7280;
+          background: white;
+        }
+        .google-btn-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 8px;
+        }
+        .google-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+        }
+        .google-icon {
+          width: 20px;
+          height: 20px;
+          object-fit: contain;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .google-text {
+          font-size: 14px;
+          font-weight: 500;
+          color: #111827;
+        }
+        .footer-text {
+          font-size: 13px;
+          color: #6B7280;
+        }
+        .footer-link {
+          font-size: 13px;
+          color: #2563EB;
+          font-weight: 500;
+        }
+      `}</style>
+      <div className="space-y-5">
+        {/* Title */}
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
         </div>
-        <div className="relative flex justify-center" style={{ fontSize: '12px', color: '#6B7280' }}>
-          <span className="px-2 bg-white">OR</span>
-        </div>
-      </div>
 
-      {/* Google Sign-In */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '8px' }}>
-        <button
-          type="button"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-          }}
-          className="hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-        >
-          <div style={{ width: '20px', height: '20px', objectFit: 'contain', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <GoogleIcon />
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <InputField
+            name="fullName"
+            type="text"
+            placeholder="Full Name"
+            icon={userIcon}
+            error={errors.fullName?.message}
+            register={register}
+            autoComplete="name"
+          />
+          <InputField
+            name="email"
+            type="email"
+            placeholder="Email"
+            icon={emailIcon}
+            error={errors.email?.message}
+            register={register}
+            autoComplete="email"
+          />
+          <InputField
+            name="password"
+            type="password"
+            placeholder="Password"
+            icon={lockIcon}
+            error={errors.password?.message}
+            register={register}
+            autoComplete="new-password"
+          />
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
+
+          {/* Register Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-red-600 text-white py-4 px-4 rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Creating account...' : 'Register'}
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="divider-container">
+            <div className="divider-line" />
+            <div className="divider-text">OR</div>
+            <div className="divider-line" />
           </div>
-          <span style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>
-            Sign in with Google
-          </span>
-        </button>
-      </div>
+        </div>
 
-      {/* Footer */}
-      <div className="text-center mt-1">
-        <span style={{ fontSize: '13px', color: '#6B7280' }}>
-          Already have an account?{' '}
+        {/* Google Sign-In */}
+        <div className="google-btn-container">
           <button
             type="button"
-            onClick={() => switchView('login')}
-            style={{ fontSize: '13px', color: '#2563EB', fontWeight: 500 }}
-            className="hover:underline transition-colors"
+            className="google-btn hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
           >
-            Sign in
+            <div className="google-icon">
+              <GoogleIcon />
+            </div>
+            <span className="google-text">
+              Sign in with Google
+            </span>
           </button>
-        </span>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-1">
+          <span className="footer-text">
+            Already have an account?{' '}
+            <button
+              type="button"
+              onClick={() => switchView('login')}
+              className="footer-link hover:underline transition-colors"
+            >
+              Sign in
+            </button>
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

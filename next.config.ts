@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
       { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" }
     ]
-  }
+  },
+  devIndicators: false,
 };
 
 export default nextConfig;
