@@ -1,4 +1,5 @@
 import PriceMagnetFrameSection from '@/components/website/PriceMagnetFrameSection';
+import OrderNowSection from '@/components/website/OrderNowSection';
 
 export const metadata = {
   title: 'Pricing | Magnify Creations',
@@ -9,6 +10,7 @@ export default function PricePage() {
   return (
     <>
       <PriceMagnetFrameSection />
+      <OrderNowSection />
     </>
   );
 }
