@@ -39,20 +39,19 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
   const hasItems = items.length > 0;
 
   return (
-    <div className="rounded-[25px] bg-[rgba(217,217,217,0.25)] p-5">
-      <Card className="border-0 bg-transparent shadow-none">
-        <CardHeader className="border-b border-[#C3C6D4] px-0 pb-4 pt-0">
-          <div>
-            <h2 className="font-manrope text-[32px] font-semibold tracking-[-0.01em] text-[#1A1C1F]">
-              Order Summary
-            </h2>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6 px-0 pb-0 pt-6">
-          <div className="space-y-5 border-b border-[#C3C6D4] pb-5">
+    <div className="max-w-[486px] rounded-[25px] bg-[#F4F5F9] p-5 lg:p-6">
+      <div className="rounded-[25px] border border-[#D8DBE5] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+        <div className="border-b border-[#C3C6D4] px-6 pt-6 pb-4">
+          <h2 className="font-manrope text-[32px] font-semibold tracking-[-0.01em] text-[#1A1C1F]">
+            Order Summary
+          </h2>
+        </div>
+
+        <div className="space-y-6 px-6 pb-6 pt-6">
+          <div className="space-y-4 border-b border-[#C3C6D4] pb-5">
             {hasItems ? (
               items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4">
+                <div key={item.id} className="flex items-center gap-4 rounded-[20px] bg-[#F8F9FD] px-4 py-3">
                   <FramePreview
                     variant={resolvePreview(item)}
                     className="h-14 w-14 flex-shrink-0"
@@ -63,13 +62,13 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
                     </h3>
                     <p className="text-[13px] text-[#434652]">Quantity: {item.quantity}</p>
                   </div>
-                  <div className="text-sm font-bold text-[#0040A1]">
+                  <div className="text-sm font-semibold text-[#0040A1]">
                     Rs{(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))
             ) : (
-              <div className="rounded-[16px] bg-white p-6 text-center text-[#434652]">
+              <div className="rounded-[18px] bg-[#F8F9FD] p-6 text-center text-[#434652]">
                 <p className="text-base font-semibold text-[#1A1C1F]">Your cart is empty.</p>
                 <p className="mt-2 text-sm">Add items to checkout before placing your order.</p>
               </div>
@@ -87,17 +86,15 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-b border-[#C3C6D4] pb-4 text-sm">
-            <span className="text-[#0040A1]">Total</span>
-            <span className="text-[#0040A1]">
-              Rs{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-            </span>
+          <div className="flex items-center justify-between border-b border-[#C3C6D4] pb-4 text-sm font-semibold text-[#0040A1]">
+            <span>Total</span>
+            <span>Rs{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
           </div>
 
-          <div className="rounded-lg border border-[#C3C6D4] bg-white p-4">
+          <div className="rounded-[20px] border border-[#C3C6D4] bg-[#F8F9FD] p-4">
             <h3 className="text-xl font-semibold text-[#002B73]">Payment Method</h3>
             <div className="mt-4 space-y-3">
-              <label className="flex items-center gap-3 rounded-lg border border-[#C3C6D4] px-4 py-3 text-sm text-[#1A1C1F]">
+              <label className="flex items-center gap-3 rounded-lg border border-[#C3C6D4] bg-white px-4 py-3 text-sm text-[#1A1C1F]">
                 <input
                   type="radio"
                   name="payment"
@@ -107,7 +104,7 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
                 <CreditCard className="h-4 w-4 text-[#747784]" />
                 <span>Credit or Debit Card</span>
               </label>
-              <label className="flex items-center gap-3 rounded-lg border border-[#C3C6D4] px-4 py-3 text-sm text-[#1A1C1F]">
+              <label className="flex items-center gap-3 rounded-lg border border-[#C3C6D4] bg-white px-4 py-3 text-sm text-[#1A1C1F]">
                 <input type="radio" name="payment" className="h-4 w-4 accent-[#002B73]" />
                 <Lock className="h-4 w-4 text-[#747784]" />
                 <span>Cash on Delivery</span>
@@ -116,8 +113,8 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
           </div>
 
           <Button
-            variant="danger"
-            className="w-full text-[18px]"
+            type="button"
+            className="w-full rounded-[18px] bg-[#FF3B30] px-4 py-4 text-[18px] font-semibold text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:bg-[#E61D11]"
             onClick={onPlaceOrder}
             disabled={!hasItems}
           >
@@ -129,8 +126,8 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
             <Lock className="h-3 w-3" />
             <span>SSL Encrypted Checkout</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function OrderDetails({
   const total = subtotal + shipping;
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden rounded-[20px] border border-[#C3C6D4] bg-white shadow-sm">
       <CardContent className="space-y-6 p-8">
         <div className="flex flex-col gap-4 border-b border-[#E2E2E7] pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -62,13 +62,13 @@ export default function OrderDetails({
               key={item.id}
               className="flex flex-col gap-4 border-b border-[#E2E2E7] pb-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex min-w-0 items-center gap-4">
                 <FramePreview
                   variant={resolvePreview(item)}
                   className="h-24 w-24"
                 />
-                <div>
-                  <p className="text-lg font-semibold text-[#1A1C1F]">{item.name}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-semibold text-[#1A1C1F]">{item.name}</p>
                   <p className="mt-2 text-sm leading-6 text-[#434652]">
                     Quantity: {item.quantity}
                   </p>

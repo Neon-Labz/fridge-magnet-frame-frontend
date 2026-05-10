@@ -39,8 +39,8 @@ export default function OrderConfirmationScreen() {
     <div className="min-h-screen bg-[#F9F9FE] text-[#1A1C1F]">
       <main className="mx-auto max-w-[1280px] px-4 pb-16 pt-20 sm:px-6 lg:px-8">
         <section className="flex flex-col items-center gap-6 text-center">
-          <div className="grid h-20 w-20 place-items-center rounded-full bg-[#0040A1] shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-[#0040A1]">
+          <div className="grid h-20 w-20 place-items-center rounded-full bg-[#0040A1] shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-[#0040A1] shadow-sm">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 6L9 17L4 12" stroke="#0040A1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -74,64 +74,67 @@ export default function OrderConfirmationScreen() {
                 orderNumber={orderNumber}
               />
 
-              <Card className="rounded-[12px] bg-[#F3F3F8] border-[#C3C6D4]">
-                <CardContent className="space-y-6 p-8">
+              <div className="rounded-[20px] bg-[#F4F5F9] p-6 shadow-sm">
+                <div className="grid gap-6 md:grid-cols-2">
                   <div>
-                    <h2 className="text-[24px] font-manrope font-semibold text-[#002B73]">Delivery Information</h2>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">
+                      Shipping Address
+                    </p>
+                    <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
+                      Alex Thompson<br />
+                      1248 Memory Lane<br />
+                      Suite 400<br />
+                      San Francisco, CA 94105
+                    </p>
                   </div>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div className="rounded-[12px] bg-white p-6">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">Shipping Address</p>
-                      <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
-                        Alex Thompson<br />
-                        1248 Memory Lane<br />
-                        Suite 400<br />
-                        San Francisco, CA 94105
-                      </p>
-                    </div>
-                    <div className="rounded-[12px] bg-white p-6">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">Contact Details</p>
-                      <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
-                        alex.thompson@example.com<br />
-                        +1 (555) 098-7654
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">
+                      Contact Details
+                    </p>
+                    <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
+                      alex.thompson@example.com<br />
+                      +1 (555) 098-7654
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-6">
-              <div className="relative overflow-hidden rounded-[12px] bg-[#0040A1] p-8 text-white">
-                <div className="absolute inset-0 bg-[rgba(255,255,255,0.002)] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]" />
-                <div className="relative space-y-6">
+              <div className="rounded-[20px] bg-[#002B73] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.12)] text-white">
+                <div className="space-y-6">
                   <div>
-                    <p className="text-[24px] font-manrope font-semibold text-white">Your order was successful</p>
-                    <p className="mt-2 max-w-[325px] text-[16px] leading-7 text-[#98B3FF]">
+                    <p className="text-[24px] font-manrope font-semibold text-white">
+                      Your order was successful
+                    </p>
+                    <p className="mt-2 max-w-[340px] text-[16px] leading-7 text-[#B3D0FF]">
                       Help us improve the framing experience for everyone.
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <button
                         key={index}
                         type="button"
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-[8px] bg-white/10 text-white transition hover:bg-white/20"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/15 text-white transition hover:bg-white/25"
                       >
                         <Star className="h-4 w-4" />
                       </button>
                     ))}
                   </div>
 
-                  <div className="rounded-[8px] border border-white/20 bg-white/10 p-3">
+                  <div className="rounded-[16px] border border-white/20 bg-white/10 p-3">
                     <textarea
                       placeholder="Tell us what you liked..."
-                      className="min-h-[86px] w-full resize-none bg-transparent text-sm text-white placeholder:text-[#98B3FF] outline-none"
+                      className="min-h-[86px] w-full resize-none bg-transparent text-sm text-white placeholder:text-[#B3D0FF] outline-none"
                     />
                   </div>
 
-                  <Button variant="secondary" className="w-full rounded-[8px] bg-white text-[#002B73] hover:bg-[#f7f7f7]">
+                  <Button
+                    variant="secondary"
+                    className="w-full rounded-[12px] bg-white text-[#002B73] shadow-lg shadow-[#062B5A]/10 hover:bg-[#f7f7f7]"
+                  >
                     Submit Feedback
                   </Button>
                 </div>
