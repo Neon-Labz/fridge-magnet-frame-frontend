@@ -1,120 +1,78 @@
-"use client";
-
-import { Search, Check, Star } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { ArrowRight, Sparkles, ShieldCheck, Truck } from "lucide-react";
 
 export const Hero = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-
   return (
-    <section
-      id="home"
-      className="relative min-h-screen flex items-center pt-20"
-    >
-      <div className="absolute inset-0">
-        <Image
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
-          alt="Luxury Home"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
-        />
-        <div className="hero-gradient absolute inset-0"></div>
-      </div>
+    <section className="relative overflow-hidden bg-[#f9f9fe]">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,rgba(0,64,161,0.12),transparent_30%),radial-gradient(circle_at_top_right,rgba(230,29,17,0.1),transparent_26%)]" />
 
-      {/* Floating Elements */}
-      <div className="absolute top-48 right-20 hidden xl:block floating">
-        <div className="glass rounded-2xl p-4 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <Check className="text-white w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm opacity-80">Property Sold</p>
-              <p className="font-bold">Modern Villa, Colombo 7</p>
-            </div>
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#C3C6D4] bg-white px-4 py-2 text-sm font-medium text-[#0040A1] shadow-sm">
+            <Sparkles className="h-4 w-4" />
+            Handcrafted frames for curated memories
           </div>
-        </div>
-      </div>
-
-      <div
-        className="absolute bottom-20 right-32 hidden xl:block floating"
-        style={{ animationDelay: "1.5s" }}
-      >
-        <div className="glass rounded-2xl p-4 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-              <Star className="text-white w-6 h-6 fill-white" />
-            </div>
-            <div>
-              <p className="text-sm opacity-80">Rated</p>
-              <p className="font-bold">4.9/5 ⭐ (2,400+ Reviews)</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-5 w-full">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
-            <span className="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-            <span className="text-white text-sm font-medium">
-              Sri Lanka&apos;s #1 Real Estate Platform
-            </span>
-          </div>
-          <h1 className="font-playfair text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
-            Find Your <br />
-            <span className="text-accent">Perfect</span> Land & Property
+          <h1 className="mt-6 max-w-xl font-manrope text-5xl font-bold tracking-[-0.04em] text-[#0040A1] sm:text-6xl">
+            Premium frames, built to elevate the moment.
           </h1>
-          <p className="text-xl text-white/80 mb-10 max-w-xl leading-relaxed">
-            Trusted real estate solutions with verified properties, bank loan
-            assistance, and legal support.
+          <p className="mt-5 max-w-xl text-lg leading-8 text-[#434652]">
+            Discover magazine-worthy fridge magnet frames, refined finishes, and thoughtful packaging designed for gifting.
           </p>
 
-          {/* Search Bar */}
-          <div className="relative max-w-4xl mx-auto">
-            <div className="absolute inset-0 bg-white/20 backdrop-blur-xl rounded-2xl" />
-            <div className="relative flex items-center">
-              <Search className="absolute left-5 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by location, title, or keywords..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-32 py-5 glass backdrop-blur-sm rounded-1xl border border-white/30 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-100 placeholder-slate-200 shadow-xl"
-              />
-              <Link
-                href={`/properties/?search=${searchQuery}`}
-                className="absolute right-3 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-1xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg shadow-primary-500/30"
-              >
-                Search
-              </Link>
-            </div>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <Link
+              href="/shop"
+              className="inline-flex items-center justify-center rounded-xl bg-[#0040A1] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_12px_24px_rgba(0,64,161,0.18)] transition hover:bg-[#00337f]"
+            >
+              Shop collection
+            </Link>
+            <Link
+              href="/checkout"
+              className="inline-flex items-center justify-center rounded-xl border border-[#C3C6D4] bg-white px-6 py-3 text-[15px] font-semibold text-[#1A1C1F] transition hover:border-[#0040A1] hover:text-[#0040A1]"
+            >
+              Checkout preview
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </div>
 
-          {/* Quick Stats */}
-          <div className="flex flex-wrap gap-8 mt-10">
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              { val: "30", label: "Properties Listed" },
-              { val: "8K", label: "Happy Customers" },
-              { val: "25", label: "Cities Covered" },
-              { val: "12", label: "Years Experience" },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-8">
-                <div className="text-white">
-                  <p className="text-3xl font-bold">
-                    {stat.val}
-                    <span className="text-accent">+</span>
-                  </p>
-                  <p className="text-sm text-white/70">{stat.label}</p>
-                </div>
-                {i < 3 && (
-                  <div className="w-px h-10 bg-white/20 hidden sm:block"></div>
-                )}
+              { icon: ShieldCheck, title: "Safe materials", text: "Archival quality and durable finishes" },
+              { icon: Truck, title: "Fast delivery", text: "Careful packing with tracked shipping" },
+              { icon: Sparkles, title: "Custom styling", text: "A visual system tuned for gifting" },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl border border-[#C3C6D4] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                <item.icon className="h-5 w-5 text-[#0040A1]" />
+                <h3 className="mt-3 text-sm font-semibold text-[#1A1C1F]">{item.title}</h3>
+                <p className="mt-1 text-sm leading-6 text-[#434652]">{item.text}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-6 top-6 h-full w-full rounded-[28px] bg-[rgba(217,217,217,0.24)]" />
+          <div className="relative rounded-[28px] border border-[#C3C6D4] bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.08)]">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { label: "Personalized frames", value: "320+ styles" },
+                { label: "Average rating", value: "4.9 / 5" },
+                { label: "Ships in", value: "2-3 days" },
+                { label: "Gift-ready", value: "Yes" },
+              ].map((stat) => (
+                <div key={stat.label} className="rounded-2xl bg-[#F8FAFC] p-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#64748B]">{stat.label}</p>
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1F]">{stat.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-[#E5E5EA] bg-gradient-to-br from-[#F9FAFF] to-white p-5">
+              <p className="text-sm font-semibold text-[#0040A1]">Designed to match the checkout experience</p>
+              <p className="mt-2 text-sm leading-6 text-[#434652]">
+                The public-facing storefront uses the same visual system as the Figma reference: soft borders, measured spacing, and strong brand blue accents.
+              </p>
+            </div>
           </div>
         </div>
       </div>
