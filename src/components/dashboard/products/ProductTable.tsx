@@ -33,7 +33,7 @@ export default function ProductTable({ products, onDelete, onView }: ProductTabl
               </td>
               <td className="pr-8">
                 <div className="flex items-center gap-5">
-                  <ProductThumb gradient={product.gradient} isPopular={product.isPopular} />
+                  <ProductThumb gradient={product.gradient} imageUrl={product.primaryImageUrl} isPopular={product.isPopular} />
                   <div>
                     <p className="text-base font-bold leading-6" style={{ color: '#002B73' }}>{product.name}</p>
                     <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>{product.series}</p>

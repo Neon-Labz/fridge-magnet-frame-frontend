@@ -55,12 +55,20 @@ export default function ViewProductModal({ isOpen, product, onClose, onUpdate }:
                 className="flex-shrink-0 flex items-center justify-center bg-[#F8F8FB] rounded-2xl p-4"
                 style={{ width: 220, height: 220, border: '1px solid #EDEDF2' }}
               >
-                <div className="w-full h-full bg-white border-[12px] border-[#A67C52] shadow-md flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 border-[1px] border-black/10" />
-                  <div className="w-[70%] h-[70%] bg-[#FDFDFD] border border-gray-100 flex items-center justify-center text-[10px] text-gray-400 font-bold text-center p-2 uppercase tracking-wider">
-                    {product.name}
+                {product.primaryImageUrl ? (
+                  <img
+                    src={product.primaryImageUrl}
+                    alt={product.name}
+                    className="h-full w-full rounded-2xl object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-white border-[12px] border-[#A67C52] shadow-md flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 border-[1px] border-black/10" />
+                    <div className="w-[70%] h-[70%] bg-[#FDFDFD] border border-gray-100 flex items-center justify-center text-[10px] text-gray-400 font-bold text-center p-2 uppercase tracking-wider">
+                      {product.name}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-3 min-w-0">

@@ -12,13 +12,13 @@ import ProductFilters, {
 } from '@/components/dashboard/products/ProductFilters';
 import ProductTable from '@/components/dashboard/products/ProductTable';
 import Pagination from '@/components/dashboard/shared/Pagination';
-import { PRODUCTS } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import type { Product, ProductFormData } from '@/types/product';
 
 const PAGE_SIZE = 4;
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const { products, setProducts, addProduct, updateProduct, deleteProduct } = useProducts();
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewTarget, setViewTarget] = useState<Product | null>(null);
@@ -80,7 +80,23 @@ export default function ProductsPage() {
     setSortOpen(false);
   };
 
-  const handleAddProduct = (formData: ProductFormData) => {
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handleAddProduct = async (formData: ProductFormData) => {
+    const primaryImageUrl = formData.primaryImage
+      ? await fileToDataUrl(formData.primaryImage)
+      : undefined;
+
+    const galleryImageUrls = await Promise.all(
+      formData.galleryImages.map((file) => fileToDataUrl(file))
+    );
+
     const newProduct: Product = {
       id: `PRD-${String(products.length + 1).padStart(3, '0')}`,
       sku:
@@ -97,6 +113,8 @@ export default function ProductsPage() {
           ? 'low-stock'
           : 'out-of-stock',
       gradient: 'from-blue-400 to-purple-500',
+      primaryImageUrl,
+      galleryImageUrls,
       description: formData.description,
       size: '8x10',
       finish: 'Matte',
@@ -106,7 +124,7 @@ export default function ProductsPage() {
       lastUpdatedDate: new Date().toLocaleDateString(),
     };
 
-    setProducts((prev) => [...prev, newProduct]);
+    addProduct(newProduct);
     setAddOpen(false);
   };
 
@@ -123,36 +141,25 @@ export default function ProductsPage() {
       'Out of Stock': 'out-of-stock',
     };
 
-    setProducts((prev) =>
-      prev.map((currentProduct) =>
-        currentProduct.id === product.id
-          ? {
-              ...currentProduct,
-              stockStatus:
-                statusMap[newStatus] ??
-                currentProduct.stockStatus,
-            }
-          : currentProduct
-      )
-    );
+    updateProduct(product.id, {
+      stockStatus:
+        statusMap[newStatus] ?? product.stockStatus,
+    });
   };
 
   const confirmDelete = () => {
     if (!deleteTarget) return;
 
-    setProducts((prev) => {
-      const next = prev.filter(
-        (product) => product.id !== deleteTarget.id
-      );
+    deleteProduct(deleteTarget.id);
 
-      if (page > Math.ceil(next.length / PAGE_SIZE)) {
-        setPage((currentPage) =>
-          Math.max(1, currentPage - 1)
-        );
+    // Adjust page if needed after deletion
+    if (page > 1) {
+      const newLength = products.length - 1;
+      const newTotalPages = Math.max(1, Math.ceil(newLength / PAGE_SIZE));
+      if (page > newTotalPages) {
+        setPage(newTotalPages);
       }
-
-      return next;
-    });
+    }
 
     setDeleteTarget(null);
   };
