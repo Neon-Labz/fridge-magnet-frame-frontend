@@ -1,6 +1,7 @@
 'use client';
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useFrameStore } from "@/store/frameStore";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
@@ -32,6 +33,7 @@ const products = [
 ];
 
 export default function ProductsSection() {
+  const router = useRouter();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
   const { addToCart } = useCartStore();
   const { addToast } = useToastStore();
@@ -54,6 +56,7 @@ export default function ProductsSection() {
 
   const handleImageClick = (frameOption: typeof products[0]['frameOption']) => {
     setSelectedFrame(frameOption);
+    router.push("/shop");
   };
 
   return (
