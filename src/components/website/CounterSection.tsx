@@ -69,7 +69,7 @@ export default function GalleryOfferSection({
       <div
         className="w-full max-w-[1800px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
         style={{
-          minHeight: "420px",
+          minHeight: "321px",
           background: "linear-gradient(105deg, #071E54 75%, #133074 75%)",
           color: "white"
         }}
