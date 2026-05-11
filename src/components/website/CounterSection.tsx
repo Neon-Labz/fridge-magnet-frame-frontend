@@ -119,10 +119,10 @@ export default function GalleryOfferSection({
 
           {/* Button */}
           <button 
-            className="font-semibold text-sm md:text-base px-8 py-4 rounded shadow-lg transition-transform hover:scale-105"
+            className="whitespace-nowrap font-semibold text-sm md:text-base px-8 py-4 rounded shadow-lg transition-transform hover:scale-105"
             style={{ backgroundColor: "white", color: "#071E54" }}
           >
-            Claim<br/>Offer
+            Claim Offer
           </button>
 
         </div>
