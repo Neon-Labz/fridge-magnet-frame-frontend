@@ -6,14 +6,13 @@ export default function Footer() {
       <div className="mx-auto max-w-[1800px] px-[20px] py-[80px]">
         <div className="grid gap-12 md:grid-cols-2 xl:grid-cols-[277px_276px_276px_276px] xl:justify-between">
           <div className="w-full max-w-[277px]">
-            <div className="relative h-14 w-44 overflow-hidden">
+            <div className="h-16 w-44">
               <Image
                 src="/logo.png"
                 alt="Magnify Logo"
-                fill
+                width={177}
+                height={55}
                 className="object-contain"
-                sizes="176px"
-                priority
               />
             </div>
 

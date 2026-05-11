@@ -9,6 +9,7 @@ export interface Product {
   stockCount: number;
   stockStatus: StockStatus;
   gradient: string;
+  previewVariant?: 'updated-1' | 'updated-2' | 'gradient';
   description?: string;
   size?: string;
   finish?: string;

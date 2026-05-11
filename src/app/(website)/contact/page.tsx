@@ -1,9 +1,18 @@
 import OurCompanySection from "@/components/website/OurCompanySection";
+import ContactSection from '@/components/website/ContactSection';
+import Header from '@/components/website/ContactHero';
+
+export const metadata = {
+  title: 'Contact Us - Magnify',
+  description: 'Get in touch with us for your photo restoration and custom album needs.',
+};
 
 export default function ContactPage() {
   return (
-    <main className="mx-auto flex w-full max-w-7xl px-6 pb-24 pt-36">
+    <main className="min-h-screen bg-white text-slate-900">
+      <Header />
       <OurCompanySection />
+      <ContactSection />
     </main>
   );
 }
