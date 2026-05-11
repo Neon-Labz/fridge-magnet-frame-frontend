@@ -78,7 +78,7 @@ function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
 
 export default function OurCompanySection() {
   return (
-    <section className="flex w-full max-w-[470px] flex-col gap-12" aria-labelledby="our-company-title">
+    <div className="w-full" aria-labelledby="our-company-title">
       <header className="flex flex-col gap-4">
         <h1
           id="our-company-title"
@@ -92,7 +92,7 @@ export default function OurCompanySection() {
         </p>
       </header>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-6">
         {contactCards.map((card) => (
           <CompanyInfoCard key={card.id} {...card} />
         ))}
@@ -137,6 +137,6 @@ export default function OurCompanySection() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
