@@ -63,7 +63,14 @@ export default function ProductsSection() {
 
               {/* CONTENT */}
               <div className="p-[26px]">
-                <h3 className="font-manrope text-[26px] font-semibold leading-[35px] text-[#1A1C1F]">
+                <h3
+                  className="font-manrope text-[26px] font-semibold leading-[35px]"
+                  style={
+                    p.title === 'Magnate With White Frame'
+                      ? { fontFamily: 'Manrope', fontStyle: 'normal', color: '#002B73' }
+                      : { color: '#1A1C1F' }
+                  }
+                >
                   {p.title}
                 </h3>
 

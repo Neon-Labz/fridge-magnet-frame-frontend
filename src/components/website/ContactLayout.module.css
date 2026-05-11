@@ -1,0 +1,73 @@
+.contactWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #f8f8fe;
+  padding: 60px 16px;
+  box-sizing: border-box;
+}
+
+.contactContainer {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  gap: 150px;
+  align-items: flex-start;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rightColumn {
+  flex: 1.1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 5600px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.companyList {
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+}
+
+.companyList > div {
+  min-height: 95px;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .contactContainer {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .leftColumn,
+  .rightColumn {
+    width: 100%;
+  }
+
+  .rightColumn {
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .formCard {
+    max-width: 100%;
+  }
+}

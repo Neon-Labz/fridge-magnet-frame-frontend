@@ -194,7 +194,7 @@ export default function CartPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 0, width: '20px', height: '20px', flex: 'none', order: 0, flexGrow: 0 }}>
                     <ArrowLeft style={{ width: '20px', height: '20px', color: '#002B73' }} />
                   </div>
-                  <span style={{ fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 600, fontSize: '18px', lineHeight: '28px', display: 'flex', alignItems: 'center', textAlign: 'center', color: '#002B73', flex: 'none', order: 1, flexGrow: 0 }}>
+                  <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: '18px', lineHeight: '28px', display: 'flex', alignItems: 'center', textAlign: 'center', color: '#002B73', flex: 'none', order: 1, flexGrow: 0 }} className="font-manrope">
                     Continue Shopping
                   </span>
                 </Link>
