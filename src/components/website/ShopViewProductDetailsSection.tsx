@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
@@ -28,7 +27,6 @@ function ShopViewProductDetailsSection({
   description =
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
-  const router = useRouter();
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
   const { addToCart } = useCartStore();
   const { addToast } = useToastStore();
