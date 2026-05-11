@@ -1,3 +1,4 @@
+import OurCompanySection from "@/components/website/OurCompanySection";
 import ContactSection from '@/components/website/ContactSection';
 import Header from '@/components/website/ContactHero';
 
@@ -10,6 +11,7 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <Header />
+      <OurCompanySection />
       <ContactSection />
     </main>
   );

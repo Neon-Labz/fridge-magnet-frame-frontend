@@ -17,6 +17,7 @@ export interface Product {
   warehouseCenter?: string;
   lastUpdatedBy?: string;
   lastUpdatedDate?: string;
+  isPopular?: boolean;
 }
 
 export interface ProductFormData {

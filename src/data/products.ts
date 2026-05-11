@@ -18,6 +18,7 @@ export const PRODUCTS: Product[] = [
     warehouseCenter: 'Main Distribution Center',
     lastUpdatedBy: 'Sarah Jenkins',
     lastUpdatedDate: 'Oct 24, 2023',
+    isPopular: true,
   },
   {
     id: '#MAG-29381',
@@ -54,6 +55,7 @@ export const PRODUCTS: Product[] = [
     warehouseCenter: 'Main Distribution Center',
     lastUpdatedBy: 'Lisa Park',
     lastUpdatedDate: 'Oct 18, 2023',
+    isPopular: true,
   },
   {
     id: '#MAG-27551',
@@ -89,6 +91,7 @@ export const PRODUCTS: Product[] = [
     warehouseLocation: 'Aisle 5, Bay A',
     warehouseCenter: 'Main Distribution Center',
     lastUpdatedBy: 'Sarah Jenkins',
+    isPopular: true,
     lastUpdatedDate: 'Oct 8, 2023',
   },
   {
