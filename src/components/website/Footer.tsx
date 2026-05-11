@@ -19,9 +19,10 @@ export default function Footer() {
   return (
     <footer className="w-full border-t border-[#C3C6D4] bg-[#F9F9FE]">
       <div className="mx-auto w-full max-w-[1600px] px-6 py-16 lg:px-8 lg:py-20">
+
         {/* GRID */}
         <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 lg:grid-cols-[minmax(260px,1.3fr)_minmax(170px,0.9fr)_minmax(170px,0.9fr)_minmax(280px,1.1fr)] lg:gap-x-16 lg:items-start lg:justify-items-start lg:gap-y-0">
-          
+
           {/* LOGO + DESC */}
           <div className="flex min-w-0 w-[252px] flex-col items-start gap-[14.88px] self-start pb-[74.5px]">
             <Image
@@ -31,19 +32,17 @@ export default function Footer() {
               height={42}
               className="block h-[42px] w-[109px]"
             />
-            <div className="flex h-[69.62px] w-[252px] flex-col items-start pb-[0.625px]">
-              <p className="flex h-[69px] w-[252px] items-center text-[14px] leading-[23px] font-normal text-[#64748B] [font-family:'Inter']">
-                Preserving your most precious moments in artisanal frames that last a lifetime.
-              </p>
-            </div>
+            <p className="text-[14px] leading-[23px] text-[#64748B]">
+              Preserving your most precious moments in artisanal frames that last a lifetime.
+            </p>
           </div>
 
           {/* QUICK LINKS */}
-          <div className="min-w-0 self-start justify-self-start pb-[32px]">
-            <h3 className="text-[16px] font-semibold leading-6 text-[#1A1C1F] [font-family:'Inter']">
+          <div>
+            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
               Quick Links
             </h3>
-            <div className="mt-6 flex flex-col gap-3 text-[14px] leading-5 font-normal text-[#64748B] [font-family:'Inter']">
+            <div className="mt-6 flex flex-col gap-3 text-[14px] text-[#64748B]">
               {quickLinks.map((link) => (
                 <Link key={link.title} href={link.href} className="hover:text-[#002B73]">
                   {link.title}
@@ -53,11 +52,11 @@ export default function Footer() {
           </div>
 
           {/* SUPPORT */}
-          <div className="min-w-0 self-start justify-self-start pb-[32px]">
-            <h3 className="text-[16px] font-semibold leading-6 text-[#1A1C1F] [font-family:'Inter']">
+          <div>
+            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
               Support
             </h3>
-            <div className="mt-6 flex flex-col gap-3 text-[14px] leading-5 font-normal text-[#64748B] [font-family:'Inter']">
+            <div className="mt-6 flex flex-col gap-3 text-[14px] text-[#64748B]">
               {supportLinks.map((link) => (
                 <Link key={link.title} href={link.href} className="hover:text-[#002B73]">
                   {link.title}
@@ -67,12 +66,12 @@ export default function Footer() {
           </div>
 
           {/* NEWSLETTER */}
-          <div className="min-w-0 self-start justify-self-start flex flex-col items-start gap-4 pb-[22px]">
-            <h3 className="text-[16px] font-semibold leading-6 text-[#1A1C1F] [font-family:'Inter']">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
               Join Our Studio
             </h3>
 
-            <p className="max-w-[252px] text-[14px] leading-5 font-normal text-[#64748B] [font-family:'Inter']">
+            <p className="text-[14px] text-[#64748B] max-w-[252px]">
               Get 10% off your next frame by joining our newsletter.
             </p>
 
@@ -80,18 +79,19 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Email address"
-                className="h-full w-full border-0 px-4 text-[14px] leading-[17px] font-normal text-[#6B7280] outline-none [font-family:'Inter']"
+                className="h-full w-full px-4 text-[14px] outline-none"
               />
               <button className="absolute right-0 top-0 flex h-full w-[43px] items-center justify-center bg-[#0040A1] text-white">
                 <ArrowRight size={16} />
               </button>
             </div>
           </div>
+
         </div>
 
         {/* BOTTOM */}
         <div className="mt-16 border-t border-[#C3C6D4] pt-6">
-          <p className="text-center text-[14px] leading-5 font-normal text-[#64748B] [font-family:'Inter']">
+          <p className="text-center text-[14px] text-[#64748B]">
             © 2026 Magnify Photo Frames. Curated Memories.
           </p>
         </div>

@@ -46,9 +46,9 @@ export default function ResetPasswordForm() {
         setSuccess(true)
         console.log('Password reset successful:', response.data)
       } else {
-        setError(response.error || 'Failed to reset password')
+        setError(response.error || 'An error occurred')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)

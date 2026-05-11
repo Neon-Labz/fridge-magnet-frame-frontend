@@ -17,7 +17,10 @@ export default function ContactSection() {
     message: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  // ✅ proper typing (best)
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { id, value } = e.target;
 
     setFormData((prev) => ({
@@ -45,7 +48,7 @@ export default function ContactSection() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="fullName" className="mb-1 block text-[14px] font-semibold text-[#434652]">
+                <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                   Full Name
                 </label>
                 <input
@@ -59,7 +62,7 @@ export default function ContactSection() {
               </div>
 
               <div>
-                <label htmlFor="email" className="mb-1 block text-[14px] font-semibold text-[#434652]">
+                <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                   Email Address
                 </label>
                 <input
@@ -74,7 +77,7 @@ export default function ContactSection() {
             </div>
 
             <div>
-              <label htmlFor="subject" className="mb-1 block text-[14px] font-semibold text-[#434652]">
+              <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                 Subject
               </label>
               <select
@@ -95,7 +98,7 @@ export default function ContactSection() {
             </div>
 
             <div>
-              <label htmlFor="message" className="mb-1 block text-[14px] font-semibold text-[#434652]">
+              <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                 Your Message
               </label>
               <textarea

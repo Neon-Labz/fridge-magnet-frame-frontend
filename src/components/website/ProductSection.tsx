@@ -1,4 +1,8 @@
+'use client';
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useFrameStore } from "@/store/frameStore";
 
 const products = [
   {
@@ -7,22 +11,33 @@ const products = [
     price: "Rs 500.00",
     img: "/product-1.png",
     badge: "New Arrival",
+    frameOption: "without-frame" as const,
   },
   {
     title: "Magnate With Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
     price: "Rs 1000.00",
     img: "/product-2.png",
+    frameOption: "black-frame" as const,
   },
   {
     title: "Magnate With White Frame",
     desc: "Brushed gold aluminum that brings warmth to any room.",
     price: "Rs 1000.00",
     img: "/product-3.png",
+    frameOption: "white-frame" as const,
   },
 ];
 
 export default function ProductsSection() {
+  const router = useRouter();
+  const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
+
+  const handleAddToCart = (frameOption: "without-frame" | "black-frame" | "white-frame") => {
+    setSelectedFrame(frameOption);
+    router.push("/shop");
+  };
+
   return (
     <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
       <div className="mx-auto max-w-[1800px] px-[20px]">
@@ -44,7 +59,7 @@ export default function ProductsSection() {
               key={i}
               className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
             >
-              
+
               {/* IMAGE */}
               <div className="relative h-[600px] w-full">
                 <Image
@@ -84,7 +99,10 @@ export default function ProductsSection() {
                     {p.price}
                   </span>
 
-                  <button className="rounded-[8px] bg-[#BC0000] px-[16px] py-[12px] text-[15px] font-semibold text-white hover:bg-[#a00000]">
+                  <button
+                    onClick={() => handleAddToCart(p.frameOption)}
+                    className="rounded-[8px] bg-[#BC0000] px-[16px] py-[12px] text-[15px] font-semibold text-white hover:bg-[#a00000]"
+                  >
                     Add to Cart
                   </button>
                 </div>
