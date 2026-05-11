@@ -96,33 +96,33 @@ export default function GalleryOfferSection({
         <div className="flex flex-col md:flex-row items-center mt-8 lg:mt-0 gap-8 z-10">
           
           {/* Countdown Timer */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.days)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">DAYS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.days)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">DAYS</span>
             </div>
-            
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
-            
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: "#BC0000" }}>:</div>
+
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.hours)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">HOURS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.hours)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">HOURS</span>
             </div>
-            
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
-            
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: "#BC0000" }}>:</div>
+
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.minutes)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">MINS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.minutes)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">MINS</span>
             </div>
           </div>
 
           {/* Button */}
-          <button 
-            className="font-semibold text-sm md:text-base px-8 py-4 rounded shadow-lg transition-transform hover:scale-105"
+          <button
+            className="font-semibold text-sm md:text-base px-8 py-3 md:py-4 rounded-lg shadow-lg transition-all hover:shadow-xl active:scale-95"
             style={{ backgroundColor: "white", color: "#071E54" }}
           >
-            Claim<br/>Offer
+            Claim Offer
           </button>
 
         </div>

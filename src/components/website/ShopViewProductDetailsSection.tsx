@@ -2,10 +2,13 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
 import { useFrameStore } from '@/store/frameStore';
+import { useCartStore } from '@/store/cartStore';
+import { useToastStore } from '@/store/toastStore';
 
 interface ShopViewProductDetailsSectionProps {
   title?: string;
@@ -16,7 +19,7 @@ interface ShopViewProductDetailsSectionProps {
   description?: string;
 }
 
-export default function ShopViewProductDetailsSection({
+function ShopViewProductDetailsSection({
   title = 'Magnate picture with black frame',
   rating = 4.8,
   reviews = 124,
@@ -25,8 +28,11 @@ export default function ShopViewProductDetailsSection({
   description =
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
+  const router = useRouter();
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
-  const [quantity, setQuantity] = useState(4);
+  const { addToCart } = useCartStore();
+  const { addToast } = useToastStore();
+  const [quantity, setQuantity] = useState(1);
 
   const getInitialPersonalization = () => {
     if (selectedFrame === 'without-frame') {
@@ -80,6 +86,20 @@ export default function ShopViewProductDetailsSection({
     return 'Magnate frame';
   };
 
+  const handleAddToCart = () => {
+    const cartItem = {
+      id: selectedFrame,
+      title: getDynamicTitle(),
+      price: price,
+      frameOption: selectedFrame,
+      quantity: quantity,
+      image: mainImageSource,
+    };
+
+    addToCart(cartItem);
+    addToast('Product added to cart successfully!', 'success');
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -119,36 +139,60 @@ export default function ShopViewProductDetailsSection({
 
           {/* Thumbnails */}
           <div className="flex gap-4">
-            {/* Black frame thumbnail */}
-            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
-              <Image
-                src={getThumbnailImageSource('black')}
-                alt="Black frame thumbnail"
-                width={128}
-                height={160}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {/* White frame thumbnail */}
-            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
-              <Image
-                src={getThumbnailImageSource('white')}
-                alt="White frame thumbnail"
-                width={128}
-                height={160}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {/* Without frame thumbnail */}
-            <div className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 border-transparent hover:border-[#1A2B5E] cursor-pointer transition-colors">
-              <Image
-                src={getThumbnailImageSource('no-frame')}
-                alt="Without frame thumbnail"
-                width={128}
-                height={160}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {personalization.option === 'with-frame' && (
+              <>
+                {/* Black frame thumbnail */}
+                <div
+                  onClick={() => setPersonalization({ option: 'with-frame' as const, frameColor: 'black' as const })}
+                  className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 cursor-pointer transition-all"
+                  style={{
+                    borderColor: personalization.frameColor === 'black' ? '#1A2B5E' : 'transparent'
+                  }}
+                >
+                  <Image
+                    src="/black-frame-product.jpg"
+                    alt="Black frame thumbnail"
+                    width={128}
+                    height={160}
+                    className="w-full h-full object-cover hover:opacity-80"
+                  />
+                </div>
+
+                {/* White frame thumbnail */}
+                <div
+                  onClick={() => setPersonalization({ option: 'with-frame' as const, frameColor: 'white' as const })}
+                  className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2 cursor-pointer transition-all"
+                  style={{
+                    borderColor: personalization.frameColor === 'white' ? '#1A2B5E' : 'transparent'
+                  }}
+                >
+                  <Image
+                    src="/white-frame-product.png"
+                    alt="White frame thumbnail"
+                    width={128}
+                    height={160}
+                    className="w-full h-full object-cover hover:opacity-80"
+                  />
+                </div>
+              </>
+            )}
+
+            {personalization.option === 'without-frame' && (
+              <div
+                className="bg-[#F4F3ED] aspect-[4/5] w-32 rounded-sm overflow-hidden border-2"
+                style={{
+                  borderColor: '#1A2B5E'
+                }}
+              >
+                <Image
+                  src="/without-frame.png"
+                  alt="Without frame product"
+                  width={128}
+                  height={160}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -247,7 +291,10 @@ export default function ShopViewProductDetailsSection({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 max-w-[500px]">
-            <button className="flex-1 flex items-center justify-center gap-2 py-3 px-6 border-2 border-[#1A2B5E] text-[#1A2B5E] font-medium rounded-[4px] hover:bg-slate-50 transition-colors">
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 flex items-center justify-center gap-2 py-3 px-6 border-2 border-[#1A2B5E] text-[#1A2B5E] font-medium rounded-[4px] hover:bg-slate-50 transition-all"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -273,3 +320,5 @@ export default function ShopViewProductDetailsSection({
     </section>
   );
 }
+
+export default ShopViewProductDetailsSection;

@@ -3,9 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCartStore } from "@/store/cartStore";
 
 export default function Header() {
   const pathname = usePathname();
+  const { items } = useCartStore();
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const isActive = (href: string) => {
     if (href === "/" && pathname === "/") return true;
@@ -55,16 +58,20 @@ export default function Header() {
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-[40px]">
-          <div className="relative cursor-pointer text-[20px] text-[#475569]">
+          <button className="relative cursor-pointer text-[24px] text-[#475569] hover:text-[#002B73] transition-colors">
             🛒
-
-          </div>
-
-        <Link href="/login">
-          <button className="h-[45px] w-[116px] rounded-[9px] bg-[#BC0000] font-inter text-[18px] font-semibold text-white">
-            Login
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#BC0000] text-white text-[12px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </button>
-        </Link>
+
+          <Link href="/login">
+            <button className="h-[45px] w-[116px] rounded-[9px] bg-[#BC0000] font-inter text-[18px] font-semibold text-white hover:bg-[#a00000] transition-colors">
+              Login
+            </button>
+          </Link>
         </div>
       </nav>
     </header>

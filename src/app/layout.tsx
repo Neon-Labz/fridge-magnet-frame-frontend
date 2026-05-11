@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import Toast from '@/components/Toast';
 import './globals.css';
 
 const geistSans = Geist({
@@ -29,6 +30,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col antialiased">
+        <Toast />
         {children}
       </body>
     </html>
