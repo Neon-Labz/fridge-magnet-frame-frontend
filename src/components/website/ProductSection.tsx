@@ -8,7 +8,7 @@ const products = [
   {
     title: "Magnet Frame",
     desc: "Sustainably sourced solid oak with museum-grade acrylic.",
-    price: "Rs 1500.00",
+    price: "Rs 500.00",
     img: "/product-1.png",
     badge: "New Arrival",
     frameOption: "without-frame" as const,
@@ -16,14 +16,14 @@ const products = [
   {
     title: "Magnet With Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
-    price: "Rs 2500.00",
+    price: "Rs 1000.00",
     img: "/product-2.png",
     frameOption: "black-frame" as const,
   },
   {
     title: "Magnet With White Frame",
     desc: "Brushed gold aluminum that brings warmth to any room.",
-    price: "Rs 2500.00",
+    price: "Rs 1000.00",
     img: "/product-3.png",
     frameOption: "white-frame" as const,
   },
@@ -39,29 +39,29 @@ export default function ProductsSection() {
   };
 
   return (
-    <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[80px]">
-      <div className="mx-auto max-w-[1200px] px-[100px]">
+    <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
+      <div className="mx-auto max-w-[1800px] px-[100px]">
 
         {/* HEADER */}
         <div className="mb-[52px]">
-          <h2 className="font-manrope text-[30px] font-bold leading-[44px] tracking-[-0.35px] text-[#002B73] lg:text-[40px] lg:leading-[50px]">
+          <h2 className="font-manrope text-[35px] font-semibold leading-[44px] tracking-[-0.35px] text-[#002B73]">
             Curated Classics
           </h2>
-          <p className="mt-[8px] font-inter text-[20px] leading-[26px] text-[#434652]">
+          <p className="mt-[8px] font-inter text-[17px] leading-[26px] text-[#434652]">
             The foundation of every great gallery wall.
           </p>
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-3 gap-[22px]">
+        <div className="grid grid-cols-3 gap-[35px]">
           {products.map((p, i) => (
             <div
               key={i}
-              className="mx-auto w-full max-w-[330px] self-start overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
+              className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
             >
 
               {/* IMAGE */}
-              <div className="relative h-[260px] w-full">
+              <div className="relative h-[600px] w-full">
                 <Image
                   src={p.img}
                   alt={p.title}
