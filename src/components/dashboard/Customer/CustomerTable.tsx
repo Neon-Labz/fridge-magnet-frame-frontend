@@ -340,7 +340,7 @@ const CustomerTable = () => {
     setDeleting(true);
     setDeleteError(null);
     try {
-      const res = await fetch(`/api/v1/customers?id=${customerToDelete.id}`, {
+      const res = await fetch(`/api/v1/customers/${customerToDelete.id}`, {
         method: 'DELETE',
       });
 

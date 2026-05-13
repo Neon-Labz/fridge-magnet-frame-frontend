@@ -9,7 +9,8 @@ const ORDER_FILTER_OPTIONS: { value: OrderFilterStatus; label: string }[] = [
   { value: 'shipped',    label: 'Shipped'     },
   { value: 'pending',    label: 'Pending'     },
   { value: 'processing', label: 'Processing'  },
-  { value: 'cancelled',  label: 'Cancelled'   },
+  { value: 'delivered',  label: 'Delivered'   },
+  { value: 'canceled',   label: 'Canceled'    },
 ];
 
 const ORDER_SORT_OPTIONS: { value: OrderSortBy; label: string }[] = [
