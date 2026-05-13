@@ -17,7 +17,7 @@ export default function Header() {
 
   return (
     <header className="fixed left-0 top-0 z-50 h-[82px] w-full border-b border-[#E5E5EA]/80 bg-white/95 shadow-[0_6px_18px_rgba(15,23,42,0.05)] backdrop-blur-sm">
-      <nav className="mx-auto flex h-full w-full max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-10">
+      <nav className=" flex h-full w-full max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-10">
         
         {/* LOGO */}
         <Link href="/" className="shrink-0">
@@ -82,14 +82,14 @@ export default function Header() {
         {/* RIGHT */}
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
           
-          <div className="relative cursor-pointer rounded-full p-1.5 text-[16px] text-[#64748B] transition-colors hover:bg-[#F8FAFC] hover:text-[#002B73] sm:p-2 sm:text-[18px]">
-            🛒
+          <div className="cursor-pointer text-[26px] text-black transition-all duration-200 hover:scale-110 hover:text-gray-700">
+          🛒
           </div>
 
           <Link href="/login">
-            <button className="h-[38px] rounded-[8px] bg-[#BC0000] px-4 font-inter text-[13px] font-semibold text-white shadow-[0_10px_20px_rgba(188,0,0,0.2)] transition-colors hover:bg-[#a10000] sm:h-[42px] sm:px-5 sm:text-[15px] lg:text-[16px]">
-              Login
-            </button>
+          <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
+           Login
+          </button>
           </Link>
 
         </div>

@@ -2,8 +2,8 @@
 
 export default function VideoSection() {
   return (
-    <section className="w-full bg-white py-[80px] lg:py-[120px]">
-      <div className="mx-auto max-w-[1800px] px-[100px]">
+    <section className="w-full bg-[#f9f9fe]  lg:py-[100px] pt-[100px]">
+      <div className="mx-auto max-w-[1800px] px-[100px] ">
         <div className="flex flex-col items-start justify-between gap-[60px] lg:flex-row">
           
           {/* Left Content */}
@@ -25,7 +25,7 @@ export default function VideoSection() {
 
           {/* Right Video Content */}
           <div className="flex w-full justify-end lg:w-1/2">
-            <div className="rounded-[24px] bg-[#f9f9fe] p-[40px]">
+            <div className="rounded-[24px] bg-[#f6f6fa] p-[40px]">
               <div className="relative aspect-[3/2] w-[500px] overflow-hidden rounded-[16px]">
                 <img
                   src="/homepage-video.gif"
