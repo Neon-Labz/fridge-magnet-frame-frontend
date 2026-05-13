@@ -1,7 +1,7 @@
 import OurCompanySection from "@/components/website/OurCompanySection";
-import ContactSection from '@/components/website/ContactSection';
-import Header from '@/components/website/ContactHero';
-import styles from '@/components/website/ContactLayout.module.css';
+import ContactSection from "@/components/website/ContactSection";
+import Header from "@/components/website/ContactHero";
+import styles from "@/components/website/ContactLayout.module.css";
 
 export const metadata = {
   title: 'Contact Us - Magnify',
@@ -12,8 +12,10 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <Header />
+
       <div className={styles.contactWrapper}>
         <div className={styles.contactContainer}>
+          
           <div className={styles.leftColumn}>
             <OurCompanySection />
           </div>
@@ -23,6 +25,7 @@ export default function ContactPage() {
               <ContactSection />
             </div>
           </div>
+
         </div>
       </div>
     </main>

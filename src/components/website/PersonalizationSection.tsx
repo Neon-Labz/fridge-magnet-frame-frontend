@@ -26,28 +26,44 @@ const FRAME_COLORS: { id: FrameColor; label: string }[] = [
   { id: 'white', label: 'White' },
 ];
 
-export default function PersonalizationSection({ onChange, initialOption = 'with-frame', initialFrameColor = 'black' }: PersonalizationSectionProps) {
-  const [selectedOption, setSelectedOption] = useState<PersonalizationOption>(initialOption);
-  const [selectedFrame, setSelectedFrame] = useState<FrameColor>(initialFrameColor);
+export default function PersonalizationSection({
+  onChange,
+  initialOption = 'with-frame',
+  initialFrameColor = 'black',
+}: PersonalizationSectionProps) {
+  const [selectedOption, setSelectedOption] =
+    useState<PersonalizationOption>(initialOption);
+  const [selectedFrame, setSelectedFrame] =
+    useState<FrameColor>(initialFrameColor);
   const [isOpen, setIsOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  /* Close dropdown when clicking outside */
+  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () =>
+      document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleOptionSelect = (opt: PersonalizationOption) => {
     setSelectedOption(opt);
     setIsOpen(false);
+
     const state: PersonalizationState =
-      opt === 'with-frame' ? { option: opt, frameColor: selectedFrame } : { option: opt };
+      opt === 'with-frame'
+        ? { option: opt, frameColor: selectedFrame }
+        : { option: opt };
+
     onChange?.(state);
   };
 
@@ -56,48 +72,54 @@ export default function PersonalizationSection({ onChange, initialOption = 'with
     onChange?.({ option: 'with-frame', frameColor: frame });
   };
 
-  const selectedLabel = OPTIONS.find((o) => o.id === selectedOption)?.label ?? '';
+  const selectedLabel =
+    OPTIONS.find((o) => o.id === selectedOption)?.label ?? '';
 
   return (
     <div className="w-full">
-      {/* ── Personalization Dropdown ─────────────────────────────── */}
-      <label className="block text-[15px] text-slate-700 mb-3">Personalization</label>
+      {/* Title */}
+      <label className="block text-[15px] text-slate-700 mb-3">
+        Personalization
+      </label>
 
+      {/* Dropdown */}
       <div className="relative" ref={dropdownRef}>
-        {/* Trigger button */}
         <button
           onClick={() => setIsOpen((prev) => !prev)}
-          className="w-full flex items-center justify-between px-5 py-3.5 rounded-full border-2 border-[#1A2B5E] bg-[#F0F2F8] text-[15px] font-semibold text-slate-800 hover:bg-[#E8EBFA] transition-colors"
+          className="w-full flex items-center justify-between px-5 py-3.5 rounded-full border-2 border-[#1A2B5E] bg-[#F0F2F8] text-[15px] font-semibold text-slate-800"
         >
           <span>{selectedLabel}</span>
+
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            className={`w-5 h-5 transition-transform ${
+              isOpen ? 'rotate-180' : ''
+            }`}
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={2.5}
             stroke="currentColor"
-            className={[
-              'w-5 h-5 text-slate-700 transition-transform duration-200',
-              isOpen ? 'rotate-180' : 'rotate-0',
-            ].join(' ')}
+            strokeWidth={2.5}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+            />
           </svg>
         </button>
 
-        {/* Dropdown list */}
+        {/* Options */}
         {isOpen && (
-          <div className="absolute z-20 top-[calc(100%+6px)] left-0 w-full bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+          <div className="absolute z-20 mt-2 w-full bg-white border rounded-xl shadow-lg">
             {OPTIONS.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => handleOptionSelect(opt.id)}
-                className={[
-                  'w-full text-left px-5 py-3.5 text-[15px] font-medium transition-colors',
+                className={`w-full text-left px-5 py-3 ${
                   selectedOption === opt.id
                     ? 'bg-[#F0F2F8] text-[#1A2B5E] font-semibold'
-                    : 'text-slate-700 hover:bg-slate-50',
-                ].join(' ')}
+                    : 'hover:bg-gray-50'
+                }`}
               >
                 {opt.label}
               </button>
@@ -106,42 +128,39 @@ export default function PersonalizationSection({ onChange, initialOption = 'with
         )}
       </div>
 
-      {/* ── Color Swatches (only when With Frame) ────────────────── */}
+      {/* Frame Color */}
       {selectedOption === 'with-frame' && (
         <div className="mt-6">
           <p className="text-[15px] text-slate-700 mb-4">Select Color</p>
-          <div className="flex items-start gap-6">
+
+          <div className="flex gap-6">
             {FRAME_COLORS.map((fc) => {
-              const isActive = selectedFrame === fc.id;
+              const active = selectedFrame === fc.id;
+
               return (
                 <button
                   key={fc.id}
                   onClick={() => handleFrameChange(fc.id)}
-                  className="flex flex-col items-center gap-2 group"
+                  className="flex flex-col items-center gap-2"
                 >
-                  {/* Outer ring */}
                   <div
-                    className={[
-                      'w-14 h-14 rounded-full flex items-center justify-center border-[3px] transition-all duration-200',
-                      isActive ? 'border-[#1A2B5E]' : 'border-transparent group-hover:border-slate-300',
-                    ].join(' ')}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center border-2 ${
+                      active ? 'border-[#1A2B5E]' : 'border-transparent'
+                    }`}
                   >
-                    {/* Inner swatch */}
                     <div
-                      className={[
-                        'w-10 h-10 rounded-full transition-transform duration-200 group-hover:scale-105',
+                      className={`w-10 h-10 rounded-full ${
                         fc.id === 'black'
-                          ? 'bg-[#0D1B40]'
-                          : 'bg-[#E8EAF0] border border-slate-200',
-                      ].join(' ')}
+                          ? 'bg-black'
+                          : 'bg-gray-200 border'
+                      }`}
                     />
                   </div>
-                  {/* Label */}
+
                   <span
-                    className={[
-                      'text-sm font-semibold',
-                      isActive ? 'text-[#1A2B5E]' : 'text-slate-400',
-                    ].join(' ')}
+                    className={`text-sm ${
+                      active ? 'text-[#1A2B5E]' : 'text-gray-400'
+                    }`}
                   >
                     {fc.label}
                   </span>
