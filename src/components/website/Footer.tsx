@@ -17,71 +17,82 @@ const supportLinks = [
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-[#C3C6D4] bg-[#F9F9FE]">
-      <div className="mx-auto w-full max-w-[1600px] px-6 py-16 lg:px-8 lg:py-20">
+    <footer className="w-full border-t border-[#E2E8F0] bg-[#F8FAFC]">
+      <div className="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 sm:py-14 lg:px-10 lg:py-16">
+        
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.2fr_0.75fr_0.75fr_0.9fr] xl:gap-10">
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 lg:grid-cols-[minmax(260px,1.3fr)_minmax(170px,0.9fr)_minmax(170px,0.9fr)_minmax(280px,1.1fr)] lg:gap-x-16 lg:items-start lg:justify-items-start lg:gap-y-0">
+          {/* LEFT */}
+          <div className="flex w-full max-w-[360px] flex-col items-start">
+            <div className="relative mb-[20px] h-[75px] w-[190px]">
+              <Image
+                src="/logo.png"
+                alt="Magnify Logo"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </div>
 
-          {/* LOGO + DESC */}
-          <div className="flex min-w-0 w-[252px] flex-col items-start gap-[14.88px] self-start pb-[74.5px]">
-            <Image
-              src="/logo.png"
-              alt="Magnify Logo"
-              width={109}
-              height={42}
-              className="block h-[42px] w-[109px]"
-            />
-            <p className="text-[14px] leading-[23px] text-[#64748B]">
-              Preserving your most precious moments in artisanal frames that last a lifetime.
+            <p className="max-w-[320px] font-inter text-[16px] leading-[1.8] text-[#64748B]">
+              © 2024 Magnify. Premium photo framing for curated memories.
+              Elevating everyday moments into lasting legacies.
             </p>
           </div>
 
           {/* QUICK LINKS */}
           <div>
-            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Quick Links
-            </h3>
-            <div className="mt-6 flex flex-col gap-3 text-[14px] text-[#64748B]">
+            </h4>
+
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
               {quickLinks.map((link) => (
-                <Link key={link.title} href={link.href} className="hover:text-[#002B73]">
-                  {link.title}
-                </Link>
+                <li key={link.title}>
+                  <Link href={link.href} className="hover:text-[#002B73]">
+                    {link.title}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           {/* SUPPORT */}
           <div>
-            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Support
-            </h3>
-            <div className="mt-6 flex flex-col gap-3 text-[14px] text-[#64748B]">
+            </h4>
+
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
               {supportLinks.map((link) => (
-                <Link key={link.title} href={link.href} className="hover:text-[#002B73]">
-                  {link.title}
-                </Link>
+                <li key={link.title}>
+                  <Link href={link.href} className="hover:text-[#002B73]">
+                    {link.title}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           {/* NEWSLETTER */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-[16px] font-semibold text-[#1A1C1F]">
-              Join Our Studio
-            </h3>
+          <div>
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
+              Newsletter
+            </h4>
 
-            <p className="text-[14px] text-[#64748B] max-w-[252px]">
-              Get 10% off your next frame by joining our newsletter.
+            <p className="mt-5 font-inter text-[15px] leading-7 text-[#64748B]">
+              Join our list for exclusive gallery updates and styling tips.
             </p>
 
-            <div className="relative h-[38px] w-full max-w-[252px] overflow-hidden rounded-[8px] border border-[#C3C6D4] bg-white">
+            <div className="mt-5 flex h-[42px] w-full max-w-[260px] overflow-hidden rounded-[10px] border border-[#C3C6D4] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
+              
               <input
                 type="email"
                 placeholder="Email address"
-                className="h-full w-full px-4 text-[14px] outline-none"
+                className="w-full px-4 font-inter text-[14px] outline-none placeholder:text-[#94A3B8]"
               />
-              <button className="absolute right-0 top-0 flex h-full w-[43px] items-center justify-center bg-[#0040A1] text-white">
+
+              <button className="flex items-center justify-center w-[42px] bg-[#002B73] text-white hover:bg-[#001f57]">
                 <ArrowRight size={16} />
               </button>
             </div>
