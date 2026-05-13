@@ -40,14 +40,14 @@ export default function ProductsSection() {
 
   return (
     <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[80px]">
-      <div className="mx-auto max-w-[1800px] px-[20px]">
+      <div className="mx-auto max-w-[1800px] px-[100px]">
 
         {/* HEADER */}
         <div className="mb-[52px]">
-          <h2 className="font-manrope text-[35px] font-semibold leading-[44px] tracking-[-0.35px] text-[#002B73]">
+          <h2 className="font-manrope text-[30px] font-bold leading-[44px] tracking-[-0.35px] text-[#002B73] lg:text-[40px] lg:leading-[50px]">
             Curated Classics
           </h2>
-          <p className="mt-[8px] font-inter text-[17px] leading-[26px] text-[#434652]">
+          <p className="mt-[8px] font-inter text-[20px] leading-[26px] text-[#434652]">
             The foundation of every great gallery wall.
           </p>
         </div>
