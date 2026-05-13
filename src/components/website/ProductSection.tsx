@@ -40,7 +40,7 @@ export default function ProductsSection() {
 
   return (
     <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
-      <div className="mx-auto max-w-[1800px] px-[20px]">
+      <div className="mx-auto max-w-[1800px] px-[100px]">
 
         {/* HEADER */}
         <div className="mb-[52px]">

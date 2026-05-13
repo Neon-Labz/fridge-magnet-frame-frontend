@@ -60,6 +60,10 @@ export default function Footer() {
             </h4>
 
             <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
+              <li>Contact Us</li>
+              <li>About Our Craft</li>
+              <li>Sustainability</li>
+
               {supportLinks.map((link) => (
                 <li key={link.title}>
                   <Link href={link.href} className="hover:text-[#002B73]">

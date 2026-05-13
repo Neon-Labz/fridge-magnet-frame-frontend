@@ -20,25 +20,25 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[#002B73]/20" />
 
       {/* CONTENT */}
-      <div className="relative z-10 flex h-full items-start pl-[60px] pt-[30px]">
+      <div className="relative z-10 flex h-full items-start pl-[100px] pt-[30px]">
         
         {/* GLASS BOX */}
         <div
           className="
             relative
-            h-[690px]
-            w-[760px]
+            h-[650px]
+            w-[600px]
             rounded-[28px]
             border
             border-white/35
             bg-[rgba(255,255,255,0.22)]
-            backdrop-blur-[45px]
+            backdrop-blur-[4px]
             shadow-[0_10px_40px_rgba(0,0,0,0.15)]
           "
         >
 
           {/* TEXT CONTAINER */}
-          <div className="absolute left-[55px] top-[105px] w-[620px]">
+          <div className="absolute left-[55px] top-[95px] w-[620px]">
 
             {/* TITLE */}
             <h1
@@ -74,7 +74,9 @@ export default function Hero() {
               "
             >
               Transform your digital memories into museum-grade
+              <br />
               physical heirlooms. Handcrafted precision for the
+              <br />
               moments that define you.
             </p>
 

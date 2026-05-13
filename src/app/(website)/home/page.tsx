@@ -5,6 +5,7 @@ import ProductSection from "@/components/website/ProductSection";
 import PricingSection from "@/components/website/PricingSection";
 import CounterSection from "@/components/website/CounterSection";
 import Footer from "@/components/website/Footer";
+import Testimonial from "@/components/website/Testimonial";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <VideoSection />
       <ProductSection />
+      <Testimonial />
       <PricingSection />
       <CounterSection />
       <Footer />
