@@ -1,38 +1,107 @@
 'use client';
 
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 export default function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative min-h-232.5 w-full overflow-hidden">
-    <div
-      className="absolute inset-0 bg-size-[100%_100%] bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/bg-hero.png')" }}
-    />
+    <section className="relative mt-[90px] h-[782px] w-full overflow-hidden">
+      
+      {/* BACKGROUND IMAGE */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/bg-hero.png')",
+        }}
+      />
 
-      <div className="absolute inset-0 bg-[#002B73]/30" />
+      {/* DARK OVERLAY */}
+      <div className="absolute inset-0 bg-[#002B73]/20" />
 
-      <div className="relative z-10 flex max-w-359.5 min-h-232.5 items-center px-21">
-        <div className="max-w-149.75  min-h-172.5 rounded-[25px] bg-white/35 px-10 pt-35 pb-25 backdrop-blur-[0px]">
-          <h1 className="max-w-138.5 font-manrope text-[48px] font-bold leading-14 tracking-[-0.96px] text-[#002B73]">
-            Your Memories,{" "}
-            <span className="text-[#BC0000]">Magnified</span> with Precision.
-          </h1>
+      {/* CONTENT */}
+      <div className="relative z-10 flex h-full items-start pl-[60px] pt-[30px]">
+        
+        {/* GLASS BOX */}
+        <div
+          className="
+            relative
+            h-[690px]
+            w-[760px]
+            rounded-[28px]
+            border
+            border-white/35
+            bg-[rgba(255,255,255,0.22)]
+            backdrop-blur-[45px]
+            shadow-[0_10px_40px_rgba(0,0,0,0.15)]
+          "
+        >
 
-          <p className="mt-6 max-w-132.75 font-inter text-[21px] leading-7.5 text-[#434652]">
-            Transform your digital memories into museum-grade physical
-            heirlooms. Handcrafted precision for the moments that define you.
-          </p>
+          {/* TEXT CONTAINER */}
+          <div className="absolute left-[55px] top-[105px] w-[620px]">
 
-          <button
-            onClick={() => router.push('/shop')}
-            className="mt-10 h-17 w-45 rounded-[8.5px] bg-[#BC0000] font-inter text-[19px] font-semibold text-white shadow-lg"
-          >
-            Shop Now
-          </button>
+            {/* TITLE */}
+            <h1
+              className="
+                font-manrope
+                text-[52px]
+                font-bold
+                leading-[62px]
+                tracking-[-1px]
+                text-[#002B73]
+              "
+            >
+              Your Memories, <br />
+
+              <span className="text-[#BC0000]">
+                Magnified
+              </span>{' '}
+              
+              with <br />
+
+              Precision.
+            </h1>
+
+            {/* PARAGRAPH */}
+            <p
+              className="
+                mt-[34px]
+                w-[560px]
+                font-inter
+                text-[18px]
+                leading-[36px]
+                text-black/75
+              "
+            >
+              Transform your digital memories into museum-grade
+              physical heirlooms. Handcrafted precision for the
+              moments that define you.
+            </p>
+
+            {/* BUTTON */}
+            <button
+              onClick={() => router.push('/shop')}
+              className="
+                mt-[42px]
+                flex
+                h-[68px]
+                w-[180px]
+                items-center
+                justify-center
+                rounded-[10px]
+                bg-[#BC0000]
+                text-[18px]
+                font-semibold
+                text-white
+                shadow-[0_10px_25px_rgba(0,0,0,0.18)]
+                transition-all
+                hover:bg-[#a00000]
+              "
+            >
+              Shop Now
+            </button>
+
+          </div>
         </div>
       </div>
     </section>

@@ -3,78 +3,77 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F8FAFC]">
-      <div className="mx-auto max-w-[1800px] px-[40px] py-[80px]">
-        <div className="grid items-start gap-12 md:grid-cols-2 xl:grid-cols-[360px_276px_276px_320px] xl:justify-between">
-          <div className="w-full max-w-[360px]">
-            <div className="relative mt-[-50px] h-[180px] w-[300px]">
+      <div className="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 sm:py-14 lg:px-10 lg:py-16">
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.2fr_0.75fr_0.75fr_0.9fr] xl:gap-10">
+          
+          {/* LEFT */}
+          <div className="flex w-full max-w-[360px] flex-col items-start">
+            <div className="relative mb-[20px] h-[75px] w-[190px]">
               <Image
                 src="/logo.png"
                 alt="Magnify Logo"
                 fill
                 priority
                 className="object-contain object-left"
-                sizes="340px"
+                sizes="190px"
               />
             </div>
 
-            <p className="mt-[-35px] font-inter text-[20px] leading-[42px] text-[#64748B]">
-              © 2024 Magnify. Premium
-              <br />
-              photo framing for curated
-              <br />
-              memories. Elevating everyday
-              <br />
-              moments into lasting
-              <br />
-              legacies.
+            <p className="max-w-[320px] font-inter text-[16px] leading-[1.8] text-[#64748B]">
+              © 2024 Magnify. Premium photo framing for curated memories.
+              Elevating everyday moments into lasting legacies.
             </p>
           </div>
 
-          <div className="pt-[32px]">
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+          {/* NAVIGATION */}
+          <div>
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Navigation
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
               <li>Privacy Policy</li>
               <li>Terms of Service</li>
               <li>Shipping Policy</li>
             </ul>
           </div>
 
-          <div className="pt-[32px]">
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+          {/* CONNECT */}
+          <div>
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Connect
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
               <li>Contact Us</li>
               <li>About Our Craft</li>
               <li>Sustainability</li>
             </ul>
           </div>
 
-          <div className="pt-[32px]">
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+          {/* NEWSLETTER */}
+          <div>
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Newsletter
             </h4>
 
-            <p className="mt-[28px] font-inter text-[20px] leading-[30px] text-[#64748B]">
+            <p className="mt-5 font-inter text-[15px] leading-7 text-[#64748B]">
               Join our list for exclusive gallery updates and styling tips.
             </p>
 
-            <div className="mt-[25px] flex h-[61px] w-full max-w-[276px] overflow-hidden rounded-[15px] border border-[#C3C6D4] bg-white">
+            <div className="mt-5 flex h-[42px] w-full max-w-[260px] overflow-hidden rounded-[10px] border border-[#C3C6D4] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full px-[18px] font-inter text-[20px] outline-none"
+                className="w-full px-4 font-inter text-[14px] outline-none placeholder:text-[#94A3B8]"
               />
 
-              <button className="w-[66px] bg-[#002B73] text-[20px] text-white">
+              <button className="w-[42px] bg-[#002B73] text-[15px] text-white transition-colors hover:bg-[#001f57]">
                 →
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </footer>
