@@ -40,7 +40,7 @@ export default function ProductsSection() {
 
   return (
     <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[80px]">
-      <div className="mx-auto max-w-[1800px] px-[100px]">
+      <div className="mx-auto max-w-[1200px] px-[100px]">
 
         {/* HEADER */}
         <div className="mb-[52px]">
@@ -53,15 +53,15 @@ export default function ProductsSection() {
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-3 gap-[35px]">
+        <div className="grid grid-cols-3 gap-[22px]">
           {products.map((p, i) => (
             <div
               key={i}
-              className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
+              className="mx-auto w-full max-w-[330px] self-start overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
             >
 
               {/* IMAGE */}
-              <div className="relative h-[600px] w-full">
+              <div className="relative h-[260px] w-full">
                 <Image
                   src={p.img}
                   alt={p.title}
