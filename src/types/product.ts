@@ -9,6 +9,9 @@ export interface Product {
   stockCount: number;
   stockStatus: StockStatus;
   gradient: string;
+  primaryImageUrl?: string;
+  galleryImageUrls?: string[];
+  previewVariant?: 'updated-1' | 'updated-2' | 'gradient';
   description?: string;
   size?: string;
   finish?: string;
@@ -16,6 +19,7 @@ export interface Product {
   warehouseCenter?: string;
   lastUpdatedBy?: string;
   lastUpdatedDate?: string;
+  isPopular?: boolean;
 }
 
 export interface ProductFormData {

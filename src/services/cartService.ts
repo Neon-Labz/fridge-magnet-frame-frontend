@@ -3,8 +3,9 @@
 import { getStorage, setStorage, removeStorage } from '../utils/localStorage';
 
 const CART_KEY = 'cart';
+const ORDER_KEY = 'latest-order';
 
-interface Product {
+export interface Product {
   id: string | number;
   name: string;
   price: number | string;
@@ -12,12 +13,20 @@ interface Product {
   quantity?: number | string;
 }
 
-interface CartItem {
+export interface CartItem {
   id: string | number;
   name: string;
   price: number;
   image?: string;
   quantity: number;
+}
+
+export interface OrderRecord {
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  orderNumber: string;
+  createdAt: string;
 }
 
 const normalizeCartItem = (product: Product): CartItem => ({
@@ -30,6 +39,7 @@ const normalizeCartItem = (product: Product): CartItem => ({
 
 const saveCartItems = (items: CartItem[]): void => {
   setStorage(CART_KEY, items);
+  window.dispatchEvent(new Event('cart-updated'));
 };
 
 export const getCartItems = (): CartItem[] => {
@@ -81,8 +91,21 @@ export const updateQuantity = (productId: string | number, quantity: number): Ca
 
 export const clearCart = (): CartItem[] => {
   removeStorage(CART_KEY);
+  window.dispatchEvent(new Event('cart-updated'));
   return [];
 };
+
+export const saveOrder = (order: OrderRecord): OrderRecord => {
+  setStorage(ORDER_KEY, order);
+  return order;
+};
+
+export const getSavedOrder = (): OrderRecord | null => {
+  const order = getStorage(ORDER_KEY);
+  return order && typeof order === 'object' ? (order as OrderRecord) : null;
+};
+
+export const clearSavedOrder = (): boolean => removeStorage(ORDER_KEY);
 
 export const getCartTotal = (): number => {
   return getCartItems().reduce((total, item) => {

@@ -17,9 +17,7 @@ export default function ContactSection() {
     message: '',
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<any>) => {
     const { id, value } = e.target;
 
     setFormData((prev) => ({
@@ -33,21 +31,18 @@ export default function ContactSection() {
   };
 
   return (
-    <section className="w-full bg-[#F8F8FE] px-4 pb-20 pt-12 sm:px-6 lg:px-8">
-      <div className="flex w-full justify-end">
-        <div className="relative w-full max-w-[620px] rounded-[16px] border border-[#C3C6D4] bg-white px-6 py-12 shadow-[0px_20px_25px_-5px_rgba(0,43,115,0.05),0px_8px_10px_-6px_rgba(0,43,115,0.05)] sm:px-12">
-          <div className="absolute -right-16 -top-16 h-32 w-32 rounded-bl-full bg-[rgba(230,28,16,0.05)]" />
+    <div className="w-full">
+      <div className="relative w-full rounded-[12px]">
+        <div className="relative z-10">
+          <h2 className="text-[30px] font-bold leading-[36px] text-[#1A1C1F]">
+            Send a Message
+          </h2>
 
-          <div className="relative z-10">
-            <h2 className="text-[30px] font-bold leading-[36px] text-[#1A1C1F]">
-              Send a Message
-            </h2>
+          <p className="mt-2 text-[16px] leading-[24px] text-[#434652]">
+            Fill out the form and we&apos;ll get back to you soon.
+          </p>
 
-            <p className="mt-2 text-[16px] leading-[24px] text-[#434652]">
-              Fill out the form and we&apos;ll get back to you soon.
-            </p>
-
-            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div className="grid gap-6 sm:grid-cols-2">
                 <div>
                   <label
@@ -138,6 +133,5 @@ export default function ContactSection() {
           </div>
         </div>
       </div>
-    </section>
   );
 }
