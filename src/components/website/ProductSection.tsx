@@ -6,7 +6,7 @@ import { useFrameStore } from "@/store/frameStore";
 
 const products = [
   {
-    title: "Magnet Frame",
+    title: "Magnet",
     desc: "Sustainably sourced solid oak with museum-grade acrylic.",
     price: "Rs 500.00",
     img: "/product-1.png",
@@ -14,17 +14,19 @@ const products = [
     frameOption: "without-frame" as const,
   },
   {
-    title: "Magnet With Black Frame",
+    title: "Magnet Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
     price: "Rs 1000.00",
     img: "/product-2.png",
+    badge: "",
     frameOption: "black-frame" as const,
   },
   {
-    title: "Magnet With White Frame",
-    desc: "Brushed gold aluminum that brings warmth to any room.",
+    title: "Magnet White Frame",
+    desc: "Clean white frame for a soft premium aesthetic.",
     price: "Rs 1000.00",
     img: "/product-3.png",
+    badge: "",
     frameOption: "white-frame" as const,
   },
 ];
@@ -33,27 +35,32 @@ export default function ProductsSection() {
   const router = useRouter();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
 
-  const handleAddToCart = (frameOption: "without-frame" | "black-frame" | "white-frame") => {
+  const handleAddToCart = (
+    frameOption: "without-frame" | "black-frame" | "white-frame"
+  ) => {
     setSelectedFrame(frameOption);
     router.push("/shop");
   };
 
   return (
-    <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
-      <div className="mx-auto max-w-[1800px] px-[100px]">
+    <section className="w-full bg-[#F9F9FE]  ">
+      
+      {/* SAME LEFT & RIGHT MARGIN */}
+      <div className="mx-auto w-full max-w-[1800px] px-[100px] ">
 
         {/* HEADER */}
         <div className="mb-[52px]">
-          <h2 className="font-manrope text-[35px] font-semibold leading-[44px] tracking-[-0.35px] text-[#002B73]">
+          <h2 className="font-manrope text-[35px] font-bold leading-[44px] tracking-[-0.35px] text-[#002B73]">
             Curated Classics
           </h2>
+
           <p className="mt-[8px] font-inter text-[17px] leading-[26px] text-[#434652]">
             The foundation of every great gallery wall.
           </p>
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-3 gap-[35px]">
+        <div className="grid grid-cols-1 gap-[28px] md:grid-cols-2 xl:grid-cols-3">
           {products.map((p, i) => (
             <div
               key={i}
@@ -61,7 +68,7 @@ export default function ProductsSection() {
             >
 
               {/* IMAGE */}
-              <div className="relative h-[600px] w-full">
+              <div className="relative h-[350px] w-full">
                 <Image
                   src={p.img}
                   alt={p.title}
@@ -77,31 +84,24 @@ export default function ProductsSection() {
               </div>
 
               {/* CONTENT */}
-              <div className="p-[26px]">
-                <h3
-                  className="font-manrope text-[26px] font-semibold leading-[35px]"
-                  style={
-                    p.title === 'Magnate With White Frame'
-                      ? { fontFamily: 'Manrope', fontStyle: 'normal', color: '#002B73' }
-                      : { color: '#1A1C1F' }
-                  }
-                >
+              <div className="p-[20px]">
+                <h3 className="font-manrope text-[22px] font-semibold leading-[30px] text-[#1A1C1F]">
                   {p.title}
                 </h3>
 
-                <p className="mt-[8px] font-inter text-[15px] leading-[22px] text-[#434652]">
+                <p className="mt-[8px] font-inter text-[14px] leading-[22px] text-[#434652]">
                   {p.desc}
                 </p>
 
                 {/* FOOTER */}
                 <div className="mt-[18px] flex items-center justify-between">
-                  <span className="font-inter text-[22px] font-semibold text-[#002B73]">
+                  <span className="font-inter text-[18px] font-semibold text-[#002B73]">
                     {p.price}
                   </span>
 
                   <button
                     onClick={() => handleAddToCart(p.frameOption)}
-                    className="rounded-[8px] bg-[#BC0000] px-[16px] py-[12px] text-[15px] font-semibold text-white hover:bg-[#a00000]"
+                    className="rounded-[8px] bg-[#BC0000] px-[16px] py-[10px] text-[14px] font-semibold text-white transition hover:bg-[#a00000]"
                   >
                     Add to Cart
                   </button>

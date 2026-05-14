@@ -6,7 +6,7 @@ export default function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative mt-[90px] h-[782px] w-full overflow-hidden">
+    <section className="relative mt-[75px] h-[782px] w-full overflow-hidden">
       
       {/* BACKGROUND IMAGE */}
       <div
@@ -38,7 +38,7 @@ export default function Hero() {
         >
 
           {/* TEXT CONTAINER */}
-          <div className="absolute left-[55px] top-[95px] w-[620px]">
+          <div className="absolute px-[30px] left-[55px] top-[95px] w-[620px]">
 
             {/* TITLE */}
             <h1
@@ -48,7 +48,7 @@ export default function Hero() {
                 font-bold
                 leading-[62px]
                 tracking-[-1px]
-                text-[#002B73]
+                text-[#032d76]
               "
             >
               Your Memories, <br />
