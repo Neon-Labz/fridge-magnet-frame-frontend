@@ -1,6 +1,7 @@
 "use client";
 
 import { Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import styles from "./OrderSummary.module.css";
 
 export default function OrderSummary({
@@ -10,6 +11,12 @@ export default function OrderSummary({
   subtotal: number;
   quantity: number;
 }) {
+  const router = useRouter();
+
+  const handleCheckout = () => {
+    router.push('/checkout');
+  };
+
   return (
     <aside className={styles.orderSummary}>
       <div className={styles.headingWrapper}>
@@ -36,7 +43,7 @@ export default function OrderSummary({
       </div>
 
       <div className={styles.checkoutWrapper}>
-        <button type="button" className={styles.checkoutBtn}>
+        <button type="button" className={styles.checkoutBtn} onClick={handleCheckout}>
           <span className={styles.checkoutText}>Check Out</span>
         </button>
       </div>

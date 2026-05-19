@@ -1,12 +1,16 @@
 'use client';
 
+'use client';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
 import { useFrameStore } from '@/store/frameStore';
 import { useCartStore } from '@/store/cartStore';
+import { addToCart, clearCart } from '@/services/cartService';
 
 interface ShopViewProductDetailsSectionProps {
   rating?: number;
@@ -34,6 +38,7 @@ function ShopViewProductDetailsSection({
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
+  const router = useRouter();
 
   const cartStore = useCartStore() as unknown as {
     addToCart?: (item: CartItem) => void;
@@ -97,22 +102,31 @@ function ShopViewProductDetailsSection({
   };
 
   const handleAddToCart = () => {
-    const cartItem: CartItem = {
+    const cartItem = {
       id: selectedFrame,
-      title: getDynamicTitle(),
+      name: getDynamicTitle(),
       price,
-      frameOption: selectedFrame,
-      quantity,
       image: mainImageSource,
+      quantity,
     };
 
-    if (cartStore.addToCart) {
-      cartStore.addToCart(cartItem);
-    } else if (cartStore.addItem) {
-      cartStore.addItem(cartItem);
-    } else {
-      console.error('No add cart function found in cartStore');
-    }
+    addToCart(cartItem as any);
+    alert('Item added to cart!');
+  };
+
+  const handleBuyNow = () => {
+    clearCart();
+
+    const cartItem = {
+      id: selectedFrame,
+      name: getDynamicTitle(),
+      price,
+      image: mainImageSource,
+      quantity,
+    };
+
+    addToCart(cartItem as any);
+    router.push('/checkout');
   };
 
   return (
@@ -272,7 +286,10 @@ function ShopViewProductDetailsSection({
               🛒 Add to Cart
             </button>
 
-            <button className="flex-1 rounded-[4px] bg-[#E62A24] px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-red-700">
+            <button 
+              onClick={handleBuyNow}
+              className="flex-1 rounded-[4px] bg-[#E62A24] px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-red-700"
+            >
               Buy Now
             </button>
           </div>
