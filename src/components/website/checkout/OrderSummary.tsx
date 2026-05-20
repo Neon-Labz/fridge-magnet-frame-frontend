@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FramePreview from "../FramePreview";
 import { CreditCard, Lock } from "lucide-react";
@@ -11,12 +10,15 @@ export type SummaryItem = {
   price: number;
   quantity: number;
   image?: string;
+  frameType?: string;
+  colorOption?: string;
 };
 
 interface OrderSummaryProps {
   items: SummaryItem[];
   subtotal: number;
   onPlaceOrder?: () => void;
+  disabled?: boolean;
 }
 
 const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradient" => {
@@ -35,8 +37,9 @@ const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradien
   return "gradient";
 };
 
-export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSummaryProps) {
+export default function OrderSummary({ items, subtotal, onPlaceOrder, disabled = false }: OrderSummaryProps) {
   const hasItems = items.length > 0;
+  const isDisabled = disabled || !hasItems;
 
   return (
     <div className="max-w-[486px] rounded-[25px] bg-[#F4F5F9] p-5 lg:p-6">
@@ -114,9 +117,9 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
 
           <Button
             type="button"
-            className="w-full rounded-[18px] bg-[#FF3B30] px-4 py-4 text-[18px] font-semibold text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:bg-[#E61D11]"
+            className={`w-full rounded-[18px] bg-[#FF3B30] px-4 py-4 text-[18px] font-semibold text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] hover:bg-[#E61D11] ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={onPlaceOrder}
-            disabled={!hasItems}
+            disabled={isDisabled}
           >
             <Lock className="mr-2 h-4 w-4" />
             Place Order

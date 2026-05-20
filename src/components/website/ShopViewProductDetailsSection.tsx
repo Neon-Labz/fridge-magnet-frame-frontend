@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
 import { useFrameStore } from '@/store/frameStore';
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/context/CartContext';
 
 interface ShopViewProductDetailsSectionProps {
   rating?: number;
@@ -16,11 +17,12 @@ interface ShopViewProductDetailsSectionProps {
   description?: string;
 }
 
-interface CartItem {
+interface CartItemLocal {
   id: string;
   title: string;
   price: number;
-  frameOption: string;
+  frameType: string;
+  colorOption?: string;
   quantity: number;
   image: string;
 }
@@ -35,10 +37,9 @@ function ShopViewProductDetailsSection({
 }: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
 
-  const cartStore = useCartStore() as unknown as {
-    addToCart?: (item: CartItem) => void;
-    addItem?: (item: CartItem) => void;
-  };
+  const { addToCart } = useCart();
+
+  const router = useRouter();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -97,21 +98,35 @@ function ShopViewProductDetailsSection({
   };
 
   const handleAddToCart = () => {
-    const cartItem: CartItem = {
-      id: selectedFrame,
+      const cartItem: CartItemLocal = {
+        id: 'magnet-main',
       title: getDynamicTitle(),
       price,
-      frameOption: selectedFrame,
+      frameType: selectedFrame,
+      colorOption: personalization.option === 'with-frame' ? personalization.frameColor : undefined,
       quantity,
       image: mainImageSource,
     };
 
-    if (cartStore.addToCart) {
-      cartStore.addToCart(cartItem);
-    } else if (cartStore.addItem) {
-      cartStore.addItem(cartItem);
-    } else {
-      console.error('No add cart function found in cartStore');
+    try {
+      addToCart({
+        id: cartItem.id,
+        title: cartItem.title,
+        image: cartItem.image,
+        frameType: cartItem.frameType,
+        colorOption: cartItem.colorOption,
+        quantity: cartItem.quantity,
+        price: cartItem.price,
+      });
+    } catch (err) {
+      console.error('Failed to add to cart', err);
+    }
+
+    // navigate to cart page after adding
+    try {
+      router.push('/cart');
+    } catch (err) {
+      console.error('Navigation to /cart failed', err);
     }
   };
 

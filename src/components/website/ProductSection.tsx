@@ -3,43 +3,67 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFrameStore } from "@/store/frameStore";
+import { useCart } from '@/context/CartContext';
 
 const products = [
   {
+    id: 'magnet-1',
     title: "Magnet",
     desc: "Sustainably sourced solid oak with museum-grade acrylic.",
-    price: "Rs 500.00",
+    price: 500,
+    priceLabel: "Rs 500.00",
     img: "/product-1.png",
     badge: "New Arrival",
     frameOption: "without-frame" as const,
+    colorOption: undefined,
   },
   {
+    id: 'magnet-2',
     title: "Magnet Black Frame",
     desc: "Deep matte black finish for a bold, contemporary statement.",
-    price: "Rs 1000.00",
+    price: 1000,
+    priceLabel: "Rs 1000.00",
     img: "/product-2.png",
     badge: "",
     frameOption: "black-frame" as const,
+    colorOption: "black",
   },
   {
+    id: 'magnet-3',
     title: "Magnet White Frame",
     desc: "Clean white frame for a soft premium aesthetic.",
-    price: "Rs 1000.00",
+    price: 1000,
+    priceLabel: "Rs 1000.00",
     img: "/product-3.png",
     badge: "",
     frameOption: "white-frame" as const,
+    colorOption: "white",
   },
 ];
 
 export default function ProductsSection() {
   const router = useRouter();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
+  const { addToCart } = useCart();
 
   const handleAddToCart = (
-    frameOption: "without-frame" | "black-frame" | "white-frame"
+    product: typeof products[number]
   ) => {
-    setSelectedFrame(frameOption);
-    router.push("/shop");
+    // set frame selection for product details flow
+    setSelectedFrame(product.frameOption);
+
+    // add to cart: if same id + frameOption exists, quantity will be increased by context
+    addToCart({
+      id: product.id,
+      title: product.title,
+      image: product.img,
+      price: product.price,
+      quantity: 1,
+      frameType: product.frameOption,
+      colorOption: product.colorOption,
+    });
+
+    router.push("/cart");
   };
 
   return (
@@ -100,7 +124,7 @@ export default function ProductsSection() {
                   </span>
 
                   <button
-                    onClick={() => handleAddToCart(p.frameOption)}
+                    onClick={() => handleAddToCart(p)}
                     className="rounded-[8px] bg-[#BC0000] px-[16px] py-[10px] text-[14px] font-semibold text-white transition hover:bg-[#a00000]"
                   >
                     Add to Cart

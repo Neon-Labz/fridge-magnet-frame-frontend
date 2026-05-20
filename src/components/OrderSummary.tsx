@@ -2,6 +2,7 @@
 
 import { Lock } from 'lucide-react';
 import styles from "./OrderSummary.module.css";
+import { useRouter } from 'next/navigation';
 
 export default function OrderSummary({
   subtotal,
@@ -10,6 +11,15 @@ export default function OrderSummary({
   subtotal: number;
   quantity: number;
 }) {
+  const router = useRouter();
+
+  const handleCheckout = () => {
+    try {
+      router.push('/checkout');
+    } catch (err) {
+      console.error('Navigation to /checkout failed', err);
+    }
+  };
   return (
     <aside className={styles.orderSummary}>
       <div className={styles.headingWrapper}>
@@ -36,7 +46,7 @@ export default function OrderSummary({
       </div>
 
       <div className={styles.checkoutWrapper}>
-        <button type="button" className={styles.checkoutBtn}>
+        <button type="button" className={styles.checkoutBtn} onClick={handleCheckout}>
           <span className={styles.checkoutText}>Check Out</span>
         </button>
       </div>
