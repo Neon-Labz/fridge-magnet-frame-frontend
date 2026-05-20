@@ -140,16 +140,23 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder, disabled =
         <Button
           type="button"
           className={`w-full text-white font-bold text-base py-3 rounded transition-colors flex items-center justify-center gap-2 ${
-            !hasItems 
+            isDisabled
               ? "bg-[#D3D3D3] cursor-not-allowed opacity-60" 
               : "bg-[#FF3B30] hover:bg-[#E61D11]"
           }`}
-          onClick={onPlaceOrder}
-          disabled={!hasItems}
+          onClick={() => !isDisabled && onPlaceOrder?.()}
+          disabled={isDisabled}
         >
           <Lock className="h-4 w-4" />
           Place Order
         </Button>
+        {isDisabled && (
+          <p className="text-xs text-center text-[#FF3B30] mt-2">
+            {!hasItems 
+              ? "Add items to cart to place order" 
+              : "Please fill all required fields to place order"}
+          </p>
+        )}
       </div>
 
       {/* SSL Info */}

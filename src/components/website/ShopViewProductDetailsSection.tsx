@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
@@ -38,7 +37,7 @@ function ShopViewProductDetailsSection({
 }: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
 
-  const { addToCart } = useCart();
+  const { addToCart, clearCart } = useCart();
 
   const router = useRouter();
 
@@ -106,6 +105,7 @@ function ShopViewProductDetailsSection({
       frameType: selectedFrame,
       colorOption: personalization.option === 'with-frame' ? personalization.frameColor : undefined,
       quantity,
+      image: mainImageSource,
     };
 
     addToCart(cartItem as any);
@@ -115,24 +115,18 @@ function ShopViewProductDetailsSection({
   const handleBuyNow = () => {
     clearCart();
 
-    const cartItem = {
-      id: selectedFrame,
-      name: getDynamicTitle(),
+    const cartItem: CartItemLocal = {
+      id: 'magnet-main',
+      title: getDynamicTitle(),
       price,
-      image: mainImageSource,
+      frameType: selectedFrame,
+      colorOption: personalization.option === 'with-frame' ? personalization.frameColor : undefined,
       quantity,
+      image: mainImageSource,
     };
 
     try {
-      addToCart({
-        id: cartItem.id,
-        title: cartItem.title,
-        image: cartItem.image,
-        frameType: cartItem.frameType,
-        colorOption: cartItem.colorOption,
-        quantity: cartItem.quantity,
-        price: cartItem.price,
-      });
+      addToCart(cartItem as any);
     } catch (err) {
       console.error('Failed to add to cart', err);
     }

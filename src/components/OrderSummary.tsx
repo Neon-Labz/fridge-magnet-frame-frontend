@@ -3,7 +3,6 @@
 import { Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from "./OrderSummary.module.css";
-import { useRouter } from 'next/navigation';
 
 export default function OrderSummary({
   subtotal,

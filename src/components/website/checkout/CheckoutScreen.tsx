@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import OrderSummary, { SummaryItem } from "./OrderSummary";
 import { saveOrder } from "@/services/cartService";
 import { useCart } from '@/context/CartContext';
-import { Truck, UserRound } from "lucide-react";
+import { useFrameStore } from "@/store/frameStore";
+import { Truck, UserRound, AlertCircle } from "lucide-react";
 
 const generateOrderNumber = () => {
   return `MAG-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -19,6 +20,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
+  const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
   const items = useMemo<SummaryItem[]>(
     () => cartItems.map((i) => ({ id: i.id, name: i.title, price: i.price, quantity: i.quantity, image: i.image, frameType: i.frameType, colorOption: i.colorOption })),
     [cartItems],
@@ -52,7 +54,39 @@ export default function CheckoutScreen() {
     notes: "",
   });
 
+  // Track which fields have been touched
+  const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
+
   const setField = (k: keyof FormState, v: string) => setForm((s) => ({ ...s, [k]: v }));
+  const markTouched = (k: keyof FormState) => setTouched((s) => ({ ...s, [k]: true }));
+
+  // Validation function for each field
+  const getFieldError = (field: keyof FormState): string | null => {
+    if (!touched[field]) return null;
+
+    switch (field) {
+      case "firstName":
+        return form.firstName.trim() === "" ? "First name is required" : null;
+      case "lastName":
+        return form.lastName.trim() === "" ? "Last name is required" : null;
+      case "email":
+        if (form.email.trim() === "") return "Email is required";
+        if (!emailRegex.test(form.email.trim())) return "Please enter a valid email address";
+        return null;
+      case "phone":
+        return form.phone.trim() === "" ? "Phone number is required" : null;
+      case "street":
+        return form.street.trim() === "" ? "Street address is required" : null;
+      case "city":
+        return form.city.trim() === "" ? "City is required" : null;
+      case "state":
+        return form.state.trim() === "" ? "State/Province is required" : null;
+      case "zip":
+        return form.zip.trim() === "" ? "ZIP code is required" : null;
+      default:
+        return null;
+    }
+  };
 
   // basic production-grade validation
   const isFormValid = useMemo(() => {
@@ -69,6 +103,18 @@ export default function CheckoutScreen() {
   }, [form]);
 
   const handlePlaceOrder = () => {
+    // Mark all fields as touched to show validation errors
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      street: true,
+      city: true,
+      state: true,
+      zip: true,
+    });
+
     if (!isFormValid || items.length === 0) {
       return;
     }
@@ -79,7 +125,7 @@ export default function CheckoutScreen() {
       shipping: 200,
       orderNumber: generateOrderNumber(),
       createdAt: new Date().toISOString(),
-      customerDetails: formData,
+      customerDetails: form,
     };
 
     saveOrder(order);
@@ -116,39 +162,75 @@ export default function CheckoutScreen() {
               <CardContent className="space-y-5 px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 pt-6 sm:pt-8">
                 <div className="grid gap-4 sm:gap-5 md:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#434652]">First Name</label>
-                      <Input
-                        value={form.firstName}
-                        placeholder="John"
-                        onChange={(e) => setField("firstName", (e.target as HTMLInputElement).value)}
-                      />
+                    <label className="text-sm font-semibold text-[#434652]">First Name <span className="text-red-500">*</span></label>
+                    <Input
+                      required
+                      value={form.firstName}
+                      placeholder="John"
+                      onChange={(e) => setField("firstName", (e.target as HTMLInputElement).value)}
+                      onBlur={() => markTouched("firstName")}
+                      className={getFieldError("firstName") ? "border-red-500" : ""}
+                    />
+                    {getFieldError("firstName") && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("firstName")}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#434652]">Last Name</label>
-                      <Input
-                        value={form.lastName}
-                        placeholder="Doe"
-                        onChange={(e) => setField("lastName", (e.target as HTMLInputElement).value)}
-                      />
+                    <label className="text-sm font-semibold text-[#434652]">Last Name <span className="text-red-500">*</span></label>
+                    <Input
+                      required
+                      value={form.lastName}
+                      placeholder="Doe"
+                      onChange={(e) => setField("lastName", (e.target as HTMLInputElement).value)}
+                      onBlur={() => markTouched("lastName")}
+                      className={getFieldError("lastName") ? "border-red-500" : ""}
+                    />
+                    {getFieldError("lastName") && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("lastName")}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#434652]">Email Address</label>
-                    <Input
-                      type="email"
-                      value={form.email}
-                      placeholder="example123@gmail.com"
-                      onChange={(e) => setField("email", (e.target as HTMLInputElement).value)}
-                    />
+                  <label className="text-sm font-semibold text-[#434652]">Email Address <span className="text-red-500">*</span></label>
+                  <Input
+                    required
+                    type="email"
+                    value={form.email}
+                    placeholder="example123@gmail.com"
+                    onChange={(e) => setField("email", (e.target as HTMLInputElement).value)}
+                    onBlur={() => markTouched("email")}
+                    className={getFieldError("email") ? "border-red-500" : ""}
+                  />
+                  {getFieldError("email") && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getFieldError("email")}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#434652]">Phone Number</label>
-                    <Input
-                      type="tel"
-                      value={form.phone}
-                      placeholder="+1 (555) 000-0000"
-                      onChange={(e) => setField("phone", (e.target as HTMLInputElement).value)}
-                    />
+                  <label className="text-sm font-semibold text-[#434652]">Phone Number <span className="text-red-500">*</span></label>
+                  <Input
+                    required
+                    type="tel"
+                    value={form.phone}
+                    placeholder="+1 (555) 000-0000"
+                    onChange={(e) => setField("phone", (e.target as HTMLInputElement).value)}
+                    onBlur={() => markTouched("phone")}
+                    className={getFieldError("phone") ? "border-red-500" : ""}
+                  />
+                  {getFieldError("phone") && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getFieldError("phone")}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -166,37 +248,73 @@ export default function CheckoutScreen() {
               </CardHeader>
               <CardContent className="space-y-5 px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 pt-6 sm:pt-8">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#434652]">Street Address</label>
+                  <label className="text-sm font-semibold text-[#434652]">Street Address <span className="text-red-500">*</span></label>
                   <Input
+                    required
                     value={form.street}
                     placeholder="123 Gallery Street"
                     onChange={(e) => setField("street", (e.target as HTMLInputElement).value)}
+                    onBlur={() => markTouched("street")}
+                    className={getFieldError("street") ? "border-red-500" : ""}
                   />
+                  {getFieldError("street") && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {getFieldError("street")}
+                    </p>
+                  )}
                 </div>
                 <div className="grid gap-4 sm:gap-5 md:grid-cols-[1fr_1fr_100px]">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#434652]">City</label>
+                    <label className="text-sm font-semibold text-[#434652]">City <span className="text-red-500">*</span></label>
                     <Input
+                      required
                       value={form.city}
                       placeholder="Manhattan"
                       onChange={(e) => setField("city", (e.target as HTMLInputElement).value)}
+                      onBlur={() => markTouched("city")}
+                      className={getFieldError("city") ? "border-red-500" : ""}
                     />
+                    {getFieldError("city") && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("city")}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#434652]">State / Province</label>
+                    <label className="text-sm font-semibold text-[#434652]">State / Province <span className="text-red-500">*</span></label>
                     <Input
+                      required
                       value={form.state}
                       placeholder="Sri Lanka"
                       onChange={(e) => setField("state", (e.target as HTMLInputElement).value)}
+                      onBlur={() => markTouched("state")}
+                      className={getFieldError("state") ? "border-red-500" : ""}
                     />
+                    {getFieldError("state") && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("state")}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#434652]">ZIP</label>
+                    <label className="text-sm font-semibold text-[#434652]">ZIP <span className="text-red-500">*</span></label>
                     <Input
+                      required
                       value={form.zip}
                       placeholder="10001"
                       onChange={(e) => setField("zip", (e.target as HTMLInputElement).value)}
+                      onBlur={() => markTouched("zip")}
+                      className={getFieldError("zip") ? "border-red-500" : ""}
                     />
+                    {getFieldError("zip") && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("zip")}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">

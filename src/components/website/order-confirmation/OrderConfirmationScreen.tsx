@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle, Star } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import FramePreview from "@/components/website/FramePreview";
+import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
 import Link from "next/link";
 import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
 import { useToast, ToastContainer } from "@/components/ui/toast";
@@ -49,10 +50,7 @@ const resolvePreview = (item: OrderItem): "updated-1" | "updated-2" | "gradient"
 
 export default function OrderConfirmationScreen() {
   const [order, setOrder] = useState<Order | null>(null);
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const { toasts, showToast, removeToast } = useToast();
+  const { toasts, removeToast } = useToast();
 
   useEffect(() => {
     const savedOrder = getSavedOrder();
@@ -78,17 +76,6 @@ export default function OrderConfirmationScreen() {
     };
   }, []);
 
-  const handleSubmitFeedback = () => {
-    if (rating > 0 || feedback.trim()) {
-      setSubmitted(true);
-      showToast("Thank you! Your feedback was submitted successfully", "success", 3000);
-      setTimeout(() => {
-        setRating(0);
-        setFeedback("");
-        setSubmitted(false);
-      }, 3000);
-    }
-  };
 
   if (!order) {
     return (
@@ -121,7 +108,7 @@ export default function OrderConfirmationScreen() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-[1.5fr_1fr]">
+        <div className="grid gap-8 grid-cols-1 lg:grid-cols-[7fr_3fr]">
           {/* Left Column: Order Details */}
           <div className="space-y-6">
             {/* Order Summary Section */}
@@ -224,61 +211,7 @@ export default function OrderConfirmationScreen() {
           </div>
 
           {/* Right Column: Feedback Section */}
-          <div className="rounded-xl bg-[#0040A1] p-4 sm:p-6 lg:p-8 text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)]">
-            <h2 className="font-manrope text-2xl sm:text-[28px] font-semibold mb-3">
-              Your order was successful
-            </h2>
-
-            <p className="text-xs sm:text-sm text-[#98B3FF] mb-6 leading-relaxed">
-              Help us improve the framing experience for everyone. How would you rate your experience?
-            </p>
-
-            {/* Star Rating */}
-            <div className="mb-6">
-              <p className="text-xs sm:text-sm text-white font-medium mb-4">
-                How would you rate your experience?
-              </p>
-              <div className="flex gap-2 justify-center sm:justify-start flex-wrap">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className={`flex h-11 sm:h-12 w-11 sm:w-12 items-center justify-center rounded-lg border-2 transition-all ${
-                      rating >= star
-                        ? "border-white bg-white text-[#0040A1]"
-                        : "border-white/20 bg-white/10 text-white hover:border-white/40"
-                    }`}
-                  >
-                    <Star className="h-5 sm:h-6 w-5 sm:w-6 fill-current" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Feedback Textarea */}
-            <div className="mb-6">
-              <textarea
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Tell us what you liked..."
-                className="w-full rounded-lg bg-white/10 border border-white/20 px-3 sm:px-4 py-3 text-xs sm:text-sm text-white placeholder-[#98B3FF] focus:outline-none focus:border-white/40 resize-none"
-                rows={4}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmitFeedback}
-              disabled={submitted}
-              className={`w-full rounded-lg px-6 py-3 font-semibold text-sm sm:text-base transition-all ${
-                submitted
-                  ? "bg-[#E8E8ED] text-[#434652] cursor-not-allowed"
-                  : "bg-white text-[#002B73] hover:bg-gray-100"
-              }`}
-            >
-              {submitted ? "Thank you!" : "Submit Feedback"}
-            </button>
-          </div>
+          <FeedbackCard />
         </div>
 
         {/* Continue Shopping */}
