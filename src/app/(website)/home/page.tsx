@@ -1,7 +1,7 @@
 import Header from "@/components/website/Header";
 import Hero from "@/components/website/Hero";
 import VideoSection from "@/components/website/VideoSection";
-import ProductSection from "@/components/website/ProductSection";
+import ProductsSection from "@/components/website/ProductsSection";
 import PricingSection from "@/components/website/PricingSection";
 import CounterSection from "@/components/website/CounterSection";
 import Testimonial from "@/components/website/Testimonial";
@@ -14,7 +14,7 @@ export default function Home() {
       <Header />
       <Hero />
       <VideoSection />
-      <ProductSection />
+      <ProductsSection />
       <HowItWorksSection />
       <PricingSection />
       <CounterSection />
