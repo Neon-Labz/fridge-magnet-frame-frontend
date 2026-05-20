@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Toast from '@/components/Toast';
 import './globals.css';
+import CartProvider from '@/context/CartContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,8 +31,10 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col antialiased">
-        <Toast />
-        {children}
+        <CartProvider>
+          <Toast />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

@@ -1,40 +1,56 @@
 "use client";
 
-import React, { useState } from 'react';
-import PersonalizationSection, { PersonalizationState } from './PersonalizationSection';
-import { useCartStore } from '../../store/cartStore';
-import { useToastStore } from '../../store/toastStore';
-import { useFrameStore } from '../../store/frameStore';
+import React, { useCallback, useState } from "react";
+import PersonalizationSection, { PersonalizationState } from "./PersonalizationSection";
+import { useFrameStore } from "@/store/frameStore";
+import { useCartStore } from "@/store/cartStore";
+import { useToastStore } from "@/store/toastStore";
 
 interface ShopViewProductDetailsSectionProps {
   products: any[];
 }
 
-export default function ShopViewProductDetailsSection({ products }: ShopViewProductDetailsSectionProps) {
+export default function ShopViewProductDetailsSection({
+  products,
+}: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((s) => s.selectedFrame);
-  const [quantity, setQuantity] = useState(1);
 
   const { addToCart } = useCartStore();
   const { addToast } = useToastStore();
 
+  const [quantity, setQuantity] = useState(1);
+  
+  const handlePersonalizationChange = useCallback(
+    (state: PersonalizationState) => {
+      // Store personalization state if needed for future use
+    },
+    []
+  );
+
   if (!products || products.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-xl text-slate-500 font-medium">No products found in database.</p>
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-xl font-medium text-slate-500">
+          No products found in database.
+        </p>
       </div>
     );
   }
 
   const product = products[0];
-  const title = product.productName ?? '';
+
+  const title = product.productName ?? "";
   const price = product.price ?? 0;
-  const description = product.description ?? '';
-  const inStock = product.status === 'In Stock';
-
-  const rawOptions: string[] = (product.personalizationInstructions?.length ? product.personalizationInstructions : product.personalization) ?? [];
-  const personalizationOptions = rawOptions.filter(Boolean);
-
+  const description = product.description ?? "";
+  const inStock = product.status === "In Stock";
   const mainImage = product.primaryImage?.secure_url ?? null;
+
+  const rawOptions: string[] =
+    (product.personalizationInstructions?.length
+      ? product.personalizationInstructions
+      : product.personalization) ?? [];
+
+  const personalizationOptions = rawOptions.filter(Boolean);
 
   const handleAddToCart = () => {
     addToCart({
@@ -45,66 +61,108 @@ export default function ShopViewProductDetailsSection({ products }: ShopViewProd
       quantity,
       image: mainImage,
     });
-    addToast('Product added to cart successfully!', 'success');
+
+    addToast("Product added to cart successfully!", "success");
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
 
-        {/* Left: Image */}
+        {/* IMAGE */}
         <div className="flex flex-col gap-6">
-          <div className="bg-[#F4F3ED] aspect-[4/5] rounded-sm flex items-center justify-center relative overflow-hidden">
+          <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
             {mainImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={mainImage} alt={title || 'Product image'} className="w-full h-full object-cover transition-opacity duration-300" />
+              <img
+                src={mainImage}
+                alt={title}
+                className="h-full w-full object-cover"
+                width={500}
+                height={625}
+              />
             ) : (
-              <div className="flex flex-col items-center justify-center text-center">
-                <p className="text-slate-400 text-sm font-medium">No image available</p>
-                <p className="text-slate-300 text-xs mt-1">Upload image to product in dashboard</p>
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-400">
+                  No image available
+                </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Right: Details */}
+        {/* DETAILS */}
         <div className="flex flex-col pt-4">
-          <h1 className="text-[22px] text-slate-800 font-medium mb-3">{title}</h1>
+          <h1 className="mb-3 text-[22px] font-medium text-slate-800">
+            {title}
+          </h1>
 
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex gap-1 text-[#FFB800]">★★★★★</div>
+          <div className="mb-6 flex items-center gap-4">
+            <div className="text-[#FFB800]">★★★★★</div>
             <div className="mx-1 h-4 w-px bg-slate-300" />
-            <span className="text-sm font-bold text-[#E62A24]">{inStock ? 'IN STOCK' : 'OUT OF STOCK'}</span>
+            <span className="text-sm font-bold text-[#E62A24]">
+              {inStock ? "IN STOCK" : "OUT OF STOCK"}
+            </span>
           </div>
 
-          <div className="text-[32px] font-bold text-[#1A2B5E] mb-6">Rs{Number(price).toFixed(2)}</div>
+          <div className="mb-6 text-[32px] font-bold text-[#1A2B5E]">
+            Rs {Number(price).toFixed(2)}
+          </div>
 
-          <p className="text-slate-600 text-base leading-relaxed mb-8">{description}</p>
+          <p className="mb-8 text-base leading-relaxed text-slate-600">
+            {description}
+          </p>
 
           <hr className="mb-8 border-slate-200" />
 
           {personalizationOptions.length > 0 && (
             <div className="mb-8">
-              <PersonalizationSection 
-                availableOptions={personalizationOptions} 
+              <PersonalizationSection
+                availableOptions={personalizationOptions}
                 availableColors={[]}
-                onChange={() => {}} 
+                onChange={handlePersonalizationChange}
               />
             </div>
           )}
 
+          {/* QUANTITY */}
           <div className="mb-10">
-            <label className="mb-3 block text-[15px] text-slate-800">Quantity</label>
+            <label className="mb-3 block text-[15px] text-slate-800">
+              Quantity
+            </label>
+
             <div className="flex w-fit items-center rounded-[4px] border border-slate-200">
-              <button onClick={() => setQuantity((p) => Math.max(1, p - 1))} className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors">−</button>
-              <div className="flex h-10 w-10 items-center justify-center border-x border-slate-200 text-[15px] font-semibold text-slate-800">{quantity}</div>
-              <button onClick={() => setQuantity((p) => p + 1)} className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors">+</button>
+              <button
+                onClick={() => setQuantity((p) => Math.max(1, p - 1))}
+                className="flex h-10 w-10 items-center justify-center"
+              >
+                −
+              </button>
+
+              <div className="flex h-10 w-10 items-center justify-center border-x text-[15px] font-semibold">
+                {quantity}
+              </div>
+
+              <button
+                onClick={() => setQuantity((p) => p + 1)}
+                className="flex h-10 w-10 items-center justify-center"
+              >
+                +
+              </button>
             </div>
           </div>
 
+          {/* ACTIONS */}
           <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
-            <button onClick={handleAddToCart} className="flex flex-1 items-center justify-center gap-2 rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] transition-all hover:bg-slate-50">🛒 Add to Cart</button>
-            <button className="flex-1 rounded-[4px] bg-[#E62A24] px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-red-700">Buy Now</button>
+            <button
+              onClick={handleAddToCart}
+              className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E]"
+            >
+              🛒 Add to Cart
+            </button>
+
+            <button className="flex-1 rounded-[4px] bg-[#E62A24] px-6 py-3 font-medium text-white">
+              Buy Now
+            </button>
           </div>
         </div>
       </div>
