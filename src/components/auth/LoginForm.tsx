@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Mail, Lock } from 'lucide-react'
 import { useAuthModal } from '@/hooks/useAuthModal'
 import { apiClient } from '@/lib/api'
+import { dispatchWebsiteAuthChanged } from '@/hooks/useWebsiteAuthSession'
 
 const styles = `
   .login-input {
@@ -134,6 +135,7 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
           setTimeout(() => {
             localStorage.setItem(tokenKey, token)
             document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
+            dispatchWebsiteAuthChanged()
 
             if (redirectTo) {
               router.replace(redirectTo)
