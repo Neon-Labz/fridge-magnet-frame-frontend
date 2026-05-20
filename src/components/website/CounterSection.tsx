@@ -64,17 +64,13 @@ export default function GalleryOfferSection({
     time.toString().padStart(2, "0");
 
   return (
-<section className="w-full bg-[#f9f9fe] px-[100px] pt-[60px]">      
+    <section className="w-full bg-[#f9f9fe] px-[100px] pt-[60px]">
       <div
         className="relative mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between overflow-hidden rounded-[28px] p-8 md:p-12 lg:min-h-[340px] lg:flex-row lg:px-20"
         style={{
-          background:
-            "linear-gradient(105deg, #071E54 75%, #133074 75%)",
-          
+          background: 'linear-gradient(105deg, #071E54 75%, #133074 75%)',
         }}
       >
-
-        {/* LEFT CONTENT */}
         {/* LEFT */}
         <div className="z-10 w-[390px]">
           <div className="mb-[18px] inline-flex rounded-full text-white/95 bg-[#b11010] px-[14px] py-[4px] text-[12px] font-bold tracking-[2px]">
@@ -93,45 +89,36 @@ export default function GalleryOfferSection({
           </p>
         </div>
 
-        {/* TIMER */}
-        <div className="z-10 flex items-center justify-center gap-[28px] text-center text-white/95">
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.days)}
+        {/* RIGHT: timer + button */}
+        <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-center md:justify-end z-10">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center">
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.days)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">DAYS</span>
             </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              DAYS
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: '#BC0000' }}>:</div>
+
+            <div className="flex flex-col items-center">
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.hours)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">HOURS</span>
+            </div>
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: '#BC0000' }}>:</div>
+
+            <div className="flex flex-col items-center">
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.minutes)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">MINS</span>
             </div>
           </div>
 
-          <div className="mb-[20px] text-[34px] font-bold text-[#D90000]">:</div>
-
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.hours)}
-            </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              HOURS
-            </div>
-          </div>
-
-          <div className="mb-[20px] text-[34px] font-bold text-[#D90000]">:</div>
-
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.minutes)}
-            </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              MINS
-            </div>
-          </div>
+          <button
+            className="font-semibold text-sm md:text-base px-8 py-3 md:py-4 rounded-lg shadow-lg transition-all hover:shadow-xl active:scale-95"
+            style={{ backgroundColor: 'white', color: '#071E54' }}
+          >
+            Claim Offer
+          </button>
         </div>
-
-        {/* BUTTON */}
-        <button className="z-10 h-[62px] w-[160px] rounded-[7px] bg-white font-inter text-[15px] font-bold leading-[24px] text-[#07357E]">
-          Claim
-          Offer
-        </button>
       </div>
     </section>
   );
