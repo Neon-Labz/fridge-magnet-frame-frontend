@@ -49,8 +49,8 @@ function CartItem({
       {/* Product Image - Left */}
       <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 0, width: '180px', height: '180px', minWidth: '180px', background: '#F3F3F8', border: '1px solid #EDEDF2', borderRadius: '10px', flex: 'none', order: 0, flexGrow: 0, overflow: 'hidden' }}>
         <Image
-          src={item.image}
-          alt={item.title}
+          src={item.image || 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22178%22 height=%22178%22><rect width=%22178%22 height=%22178%22 fill=%22%23e5e7eb%22 /></svg>'}
+          alt={item.title || 'Product image'}
           width={178}
           height={178}
           style={{ width: '178px', height: '178px', objectFit: 'cover' }}

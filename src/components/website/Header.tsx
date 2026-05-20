@@ -2,14 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCartStore } from "@/store/cartStore";
+import { usePathname, useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import {
+  clearWebsiteAuthSession,
+  useWebsiteAuthSession,
+} from "@/hooks/useWebsiteAuthSession";
 
 export default function Header() {
   const pathname = usePathname();
-  const { items } = useCartStore();
+  const router = useRouter();
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const { totalQuantity } = useCart();
+  const { isAuthenticated } = useWebsiteAuthSession();
 
   const isActive = (href: string) => {
     if (href === "/" && pathname === "/") return true;
@@ -22,7 +27,7 @@ export default function Header() {
   return (
     <header className="fixed left-0 top-0 z-50 h-[82px] w-full border-b border-[#E5E5EA]/80 bg-white/95 shadow-[0_6px_18px_rgba(15,23,42,0.05)] backdrop-blur-sm">
       <nav className="flex h-full w-full max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-10">
-
+        
         {/* LOGO */}
         <Link href="/" className="shrink-0">
           <Image
@@ -37,7 +42,7 @@ export default function Header() {
 
         {/* NAV LINKS */}
         <div className="flex items-center gap-3 font-inter text-[13px] font-medium sm:gap-6 sm:text-[15px] lg:gap-8 lg:text-[16px]">
-
+          
           <Link
             href="/"
             className={
@@ -85,23 +90,35 @@ export default function Header() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-
+          
           <button className="relative cursor-pointer text-[24px] text-[#475569] transition-colors hover:text-[#002B73]">
             🛒
-            {totalItems > 0 && (
+            {totalQuantity > 0 && (
               <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[12px] font-bold text-white">
-                {totalItems}
+                {totalQuantity}
               </span>
             )}
           </button>
 
-          <Link href="/login">
-            <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
-              Login
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => {
+                clearWebsiteAuthSession();
+                router.push("/");
+              }}
+              className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]"
+            >
+              Logout
             </button>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
+                Login
+              </button>
+            </Link>
+          )}
         </div>
-
       </nav>
     </header>
   );

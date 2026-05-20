@@ -1,148 +1,232 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Star } from "lucide-react";
-import OrderDetails, { OrderItem } from "./OrderDetails";
-import { clearCart, getCartItems, getSavedOrder } from "@/services/cartService";
+import { useEffect, useState } from "react";
+import { CheckCircle } from "lucide-react";
+import FramePreview from "@/components/website/FramePreview";
+import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
+import Link from "next/link";
+import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
+import { useToast, ToastContainer } from "@/components/ui/toast";
+
+interface OrderItem {
+  id: string | number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+interface Order {
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  orderNumber: string;
+  createdAt: string;
+  customerDetails: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    deliveryNotes: string;
+  };
+}
+
+const resolvePreview = (item: OrderItem): "updated-1" | "updated-2" | "gradient" => {
+  if (item.image === "updated-1" || item.image === "updated-2") {
+    return item.image;
+  }
+  if (item.name && item.name.toLowerCase().includes("white frame")) {
+    return "updated-1";
+  }
+  if (item.name && item.name.toLowerCase().includes("magnate frame")) {
+    return "updated-2";
+  }
+  return "gradient";
+};
 
 export default function OrderConfirmationScreen() {
-  const [items, setItems] = useState<OrderItem[]>([]);
-  const [orderNumber, setOrderNumber] = useState<string | undefined>(undefined);
-  const [shipping, setShipping] = useState<number>(200);
+  const [order, setOrder] = useState<Order | null>(null);
+  const { toasts, removeToast } = useToast();
 
   useEffect(() => {
     const savedOrder = getSavedOrder();
-
-    if (savedOrder && savedOrder.items.length > 0) {
-      setItems(savedOrder.items);
-      setOrderNumber(savedOrder.orderNumber);
-      setShipping(savedOrder.shipping);
-      clearCart();
-      return;
+    if (savedOrder) {
+      setOrder(savedOrder as Order);
     }
 
-    const stored = getCartItems();
-    setItems(stored.map((item) => ({
-      ...item,
-      price: typeof item.price === "string" ? parseFloat(item.price) : item.price,
-    })));
+    // Cleanup: Clear saved order after 5 minutes to free up memory
+    const cleanupTimer = setTimeout(() => {
+      clearSavedOrder();
+    }, 5 * 60 * 1000);
+
+    // Also clear on page unload
+    const handleBeforeUnload = () => {
+      clearSavedOrder();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      clearTimeout(cleanupTimer);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
-  const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items]
-  );
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F9F9FE] to-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <p className="text-[#434652]">Loading order details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const total = order.subtotal + order.shipping;
 
   return (
-    <div className="min-h-screen bg-[#F9F9FE] text-[#1A1C1F]">
-      <main className="mx-auto max-w-[1280px] px-4 pb-16 pt-20 sm:px-6 lg:px-8">
-        <section className="flex flex-col items-center gap-6 text-center">
-          <div className="grid h-20 w-20 place-items-center rounded-full bg-[#0040A1] shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-[#0040A1] shadow-sm">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 6L9 17L4 12" stroke="#0040A1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#F9F9FE] to-white">
+      <div className="mx-auto w-full max-w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-20">
+        {/* Header - Success Message */}
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#0040A1]">
+            <CheckCircle className="h-10 w-10 text-white" />
           </div>
 
-          <div className="max-w-[672px]">
-            <h1 className="font-manrope text-[48px] font-bold leading-[56px] tracking-[-0.96px] text-[#002B73]">
-              Thank You for Your Order
-            </h1>
-            <p className="mt-4 text-[18px] leading-7 text-[#434652]">
-              Your memories are in safe hands. We’ve received your order and are preparing to craft your custom frames with the precision they deserve.
-            </p>
-          </div>
-        </section>
+          <h1 className="font-manrope text-4xl sm:text-5xl lg:text-[48px] font-bold tracking-[-0.96px] text-[#002B73] mb-4">
+            Thank You for Your Order
+          </h1>
 
-        {items.length === 0 ? (
-          <div className="mt-16 rounded-[20px] border border-[#C3C6D4] bg-white p-12 text-center">
-            <h2 className="text-2xl font-semibold text-[#002B73]">No order was found</h2>
-            <p className="mt-4 text-[#434652]">
-              We couldn’t find order details for this confirmation. Please return to checkout and place your order again.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-16 grid gap-8 xl:grid-cols-[1.8fr_1fr]">
-            <div className="space-y-6">
-              <OrderDetails
-                items={items}
-                subtotal={subtotal}
-                shipping={shipping}
-                orderNumber={orderNumber}
-              />
+          <p className="max-w-[672px] text-base sm:text-lg text-[#434652] leading-relaxed">
+            Your memories are in safe hands. We've received your order and are preparing to craft your custom frames with the precision they deserve.
+          </p>
+        </div>
 
-              <div className="rounded-[20px] bg-[#F4F5F9] p-6 shadow-sm">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">
-                      Shipping Address
-                    </p>
-                    <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
-                      Alex Thompson<br />
-                      1248 Memory Lane<br />
-                      Suite 400<br />
-                      San Francisco, CA 94105
-                    </p>
+        {/* Main Content Grid */}
+        <div className="grid gap-8 grid-cols-1 lg:grid-cols-[7fr_3fr]">
+          {/* Left Column: Order Details */}
+          <div className="space-y-6">
+            {/* Order Summary Section */}
+            <div className="rounded-xl border border-[#C3C6D4] bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] overflow-hidden">
+              {/* Header */}
+              <div className="border-b border-[#C3C6D4] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h2 className="font-manrope text-2xl sm:text-[28px] font-semibold text-[#002B73]">
+                  Order Details
+                </h2>
+                <div className="bg-[#E8E8ED] rounded-full px-4 py-2 self-start sm:self-auto">
+                  <span className="text-xs sm:text-sm font-medium text-[#1A1C1F]">
+                    Order #{order.orderNumber}
+                  </span>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="divide-y divide-[#E2E2E7]">
+                {order.items.map((item) => (
+                  <div key={item.id} className="flex gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-4">
+                    {/* Product Image */}
+                    <div className="flex-shrink-0 w-20 sm:w-24 h-20 sm:h-24 rounded-lg border border-[#C3C6D4] bg-white overflow-hidden flex items-center justify-center">
+                      <FramePreview
+                        variant={resolvePreview(item)}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <h3 className="font-semibold text-base sm:text-lg text-[#1A1C1F] line-clamp-2 mb-1">
+                        {item.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#434652]">
+                        Quantity: {item.quantity} • Frame: White
+                      </p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="text-right font-bold text-base sm:text-lg text-[#1A1C1F] whitespace-nowrap">
+                      Rs{(item.price * item.quantity).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#747784]">
-                      Contact Details
-                    </p>
-                    <p className="mt-4 text-[16px] leading-6 text-[#1A1C1F]">
-                      alex.thompson@example.com<br />
-                      +1 (555) 098-7654
-                    </p>
-                  </div>
+                ))}
+              </div>
+
+              {/* Order Summary Totals */}
+              <div className="border-t border-[#C3C6D4] bg-[#F9F9FE] px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+                <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+                  <span>Subtotal</span>
+                  <span>Rs{order.subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+                  <span>Shipping</span>
+                  <span>Rs{order.shipping.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="border-t border-[#C3C6D4] pt-4 flex justify-between text-base sm:text-xl font-bold text-[#002B73]">
+                  <span>Total</span>
+                  <span>Rs{total.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="rounded-[20px] bg-[#002B73] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.12)] text-white">
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-[24px] font-manrope font-semibold text-white">
-                      Your order was successful
+            {/* Delivery Information Section */}
+            <div className="rounded-xl border border-[#C3C6D4] bg-[#F3F3F8] p-4 sm:p-6 lg:p-8">
+              <h2 className="font-manrope text-2xl sm:text-[28px] font-semibold text-[#002B73] mb-6">
+                Delivery Information
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                {/* Shipping Address */}
+                <div className="space-y-3">
+                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#747784]">
+                    Shipping Address
+                  </p>
+                  <div className="text-xs sm:text-sm text-[#1A1C1F] space-y-1 leading-relaxed">
+                    <p className="font-medium">
+                      {order.customerDetails.firstName} {order.customerDetails.lastName}
                     </p>
-                    <p className="mt-2 max-w-[340px] text-[16px] leading-7 text-[#B3D0FF]">
-                      Help us improve the framing experience for everyone.
+                    <p>{order.customerDetails.street}</p>
+                    <p>
+                      {order.customerDetails.city}, {order.customerDetails.state}{" "}
+                      {order.customerDetails.zip}
                     </p>
                   </div>
+                </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-[12px] bg-white/15 text-white transition hover:bg-white/25"
-                      >
-                        <Star className="h-4 w-4" />
-                      </button>
-                    ))}
+                {/* Contact Details */}
+                <div className="space-y-3">
+                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#747784]">
+                    Contact Details
+                  </p>
+                  <div className="text-xs sm:text-sm text-[#1A1C1F] space-y-1">
+                    <p>{order.customerDetails.email}</p>
+                    <p>{order.customerDetails.phone}</p>
                   </div>
-
-                  <div className="rounded-[16px] border border-white/20 bg-white/10 p-3">
-                    <textarea
-                      placeholder="Tell us what you liked..."
-                      className="min-h-[86px] w-full resize-none bg-transparent text-sm text-white placeholder:text-[#B3D0FF] outline-none"
-                    />
-                  </div>
-
-                  <Button
-                    variant="secondary"
-                    className="w-full rounded-[12px] bg-white text-[#002B73] shadow-lg shadow-[#062B5A]/10 hover:bg-[#f7f7f7]"
-                  >
-                    Submit Feedback
-                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </main>
+
+          {/* Right Column: Feedback Section */}
+          <FeedbackCard />
+        </div>
+
+        {/* Continue Shopping */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/shop"
+            className="inline-block bg-[#FF3B30] hover:bg-[#E61D11] text-white font-semibold px-6 sm:px-8 py-3 rounded-lg transition-colors text-sm sm:text-base"
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      </div>
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }
