@@ -1,34 +1,75 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import OrderSummary, { SummaryItem } from "./OrderSummary";
-import { clearCart, getCartItems, saveOrder } from "@/services/cartService";
+import { saveOrder } from "@/services/cartService";
+import { useCart } from '@/context/CartContext';
 import { Truck, UserRound } from "lucide-react";
 
 const generateOrderNumber = () => {
   return `MAG-${Math.floor(10000 + Math.random() * 90000)}`;
 };
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function CheckoutScreen() {
   const router = useRouter();
-  const [items, setItems] = useState<SummaryItem[]>([]);
-
-  useEffect(() => {
-    const stored = getCartItems();
-    setItems(stored);
-  }, []);
-
-  const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items],
+  const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
+  const items = useMemo<SummaryItem[]>(
+    () => cartItems.map((i) => ({ id: i.id, name: i.title, price: i.price, quantity: i.quantity, image: i.image, frameType: i.frameType, colorOption: i.colorOption })),
+    [cartItems],
   );
 
+  // use subtotal from cart context (keeps single source of truth)
+  const subtotal = cartSubtotal;
+
+  // Form state (controlled)
+  type FormState = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    notes?: string;
+  };
+
+  const [form, setForm] = useState<FormState>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    notes: "",
+  });
+
+  const setField = (k: keyof FormState, v: string) => setForm((s) => ({ ...s, [k]: v }));
+
+  // basic production-grade validation
+  const isFormValid = useMemo(() => {
+    return (
+      form.firstName.trim() !== "" &&
+      form.lastName.trim() !== "" &&
+      emailRegex.test(form.email.trim()) &&
+      form.phone.trim() !== "" &&
+      form.street.trim() !== "" &&
+      form.city.trim() !== "" &&
+      form.state.trim() !== "" &&
+      form.zip.trim() !== ""
+    );
+  }, [form]);
+
   const handlePlaceOrder = () => {
-    if (items.length === 0) {
+    if (!isFormValid || items.length === 0) {
       return;
     }
 
@@ -74,20 +115,38 @@ export default function CheckoutScreen() {
                 <div className="grid gap-5 md:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[#434652]">First Name</label>
-                    <Input defaultValue="John" />
+                      <Input
+                        value={form.firstName}
+                        placeholder="John"
+                        onChange={(e) => setField("firstName", (e.target as HTMLInputElement).value)}
+                      />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[#434652]">Last Name</label>
-                    <Input defaultValue="Doe" />
+                      <Input
+                        value={form.lastName}
+                        placeholder="Doe"
+                        onChange={(e) => setField("lastName", (e.target as HTMLInputElement).value)}
+                      />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[#434652]">Email Address</label>
-                  <Input defaultValue="john.doe@example.com" />
+                    <Input
+                      type="email"
+                      value={form.email}
+                      placeholder="example123@gmail.com"
+                      onChange={(e) => setField("email", (e.target as HTMLInputElement).value)}
+                    />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[#434652]">Phone Number</label>
-                  <Input defaultValue="+1 (555) 000-0000" />
+                    <Input
+                      type="tel"
+                      value={form.phone}
+                      placeholder="+1 (555) 000-0000"
+                      onChange={(e) => setField("phone", (e.target as HTMLInputElement).value)}
+                    />
                 </div>
               </CardContent>
             </Card>
@@ -106,25 +165,45 @@ export default function CheckoutScreen() {
               <CardContent className="space-y-5 px-8 pb-12 pt-8">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[#434652]">Street Address</label>
-                  <Input defaultValue="123 Gallery Street" />
+                  <Input
+                    value={form.street}
+                    placeholder="123 Gallery Street"
+                    onChange={(e) => setField("street", (e.target as HTMLInputElement).value)}
+                  />
                 </div>
                 <div className="grid gap-5 md:grid-cols-[1fr_1fr_83px]">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[#434652]">City</label>
-                    <Input defaultValue="Manhattan" />
+                    <Input
+                      value={form.city}
+                      placeholder="Manhattan"
+                      onChange={(e) => setField("city", (e.target as HTMLInputElement).value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[#434652]">State / Province</label>
-                    <Input defaultValue="Sri Lanka" />
+                    <Input
+                      value={form.state}
+                      placeholder="Sri Lanka"
+                      onChange={(e) => setField("state", (e.target as HTMLInputElement).value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[#434652]">ZIP</label>
-                    <Input defaultValue="10001" />
+                    <Input
+                      value={form.zip}
+                      placeholder="10001"
+                      onChange={(e) => setField("zip", (e.target as HTMLInputElement).value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[#434652]">Delivery Notes (Optional)</label>
-                  <Textarea defaultValue="Leave at front desk" />
+                  <Textarea
+                    value={form.notes}
+                    placeholder="Leave at front desk"
+                    onChange={(e) => setField("notes", (e.target as HTMLTextAreaElement).value)}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -134,6 +213,7 @@ export default function CheckoutScreen() {
             items={items}
             subtotal={subtotal}
             onPlaceOrder={handlePlaceOrder}
+            disabled={!isFormValid}
           />
         </div>
       </div>
