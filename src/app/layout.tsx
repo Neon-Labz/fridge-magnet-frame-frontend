@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import Toast from '@/components/Toast';
 import './globals.css';
 import CartProvider from '@/context/CartContext';
 
@@ -30,7 +31,10 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col antialiased">
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          <Toast />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );
