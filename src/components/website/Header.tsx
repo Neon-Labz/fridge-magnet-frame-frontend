@@ -2,13 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from '@/context/CartContext';
+import { clearWebsiteAuthSession, useWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const { totalQuantity } = useCart();
+  const { isAuthenticated } = useWebsiteAuthSession();
 
   const isActive = (href: string) => {
     if (href === "/" && pathname === "/") return true;
@@ -93,11 +96,24 @@ export default function Header() {
             )}
           </Link>
 
-          <Link href="/login">
-          <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
-           Login
-          </button>
-          </Link>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => {
+                clearWebsiteAuthSession();
+                router.push('/');
+              }}
+              className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link href="/login">
+              <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
+                Login
+              </button>
+            </Link>
+          )}
 
         </div>
       </nav>
