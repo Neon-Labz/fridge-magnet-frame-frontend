@@ -26,11 +26,11 @@ const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradien
     return item.image;
   }
 
-  if (item.name.toLowerCase().includes("white frame")) {
+  if (item.name && item.name.toLowerCase().includes("white frame")) {
     return "updated-1";
   }
 
-  if (item.name.toLowerCase().includes("magnate frame")) {
+  if (item.name && item.name.toLowerCase().includes("magnate frame")) {
     return "updated-2";
   }
 
