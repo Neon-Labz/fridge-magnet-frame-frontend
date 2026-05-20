@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Lock, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import OrderSummary from '../../../components/OrderSummary';
+import { useCart } from '@/context/CartContext';
 
 type CartItemData = {
   id: string;
@@ -13,6 +13,8 @@ type CartItemData = {
   price: number;
   quantity: number;
   image: string;
+  frameType?: string;
+  colorOption?: string;
 };
 
 function CartItem({
@@ -21,13 +23,13 @@ function CartItem({
   onDelete,
 }: {
   item: CartItemData;
-  onQuantityChange: (id: string, quantity: number) => void;
-  onDelete: (id: string) => void;
+  onQuantityChange: (id: string, frameType: string | undefined, colorOption: string | undefined, quantity: number) => void;
+  onDelete: (id: string, frameType: string | undefined, colorOption: string | undefined) => void;
 }) {
   const handleInput = (value: string) => {
     const qty = Number(value);
     if (!Number.isNaN(qty)) {
-      onQuantityChange(item.id, Math.max(1, qty));
+      onQuantityChange(item.id, item.frameType, item.colorOption, Math.max(1, qty));
     }
   };
 
@@ -35,7 +37,7 @@ function CartItem({
     <article style={{ position: 'relative', boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', padding: '32px', gap: '32px', width: '100%', minHeight: '220px', background: '#FFFFFF', border: '1px solid #C3C6D4', boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)', borderRadius: '14px' }} className="rounded-[14px]">
       <button
         type="button"
-        onClick={() => onDelete(item.id)}
+        onClick={() => onDelete(item.id, item.frameType, item.colorOption)}
         style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 0, width: '16px', height: '18px', background: 'none', border: 'none', cursor: 'pointer', zIndex: 2 }}
         aria-label="Delete item"
       >
@@ -78,7 +80,7 @@ function CartItem({
           <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'stretch', padding: 0, height: '40px', border: '1px solid #C3C6D4', borderRadius: '8px', background: '#FFFFFF', overflow: 'hidden', flex: 'none' }}>
             <button
               type="button"
-              onClick={() => onQuantityChange(item.id, Math.max(1, item.quantity - 1))}
+              onClick={() => onQuantityChange(item.id, item.frameType, item.colorOption, Math.max(1, item.quantity - 1))}
               style={{ boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 12px', border: 'none', borderRight: '1px solid #C3C6D4', background: '#FFFFFF', cursor: 'pointer', transition: 'background-color 0.2s ease', flex: 'none' }}
               className="hover:bg-[#F9F9FE]"
             >
@@ -99,7 +101,7 @@ function CartItem({
             
             <button
               type="button"
-              onClick={() => onQuantityChange(item.id, item.quantity + 1)}
+              onClick={() => onQuantityChange(item.id, item.frameType, item.colorOption, item.quantity + 1)}
               style={{ boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 12px', border: 'none', borderLeft: '1px solid #C3C6D4', background: '#FFFFFF', cursor: 'pointer', transition: 'background-color 0.2s ease', flex: 'none' }}
               className="hover:bg-[#F9F9FE]"
             >
@@ -122,42 +124,15 @@ function CartItem({
 
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItemData[]>([
-    {
-      id: "1",
-      title: "Heritage Oak Frame",
-      subtitle: "Frame: White",
-      price: 250,
-      quantity: 8,
-      image: "/logo.png",
-    },
-    {
-      id: "2",
-      title: "Modern Matte Ebony",
-      subtitle: "Frame: No Frame",
-      price: 125,
-      quantity: 4,
-      image: "/logo.png",
-    },
-  ]);
+  const { items, subtotal, totalQuantity, updateQuantity, removeFromCart } = useCart();
 
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setCartItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item,
-      ),
-    );
+  const handleQuantityChange = (id: string, frameType: string | undefined, colorOption: string | undefined, quantity: number) => {
+    updateQuantity(id, frameType, colorOption, Math.max(1, quantity));
   };
 
-  const handleDelete = (id: string) => {
-    setCartItems((current) => current.filter((item) => item.id !== id));
+  const handleDelete = (id: string, frameType: string | undefined, colorOption: string | undefined) => {
+    removeFromCart(id, frameType, colorOption);
   };
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="relative w-full bg-[#F9F9FE]">
@@ -175,14 +150,27 @@ export default function CartPage() {
           <div className="grid gap-8 lg:gap-12 grid-cols-1 lg:grid-cols-[1fr_420px]">
             <section className="space-y-8 lg:space-y-6">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '32px', width: '100%' }}>
-                {cartItems.map((item) => (
+                {items.map((it) => {
+                  const item: CartItemData = {
+                    id: it.id,
+                    title: it.title,
+                    subtitle: it.colorOption ? `Frame: ${it.frameType} • Color: ${it.colorOption}` : `Frame: ${it.frameType}`,
+                    price: it.price,
+                    quantity: it.quantity,
+                    image: it.image,
+                    frameType: it.frameType,
+                    colorOption: it.colorOption,
+                  };
+
+                  return (
                   <CartItem
-                    key={item.id}
+                    key={`${item.id}-${item.frameType}`}
                     item={item}
                     onQuantityChange={handleQuantityChange}
                     onDelete={handleDelete}
                   />
-                ))}
+                  );
+                })}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '32px 0px 0px', width: '100%', flex: 'none', order: 2, alignSelf: 'stretch', flexGrow: 0 }}>

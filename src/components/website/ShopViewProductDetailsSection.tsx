@@ -1,16 +1,14 @@
-'use client';
-
-'use client';
+"use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import PersonalizationSection, {
   PersonalizationState,
 } from '@/components/website/PersonalizationSection';
 import { useFrameStore } from '@/store/frameStore';
-import { useCartStore } from '@/store/cartStore';
-import { addToCart, clearCart } from '@/services/cartService';
+import { useCart } from '@/context/CartContext';
 
 interface ShopViewProductDetailsSectionProps {
   rating?: number;
@@ -20,11 +18,12 @@ interface ShopViewProductDetailsSectionProps {
   description?: string;
 }
 
-interface CartItem {
+interface CartItemLocal {
   id: string;
   title: string;
   price: number;
-  frameOption: string;
+  frameType: string;
+  colorOption?: string;
   quantity: number;
   image: string;
 }
@@ -38,12 +37,10 @@ function ShopViewProductDetailsSection({
     'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames. Each piece is hand-finished to ensure a museum-grade quality that complements any interior.',
 }: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((state) => state.selectedFrame);
-  const router = useRouter();
 
-  const cartStore = useCartStore() as unknown as {
-    addToCart?: (item: CartItem) => void;
-    addItem?: (item: CartItem) => void;
-  };
+  const { addToCart } = useCart();
+
+  const router = useRouter();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -102,11 +99,12 @@ function ShopViewProductDetailsSection({
   };
 
   const handleAddToCart = () => {
-    const cartItem = {
-      id: selectedFrame,
-      name: getDynamicTitle(),
+      const cartItem: CartItemLocal = {
+        id: 'magnet-main',
+      title: getDynamicTitle(),
       price,
-      image: mainImageSource,
+      frameType: selectedFrame,
+      colorOption: personalization.option === 'with-frame' ? personalization.frameColor : undefined,
       quantity,
     };
 
@@ -125,8 +123,26 @@ function ShopViewProductDetailsSection({
       quantity,
     };
 
-    addToCart(cartItem as any);
-    router.push('/checkout');
+    try {
+      addToCart({
+        id: cartItem.id,
+        title: cartItem.title,
+        image: cartItem.image,
+        frameType: cartItem.frameType,
+        colorOption: cartItem.colorOption,
+        quantity: cartItem.quantity,
+        price: cartItem.price,
+      });
+    } catch (err) {
+      console.error('Failed to add to cart', err);
+    }
+
+    // navigate to cart page after adding
+    try {
+      router.push('/cart');
+    } catch (err) {
+      console.error('Navigation to /cart failed', err);
+    }
   };
 
   return (

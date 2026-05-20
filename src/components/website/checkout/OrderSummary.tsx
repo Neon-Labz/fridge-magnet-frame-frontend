@@ -10,12 +10,15 @@ export type SummaryItem = {
   price: number;
   quantity: number;
   image?: string;
+  frameType?: string;
+  colorOption?: string;
 };
 
 interface OrderSummaryProps {
   items: SummaryItem[];
   subtotal: number;
   onPlaceOrder?: () => void;
+  disabled?: boolean;
 }
 
 const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradient" => {
@@ -34,8 +37,9 @@ const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradien
   return "gradient";
 };
 
-export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSummaryProps) {
+export default function OrderSummary({ items, subtotal, onPlaceOrder, disabled = false }: OrderSummaryProps) {
   const hasItems = items.length > 0;
+  const isDisabled = disabled || !hasItems;
 
   return (
     <div className="w-full">

@@ -1,11 +1,14 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from '@/context/CartContext';
 
 export default function Header() {
   const pathname = usePathname();
+
+  const { totalQuantity } = useCart();
 
   const isActive = (href: string) => {
     if (href === "/" && pathname === "/") return true;
@@ -81,10 +84,14 @@ export default function Header() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-          
-          <div className="cursor-pointer text-[26px] text-black transition-all duration-200 hover:scale-110 hover:text-gray-700">
-          🛒
-          </div>
+          <Link href="/cart" className="relative block">
+            <div className="cursor-pointer text-[26px] text-black transition-all duration-200 hover:scale-110 hover:text-gray-700">
+              🛒
+            </div>
+            {totalQuantity > 0 && (
+              <span className="absolute -top-2 -right-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white">{totalQuantity}</span>
+            )}
+          </Link>
 
           <Link href="/login">
           <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
