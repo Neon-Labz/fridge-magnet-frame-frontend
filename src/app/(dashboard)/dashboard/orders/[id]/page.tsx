@@ -1,16 +1,45 @@
-import { ORDERS } from '@/data/orders';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import OrderStatus from '@/components/dashboard/orders/OrderStatus';
+import { fetchOrder } from '@/lib/orders';
+import type { Order } from '@/types/order';
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+export default function OrderStatusPage() {
+  const params = useParams<{ id: string }>();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function OrderStatusPage({ params }: Props) {
-  const { id } = await params;
-  const order = ORDERS.find((o) => o.id === id || o.orderId === id);
+  useEffect(() => {
+    const loadOrder = async () => {
+      setLoading(true);
+      setError(null);
 
-  if (!order) {
-    return <div>Order not found</div>;
+      try {
+        setOrder(await fetchOrder(params.id));
+      } catch (err) {
+        setOrder(null);
+        setError(err instanceof Error ? err.message : 'Order not found');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      void loadOrder();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="p-8 text-sm font-medium text-slate-600">Loading order...</div>;
+  }
+
+  if (error || !order) {
+    return <div className="p-8 text-sm font-medium text-red-700">{error || 'Order not found'}</div>;
   }
 
   return <OrderStatus order={order} />;

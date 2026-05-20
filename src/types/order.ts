@@ -1,4 +1,4 @@
-export type OrderStatus = 'shipped' | 'pending' | 'processing' | 'cancelled';
+export type OrderStatus = 'shipped' | 'pending' | 'processing' | 'delivered' | 'canceled';
 
 export interface Order {
   id: string;
@@ -10,4 +10,6 @@ export interface Order {
   status: OrderStatus;
   email?: string;
   totalValue?: number;
+  shippingAddress?: string;
+  adminNote?: string;
 }

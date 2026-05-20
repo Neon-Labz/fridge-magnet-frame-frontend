@@ -1,71 +1,108 @@
+import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+const quickLinks = [
+  { title: "Shop All Frames", href: "/shop" },
+  { title: "Frame Customizer", href: "/customizer" },
+  { title: "Gallery Inspiration", href: "/gallery" },
+];
+
+const supportLinks = [
+  { title: "Privacy Policy", href: "/privacy" },
+  { title: "Terms of Service", href: "/terms" },
+  { title: "Shipping & Returns", href: "/shipping" },
+  { title: "Contact Us", href: "/contact" },
+];
 
 export default function Footer() {
   return (
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F8FAFC]">
-      <div className="mx-auto max-w-[1800px] px-[20px] py-[80px]">
-        <div className="grid gap-12 md:grid-cols-2 xl:grid-cols-[277px_276px_276px_276px] xl:justify-between">
-          <div className="w-full max-w-[277px]">
-            <div className="h-16 w-44">
+      <div className="mx-auto max-w-[1800px] px-[80px] py-[70px]">
+        <div className="grid items-start gap-[70px] xl:grid-cols-[380px_220px_220px_320px]">
+          
+          {/* LOGO + TEXT */}
+          <div className="flex flex-col items-start">
+            <div className="relative mb-[12px] h-[95px] w-[260px]">
               <Image
                 src="/logo.png"
                 alt="Magnify Logo"
-                width={177}
-                height={55}
-                className="object-contain"
+                fill
+                priority
+                className="object-contain object-left"
+                sizes="260px"
               />
             </div>
 
-            <p className="mt-10 font-inter text-[20px] leading-9 text-[#64748B]">
+            <p className="max-w-[330px] font-inter text-[15px] leading-[28px] text-[#64748B]">
               © 2024 Magnify. Premium photo framing for curated memories.
               Elevating everyday moments into lasting legacies.
             </p>
           </div>
 
+          {/* QUICK LINKS */}
           <div>
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
-              Navigation
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
+              Quick Links
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
-              <li>Privacy Policy</li>
-              <li>Terms of Service</li>
-              <li>Shipping Policy</li>
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
+              {quickLinks.map((link) => (
+                <li key={link.title}>
+                  <Link href={link.href} className="hover:text-[#002B73]">
+                    {link.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* SUPPORT */}
           <div>
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
-              Connect
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
+              Support
             </h4>
 
-            <ul className="mt-[30px] space-y-[22px] font-inter text-[20px] text-[#64748B]">
-              <li>Contact Us</li>
-              <li>About Our Craft</li>
-              <li className="font-semibold">Sustainability</li>
+            <ul className="mt-5 space-y-4 font-inter text-[15px] text-[#64748B]">
+              {supportLinks.map((link) => (
+                <li key={link.title}>
+                  <Link href={link.href} className="hover:text-[#002B73]">
+                    {link.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* NEWSLETTER */}
           <div>
-            <h4 className="font-manrope text-[20px] font-bold uppercase tracking-[1px] text-[#1E3A8A]">
+            <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Newsletter
             </h4>
 
-            <p className="mt-[28px] font-inter text-[20px] leading-[30px] text-[#64748B]">
+            <p className="mt-5 font-inter text-[15px] leading-7 text-[#64748B]">
               Join our list for exclusive gallery updates and styling tips.
             </p>
 
-            <div className="mt-[25px] flex h-[61px] w-full max-w-[276px] overflow-hidden rounded-[15px] border border-[#C3C6D4] bg-white">
+            <div className="mt-5 flex h-[44px] w-full max-w-[270px] overflow-hidden rounded-[10px] border border-[#C3C6D4] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full px-[18px] font-inter text-[20px] outline-none"
+                className="w-full px-4 font-inter text-[14px] outline-none placeholder:text-[#94A3B8]"
               />
-              <button className="w-[66px] bg-[#002B73] text-[20px] text-white">
-                →
+
+              <button className="flex w-[44px] items-center justify-center bg-[#002B73] text-white hover:bg-[#001f57]">
+                <ArrowRight size={16} />
               </button>
             </div>
           </div>
+        </div>
+
+        {/* SMALL FOOTER */}
+        <div className="mt-[55px] border-t border-[#C3C6D4] pt-[22px]">
+          <p className="text-center font-inter text-[14px] text-[#64748B]">
+            © 2026 Magnify Photo Frames. Curated Memories.
+          </p>
         </div>
       </div>
     </footer>
