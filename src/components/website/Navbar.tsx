@@ -52,14 +52,14 @@ export default function Navbar() {
 
         {/* DESKTOP RIGHT */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="relative">
+          <Link href="/cart" aria-label="Cart" className="relative inline-flex items-center justify-center">
             <ShoppingCart className="h-5 w-5 text-[#475569]" />
             {totalQuantity > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
                 {totalQuantity}
               </span>
             )}
-          </div>
+          </Link>
 
           {isAuthenticated ? (
             <button
@@ -108,14 +108,14 @@ export default function Navbar() {
             ))}
 
             <div className="flex items-center gap-4 mt-2">
-              <div className="relative">
+              <Link href="/cart" aria-label="Cart" className="relative inline-flex items-center justify-center">
                 <ShoppingCart className="h-5 w-5 text-[#475569]" />
-                  {totalQuantity > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
-                      {totalQuantity}
-                    </span>
-                  )}
-              </div>
+                {totalQuantity > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
+                    {totalQuantity}
+                  </span>
+                )}
+              </Link>
 
                 {isAuthenticated ? (
                   <button

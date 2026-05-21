@@ -90,15 +90,18 @@ export default function Header() {
 
         {/* RIGHT */}
         <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-          
-          <button className="relative cursor-pointer text-[24px] text-[#475569] transition-colors hover:text-[#002B73]">
-            🛒
+          <Link
+            href="/cart"
+            aria-label="Cart"
+            className="relative inline-flex cursor-pointer items-center justify-center text-[24px] text-[#475569] transition-colors hover:text-[#002B73]"
+          >
+            <span aria-hidden="true">🛒</span>
             {totalQuantity > 0 && (
               <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[12px] font-bold text-white">
                 {totalQuantity}
               </span>
             )}
-          </button>
+          </Link>
 
           {isAuthenticated ? (
             <button
