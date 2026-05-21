@@ -5,9 +5,25 @@ import PersonalizationSection, { PersonalizationState } from "./PersonalizationS
 import { useFrameStore } from "@/store/frameStore";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
+import type { ShopProduct } from "@/types/shopProduct";
 
 interface ShopViewProductDetailsSectionProps {
-  products: any[];
+  products: ShopProduct[];
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim();
+    return normalized ? [normalized] : [];
+  }
+
+  return [];
 }
 
 export default function ShopViewProductDetailsSection({
@@ -21,7 +37,7 @@ export default function ShopViewProductDetailsSection({
   const [quantity, setQuantity] = useState(1);
   
   const handlePersonalizationChange = useCallback(
-    (state: PersonalizationState) => {
+    (_state: PersonalizationState) => {
       // Store personalization state if needed for future use
     },
     []
@@ -37,24 +53,22 @@ export default function ShopViewProductDetailsSection({
     );
   }
 
-  const product = products[0];
+  const product = products[0] && typeof products[0] === "object" ? products[0] : {};
 
   const title = product.productName ?? "";
-  const price = product.price ?? 0;
+  const price = Number(product.price ?? 0);
   const description = product.description ?? "";
   const inStock = product.status === "In Stock";
-  const mainImage = product.primaryImage?.secure_url ?? null;
+  const mainImage = product.primaryImage?.secure_url;
 
-  const rawOptions: string[] =
-    (product.personalizationInstructions?.length
-      ? product.personalizationInstructions
-      : product.personalization) ?? [];
-
-  const personalizationOptions = rawOptions.filter(Boolean);
+  const personalizationOptions =
+    toStringArray(product.personalizationInstructions).length > 0
+      ? toStringArray(product.personalizationInstructions)
+      : toStringArray(product.personalization);
 
   const handleAddToCart = () => {
     addToCart({
-      id: product._id,
+      id: product._id ?? `shop-${Date.now()}`,
       title,
       price,
       frameOption: selectedFrame,
