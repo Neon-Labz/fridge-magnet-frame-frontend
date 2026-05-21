@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 import PersonalizationSection, { PersonalizationState } from "./PersonalizationSection";
 import { useFrameStore } from "@/store/frameStore";
-import { useCartStore } from "@/store/cartStore";
+import { useCart } from "@/context/CartContext";
 import { useToastStore } from "@/store/toastStore";
 
 interface ShopViewProductDetailsSectionProps {
@@ -15,7 +15,7 @@ export default function ShopViewProductDetailsSection({
 }: ShopViewProductDetailsSectionProps) {
   const selectedFrame = useFrameStore((s) => s.selectedFrame);
 
-  const { addToCart } = useCartStore();
+  const { addToCart } = useCart();
   const { addToast } = useToastStore();
 
   const [quantity, setQuantity] = useState(1);
@@ -57,7 +57,7 @@ export default function ShopViewProductDetailsSection({
       id: product._id,
       title,
       price,
-      frameOption: selectedFrame,
+      frameType: selectedFrame,
       quantity,
       image: mainImage,
     });

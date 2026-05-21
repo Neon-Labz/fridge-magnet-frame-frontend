@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useFrameStore } from "@/store/frameStore";
-import { useCartStore } from "@/store/cartStore";
+import { useCart } from "@/context/CartContext";
 import { useToastStore } from "@/store/toastStore";
 import { useState, useEffect } from "react";
 
@@ -19,7 +19,7 @@ export default function ProductsSection() {
   const router = useRouter();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
   const setSelectedProductId = useFrameStore((state) => state.setSelectedProductId);
-  const { addToCart } = useCartStore();
+  const { addToCart } = useCart();
   const { addToast } = useToastStore();
   const [addedProduct, setAddedProduct] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,12 +27,23 @@ export default function ProductsSection() {
 
   useEffect(() => {
     async function fetchProducts() {
-      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000/api/v1';
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
+        '/api/v1';
       try {
         const res = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
-          setProducts(json?.data?.products ?? []);
+          const extractedProducts = Array.isArray(json?.data?.products)
+            ? json.data.products
+            : Array.isArray(json?.products)
+              ? json.products
+              : Array.isArray(json?.data)
+                ? json.data
+                : [];
+
+          setProducts(extractedProducts);
         }
       } catch (err) {
         console.error('[ProductsSection] Failed to fetch products:', err);
@@ -49,7 +60,7 @@ export default function ProductsSection() {
       id: product._id,
       title: product.productName,
       price: product.price,
-      frameOption: 'black-frame' as const,
+      frameType: 'black-frame' as const,
       quantity: 1,
       image: product.primaryImage?.secure_url || '/product-1.png',
     };
