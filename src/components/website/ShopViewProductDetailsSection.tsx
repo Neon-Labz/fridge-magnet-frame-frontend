@@ -59,7 +59,7 @@ export default function ShopViewProductDetailsSection({
   const price = Number(product.price ?? 0);
   const description = product.description ?? "";
   const inStock = product.status === "In Stock";
-  const mainImage = product.primaryImage?.secure_url;
+  const mainImage = product.primaryImage?.secure_url ?? "";
 
   const personalizationOptions =
     toStringArray(product.personalizationInstructions).length > 0
@@ -81,18 +81,16 @@ export default function ShopViewProductDetailsSection({
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-20">
 
         {/* IMAGE */}
         <div className="flex flex-col gap-6">
-          <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
+          <div className="relative flex aspect-[3/4] md:aspect-[4/5] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
             {mainImage ? (
               <img
-                src={mainImage}
-                alt={title}
-                className="h-full w-full object-cover"
-                width={500}
-                height={625}
+                  src={mainImage}
+                  alt={title}
+                  className="h-full w-full object-cover"
               />
             ) : (
               <div className="text-center">
@@ -105,7 +103,7 @@ export default function ShopViewProductDetailsSection({
         </div>
 
         {/* DETAILS */}
-        <div className="flex flex-col pt-4">
+        <div className="flex flex-col pt-3">
           <h1 className="mb-3 text-[22px] font-medium text-slate-800">
             {title}
           </h1>
@@ -118,11 +116,11 @@ export default function ShopViewProductDetailsSection({
             </span>
           </div>
 
-          <div className="mb-6 text-[32px] font-bold text-[#1A2B5E]">
+          <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
             Rs {Number(price).toFixed(2)}
           </div>
 
-          <p className="mb-8 text-base leading-relaxed text-slate-600">
+          <p className="mb-8 text-sm md:text-base leading-relaxed text-slate-600">
             {description}
           </p>
 
