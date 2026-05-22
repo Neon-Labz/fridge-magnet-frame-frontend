@@ -1,14 +1,11 @@
 import type { ReactNode } from "react";
-import React from 'react';
-import Footer from "@/components/website/Footer";
-import Header from "@/components/website/Header";
+import React from "react";
+import WebsiteLayoutShell from "@/components/website/WebsiteLayoutShell";
 
 export default function WebsiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans">
-      <Header />
+    <WebsiteLayoutShell>
       <main className="pt-[75px]">{children}</main>
-      <Footer />
-    </div>
+    </WebsiteLayoutShell>
   );
 }

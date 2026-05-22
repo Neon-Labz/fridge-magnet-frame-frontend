@@ -20,19 +20,13 @@
   }
 }
 
-/* LARGE DESKTOP ONLY */
+/* LARGE DESKTOP */
 @media (min-width: 1280px) {
   .container {
     flex-direction: row;
     align-items: stretch;
-
     gap: 60px;
-
-    padding-top: 25px;
-    padding-bottom: 60px;
-
-    padding-left: 100px;
-    padding-right: 100px;
+    padding: 25px 100px 60px;
   }
 }
 
@@ -42,9 +36,6 @@
 .pricingColumn,
 .occasionsColumn {
   flex: 1;
-
-  display: flex;
-  flex-direction: column;
 }
 
 /* =========================
@@ -54,26 +45,19 @@
   margin-bottom: 28px;
 }
 
-/* TITLE */
 .columnTitle {
   margin: 0;
-
   font-size: 24px;
   font-weight: 800;
   line-height: 34px;
-
   color: #002B73;
 }
 
-/* SUBTEXT */
 .columnSubtext {
   margin-top: 10px;
-
   max-width: 440px;
-
   font-size: 14px;
   line-height: 24px;
-
   color: #64748B;
 }
 
@@ -108,15 +92,11 @@
 ========================= */
 .priceCardsGrid {
   display: grid;
-
   grid-template-columns: 1fr;
-
   gap: 20px;
-
   height: 100%;
 }
 
-/* LARGE DESKTOP ONLY */
 @media (min-width: 1280px) {
   .priceCardsGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -128,27 +108,18 @@
 ========================= */
 .priceCard {
   position: relative;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
   min-height: 250px;
-  height: 100%;
-
   padding: 28px;
-
-  overflow: hidden;
-
   border-radius: 16px;
   border: 2px solid;
-
   background: #FFFFFF;
-
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
-/* DESKTOP */
 @media (min-width: 1280px) {
   .priceCard {
     min-height: 280px;
@@ -156,9 +127,9 @@
   }
 }
 
-/* CARD VARIANTS */
 .priceCard.default {
-  border-color: #FEF9C3;
+  border-color: #fef9c3;
+  background: white;
 }
 
 .priceCard.popular {
@@ -171,80 +142,59 @@
 ========================= */
 .ribbon {
   position: absolute;
-
-  top: 18px;
-  right: -42px;
-
-  background: #DC2626;
+  top: 0;
+  right: 0;
+  background: #dc2626;
   color: white;
-
-  padding: 6px 40px;
-
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
-
-  transform: rotate(45deg);
-
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  transform: rotate(45deg) translate(30%, -50%);
+  transform-origin: center;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* =========================
-   CARD TEXT
+   CARD CONTENT
 ========================= */
 .cardLabel {
   font-size: 11px;
   font-weight: 700;
-
   color: #6B7280;
-
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .cardTitle {
   margin-top: 10px;
-
   font-size: 22px;
   font-weight: 700;
   line-height: 30px;
-
   color: #1F2937;
 }
 
 .priceSection {
   display: flex;
   align-items: baseline;
-
   gap: 8px;
-
   margin: 14px 0;
 }
 
 .pricePrefix {
   font-size: 14px;
-
   color: #6B7280;
 }
 
 .priceAmount {
   font-size: 28px;
   font-weight: 900;
-
-  color: #DC2626;
-}
-
-/* DESKTOP */
-@media (min-width: 1280px) {
-  .priceAmount {
-    font-size: 25px;
-  }
+  color: #dc2626;
+  line-height: 1;
 }
 
 .cardDescription {
   font-size: 14px;
   line-height: 24px;
-
   color: #6B7280;
 }
 
@@ -253,18 +203,14 @@
 ========================= */
 .occasionsGrid {
   display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 16px;
-
-  height: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
-/* TABLET */
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .occasionsGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
 }
 
@@ -274,58 +220,31 @@
 .occasionCard {
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
-  min-height: 130px;
-  height: 100%;
-
-  padding: 24px 18px;
-
+  gap: 16px;
+  min-height: 140px;
+  padding: 24px 16px;
   background: white;
-
-  border: 1px solid #F1F5F9;
-  border-radius: 14px;
-
+  border: 1px solid #f3f4f6;
+  border-radius: 10px;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .occasionCard:hover {
-  border-color: #E2E8F0;
-
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: #e5e7eb;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-/* EMOJI */
 .occasionEmoji {
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1;
 }
 
-/* LABEL */
 .occasionLabel {
-  margin-top: 12px;
-
   font-size: 14px;
   font-weight: 600;
-
   text-align: center;
-
   color: #1F2937;
-}
-
-/* DESKTOP */
-@media (min-width: 1280px) {
-  .occasionCard {
-    min-height: 145px;
-  }
-
-  .occasionEmoji {
-    font-size: 34px;
-  }
-
-  .occasionLabel {
-    font-size: 15px;
-  }
 }

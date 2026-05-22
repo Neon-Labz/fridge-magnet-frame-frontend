@@ -3,12 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, ShoppingCart } from "lucide-react";
+import { clearWebsiteAuthSession, useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+
   const pathname = usePathname();
+  const router = useRouter();
+
+  const { isAuthenticated } = useWebsiteAuthSession();
+  const { totalQuantity } = useCart();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -23,7 +30,6 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full h-[75px] bg-white/95 backdrop-blur-md border-b border-[#E5E5EA]/80 shadow-sm">
-
       <div className="flex h-full items-center justify-between max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
 
         {/* LOGO */}
@@ -54,39 +60,56 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-4">
+        {/* DESKTOP RIGHT */}
+        <div className="hidden md:flex items-center gap-6">
 
           {/* CART */}
-          <Link href="/cart" className="relative">
-            <ShoppingCart className="h-5 w-5 text-[#475569] hover:text-[#BC0000]" />
-            <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-[#BC0000] text-white text-[10px] flex items-center justify-center">
-              2
-            </span>
-          </Link>
+          <div className="relative">
+            <Link href="/cart">
+              <ShoppingCart className="h-5 w-5 text-[#475569]" />
+            </Link>
 
-          {/* LOGIN (desktop only optional) */}
-          <Link href="/login" className="hidden sm:block">
-            <button className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]">
-              Login
+            {totalQuantity > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
+                {totalQuantity}
+              </span>
+            )}
+          </div>
+
+          {/* AUTH BUTTON */}
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => {
+                clearWebsiteAuthSession();
+                router.push("/");
+              }}
+              className="flex h-[40px] items-center rounded-[8px] bg-[#E61D11] px-6 text-sm font-semibold text-white"
+            >
+              Logout
             </button>
-          </Link>
-
-          {/* BURGER MENU */}
-          <button
-            className="md:hidden text-[#475569]"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
+          ) : (
+            <Link
+              href="/login"
+              className="flex h-[40px] items-center rounded-[8px] bg-[#E61D11] px-6 text-sm font-semibold text-white"
+            >
+              Login
+            </Link>
+          )}
         </div>
+
+        {/* MOBILE MENU BUTTON */}
+        <button
+          className="md:hidden text-[#475569]"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
 
       {/* MOBILE MENU */}
       {isOpen && (
         <div className="md:hidden border-t border-[#E5E5EA] bg-white px-6 py-4">
-
           <div className="flex flex-col gap-4">
 
             {navLinks.map((link) => (
@@ -104,27 +127,46 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* CART MOBILE
-            <Link
-              href="/cart"
-              onClick={closeMenu}
-              className="flex items-center gap-2 text-[#475569]"
-            >
-              <ShoppingCart size={18} />
-              Cart
-            </Link> */}
+            {/* CART + AUTH MOBILE */}
+            <div className="flex items-center justify-between mt-2">
 
-            {/* LOGIN MOBILE */}
-            <Link href="/login" onClick={closeMenu}>
-              <button className="w-full h-[42px] rounded-[8px] bg-[#BC0000] text-white font-semibold">
-                Login
-              </button>
-            </Link>
+              <div className="relative">
+                <Link href="/cart" onClick={closeMenu}>
+                  <ShoppingCart className="h-5 w-5 text-[#475569]" />
+                </Link>
+
+                {totalQuantity > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
+                    {totalQuantity}
+                  </span>
+                )}
+              </div>
+
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearWebsiteAuthSession();
+                    router.push("/");
+                  }}
+                  className="rounded-[8px] bg-[#E61D11] px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={closeMenu}
+                  className="rounded-[8px] bg-[#E61D11] px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
 
           </div>
         </div>
       )}
-
     </header>
   );
 }

@@ -89,7 +89,7 @@ export default function OurCompanySection() {
         </h1>
 
         <p className="font-inter text-[16px] leading-[29px] text-[#434652]">
-          We are here to support your business inquiries and partnerships. 
+          We are here to support your business inquiries and partnerships.
           Reach out through phone, email, or visit us in person.
         </p>
       </header>

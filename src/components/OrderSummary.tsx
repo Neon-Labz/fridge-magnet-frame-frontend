@@ -1,6 +1,8 @@
 "use client";
 
 import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
 import styles from "./OrderSummary.module.css";
 
 export default function OrderSummary({
@@ -10,9 +12,19 @@ export default function OrderSummary({
   subtotal: number;
   quantity: number;
 }) {
+  const router = useRouter();
+  const { isAuthenticated } = useWebsiteAuthSession();
+
+  const handleCheckout = () => {
+    try {
+      router.push(isAuthenticated ? "/checkout" : "/login");
+    } catch (err) {
+      console.error("Navigation to /checkout failed", err);
+    }
+  };
+
   return (
     <aside className={styles.orderSummary}>
-      
       <h2 className={styles.heading}>Order Summary</h2>
 
       <div className={styles.rows}>
@@ -34,7 +46,15 @@ export default function OrderSummary({
         <span className={styles.total}>Rs. {subtotal.toFixed(2)}</span>
       </div>
 
-      <button className={styles.button}>Checkout</button>
+      <div className={styles.checkoutWrapper}>
+        <button
+          type="button"
+          className={styles.checkoutBtn}
+          onClick={handleCheckout}
+        >
+          <span className={styles.checkoutText}>Check Out</span>
+        </button>
+      </div>
 
       <div className={styles.secure}>
         <Lock size={14} />

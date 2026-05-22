@@ -59,153 +59,82 @@ export default function GalleryOfferSection({
     return () => clearInterval(timer);
   }, []);
 
-  /* FORMAT */
-  const formatTime = (time: number) =>
-    time.toString().padStart(2, "0");
+  const formatTime = (time: number) => time.toString().padStart(2, "0");
 
   return (
     <section className="w-full bg-[#f9f9fe] pt-[40px] lg:pt-[10px] pb-[40px] lg:pb-[100px]">
-
       <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-[100px]">
-
+        
         <div
-          className="
-            relative
-            overflow-hidden
-            rounded-[24px]
-            px-5 py-8
-            sm:px-8 sm:py-10
-            lg:px-16 lg:py-14
-          "
+          className="relative overflow-hidden rounded-[24px] px-5 py-8 sm:px-8 sm:py-10 lg:px-16 lg:py-14"
           style={{
-            background:
-              "linear-gradient(105deg, #071E54 75%, #133074 75%)",
+            background: "linear-gradient(105deg, #071E54 75%, #133074 75%)",
           }}
         >
 
-          {/* MAIN FLEX */}
-          <div
-            className="
-              flex flex-col
-              items-center
-              text-center
-              gap-2
+          {/* MAIN CONTENT */}
+          <div className="flex flex-col xl:flex-row items-center justify-between text-center xl:text-left gap-6">
 
-              xl:flex-row
-              xl:items-center
-              xl:justify-between
-              xl:text-left
-            "
-          >
-
-            {/* LEFT CONTENT */}
+            {/* LEFT TEXT */}
             <div className="z-10 w-full max-w-[420px]">
-
               <div className="mb-[18px] inline-flex rounded-full bg-[#b11010] px-[14px] py-[5px] text-[11px] font-bold tracking-[2px] text-white/95 sm:text-[12px]">
                 LIMITED RELEASE
               </div>
 
-              <h2 className="font-manrope text-[28px] font-bold leading-[36px] text-white/95 sm:text-[34px] sm:leading-[42px]">
+              <h2 className="font-manrope text-[28px] sm:text-[34px] font-bold leading-[36px] sm:leading-[42px] text-white/95">
                 Limited Time Gallery
                 <br />
                 Opening Offer
               </h2>
 
-              <p className="mt-[10px] font-inter text-[15px] leading-[24px] text-white/90 sm:text-[17px]">
-                Elevate your home with 20% off all Gallery Frames.
-                Exclusive seasonal pricing.
+              <p className="mt-[10px] text-[15px] sm:text-[17px] leading-[24px] text-white/90">
+                Elevate your home with 20% off all Gallery Frames. Exclusive seasonal pricing.
               </p>
-
             </div>
 
             {/* TIMER */}
-            <div
-              className="
-                z-10
-                flex items-center justify-center
-                gap-4 sm:gap-6 lg:gap-7
-                text-center text-white/95
-                flex-wrap
-              "
-            >
+            <div className="z-10 flex items-center justify-center gap-4 sm:gap-6 text-white/95">
 
-              {/* DAYS */}
-              <div>
-                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+              <div className="text-center">
+                <div className="text-[38px] sm:text-[48px] font-bold">
                   {formatTime(timeLeft.days)}
                 </div>
-
-                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                <div className="text-[11px] sm:text-[12px] tracking-[2px] text-white/60 mt-1">
                   DAYS
                 </div>
               </div>
 
-              <div className="mb-[16px] text-[26px] font-bold text-[#D90000] sm:text-[34px]">
-                :
-              </div>
+              <div className="text-[26px] sm:text-[34px] font-bold text-[#D90000]">:</div>
 
-              {/* HOURS */}
-              <div>
-                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+              <div className="text-center">
+                <div className="text-[38px] sm:text-[48px] font-bold">
                   {formatTime(timeLeft.hours)}
                 </div>
-
-                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                <div className="text-[11px] sm:text-[12px] tracking-[2px] text-white/60 mt-1">
                   HOURS
                 </div>
               </div>
 
-              <div className="mb-[16px] text-[26px] font-bold text-[#D90000] sm:text-[34px]">
-                :
-              </div>
+              <div className="text-[26px] sm:text-[34px] font-bold text-[#D90000]">:</div>
 
-              {/* MINUTES */}
-              <div>
-                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+              <div className="text-center">
+                <div className="text-[38px] sm:text-[48px] font-bold">
                   {formatTime(timeLeft.minutes)}
                 </div>
-
-                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                <div className="text-[11px] sm:text-[12px] tracking-[2px] text-white/60 mt-1">
                   MINS
                 </div>
               </div>
-
             </div>
 
             {/* BUTTON */}
-            <button
-              className="
-                z-10
-                flex items-center justify-center
-
-                h-[54px]
-                w-full
-                max-w-[220px]
-
-                rounded-[10px]
-                bg-white
-
-                px-6
-
-                font-inter
-                text-[14px]
-                font-bold
-                text-[#07357E]
-
-                transition-all
-                hover:scale-[1.02]
-
-                sm:h-[62px]
-                sm:text-[15px]
-
-                xl:w-[160px]
-              "
-            >
+            <button className="z-10 flex items-center justify-center h-[54px] sm:h-[62px] w-full max-w-[220px] rounded-[10px] bg-white text-[#07357E] font-bold text-[14px] sm:text-[15px] transition hover:scale-[1.02]">
               Claim Offer
             </button>
 
           </div>
         </div>
+
       </div>
     </section>
   );

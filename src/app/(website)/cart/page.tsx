@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import OrderSummary from "@/components/OrderSummary";
+import { useCart } from "@/context/CartContext";
 
 type CartItemData = {
   id: string;
@@ -13,6 +13,8 @@ type CartItemData = {
   price: number;
   quantity: number;
   image: string;
+  frameType?: string;
+  colorOption?: string;
 };
 
 function CartItem({
@@ -21,13 +23,28 @@ function CartItem({
   onDelete,
 }: {
   item: CartItemData;
-  onQuantityChange: (id: string, quantity: number) => void;
-  onDelete: (id: string) => void;
+  onQuantityChange: (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined,
+    quantity: number
+  ) => void;
+  onDelete: (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined
+  ) => void;
 }) {
   const handleInput = (value: string) => {
     const qty = Number(value);
-    if (!isNaN(qty)) {
-      onQuantityChange(item.id, qty < 1 ? 1 : qty);
+
+    if (!Number.isNaN(qty)) {
+      onQuantityChange(
+        item.id,
+        item.frameType,
+        item.colorOption,
+        Math.max(1, qty)
+      );
     }
   };
 
@@ -36,20 +53,26 @@ function CartItem({
       {/* DELETE */}
       <button
         type="button"
-        onClick={() => onDelete(item.id)}
+        onClick={() =>
+          onDelete(item.id, item.frameType, item.colorOption)
+        }
         className="absolute top-3 right-3 z-10 text-gray-500 hover:text-red-500"
+        aria-label="Delete item"
       >
         <Trash2 size={16} />
       </button>
 
-      {/* IMAGE (CENTER FIXED) */}
-      <div className="w-[90px] h-[90px] bg-[#F3F3F8] rounded-lg flex items-center justify-center overflow-hidden">
+      {/* IMAGE */}
+      <div className="w-[90px] h-[90px] bg-[#F3F3F8] rounded-lg flex items-center justify-center overflow-hidden shrink-0">
         <Image
-          src={item.image}
-          alt={item.title}
-          width={80}
-          height={80}
-          className="object-contain"
+          src={
+            item.image ||
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="178" height="178"><rect width="178" height="178" fill="#e5e7eb" /></svg>'
+          }
+          alt={item.title || "Product image"}
+          width={90}
+          height={90}
+          className="object-cover rounded-lg w-full h-full"
         />
       </div>
 
@@ -61,7 +84,7 @@ function CartItem({
             {item.title}
           </h3>
 
-          {/* SUBTITLE FIXED */}
+          {/* SUBTITLE */}
           <p className="text-[14px] sm:text-[15px] text-gray-600">
             {item.subtitle}
           </p>
@@ -74,7 +97,12 @@ function CartItem({
             <button
               type="button"
               onClick={() =>
-                onQuantityChange(item.id, Math.max(1, item.quantity - 1))
+                onQuantityChange(
+                  item.id,
+                  item.frameType,
+                  item.colorOption,
+                  Math.max(1, item.quantity - 1)
+                )
               }
               className="px-3 py-1 hover:bg-gray-100"
             >
@@ -91,7 +119,14 @@ function CartItem({
 
             <button
               type="button"
-              onClick={() => onQuantityChange(item.id, item.quantity + 1)}
+              onClick={() =>
+                onQuantityChange(
+                  item.id,
+                  item.frameType,
+                  item.colorOption,
+                  item.quantity + 1
+                )
+              }
               className="px-3 py-1 hover:bg-gray-100"
             >
               +
@@ -109,38 +144,35 @@ function CartItem({
 }
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItemData[]>([
-    {
-      id: "1",
-      title: "Heritage Oak Frame",
-      subtitle: "Frame: White",
-      price: 250,
-      quantity: 2,
-      image: "/logo.png",
-    },
-    {
-      id: "2",
-      title: "Modern Matte Ebony",
-      subtitle: "Frame: No Frame",
-      price: 125,
-      quantity: 1,
-      image: "/logo.png",
-    },
-  ]);
+  const {
+    items,
+    subtotal,
+    totalQuantity,
+    updateQuantity,
+    removeFromCart,
+  } = useCart();
 
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity } : item)),
+  const handleQuantityChange = (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined,
+    quantity: number
+  ) => {
+    updateQuantity(
+      id,
+      frameType,
+      colorOption,
+      Math.max(1, quantity)
     );
   };
 
-  const handleDelete = (id: string) => {
-    setCartItems((items) => items.filter((i) => i.id !== id));
+  const handleDelete = (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined
+  ) => {
+    removeFromCart(id, frameType, colorOption);
   };
-
-  const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
-  const totalQty = cartItems.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
     <div className="bg-[#F9F9FE]">
@@ -150,23 +182,39 @@ export default function CartPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">
             Your Gallery Bag
           </h1>
+
           <p className="text-gray-500 mt-2 text-sm sm:text-base">
             Review your items before checkout
           </p>
         </header>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8 items-start mr-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8 items-start">
           {/* LEFT */}
           <section className="space-y-5 w-full">
-            {cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onQuantityChange={handleQuantityChange}
-                onDelete={handleDelete}
-              />
-            ))}
+            {items.map((it) => {
+              const item: CartItemData = {
+                id: it.id,
+                title: it.title,
+                subtitle: it.colorOption
+                  ? `Frame: ${it.frameType} • Color: ${it.colorOption}`
+                  : `Frame: ${it.frameType}`,
+                price: it.price,
+                quantity: it.quantity,
+                image: it.image,
+                frameType: it.frameType,
+                colorOption: it.colorOption,
+              };
+
+              return (
+                <CartItem
+                  key={`${item.id}-${item.frameType}-${item.colorOption ?? "no-color"}`}
+                  item={item}
+                  onQuantityChange={handleQuantityChange}
+                  onDelete={handleDelete}
+                />
+              );
+            })}
 
             <Link
               href="/shop"
@@ -178,7 +226,10 @@ export default function CartPage() {
           </section>
 
           {/* RIGHT */}
-          <OrderSummary subtotal={subtotal} quantity={totalQty} />
+          <OrderSummary
+            subtotal={subtotal}
+            quantity={totalQuantity}
+          />
         </div>
       </main>
     </div>

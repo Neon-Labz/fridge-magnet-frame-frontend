@@ -1,24 +1,22 @@
 import Header from "@/components/website/Header";
 import Hero from "@/components/website/Hero";
-import VideoSection from "@/components/website/VideoSection";
 import ProductSection from "@/components/website/ProductSection";
+import VideoSection from "@/components/website/VideoSection";
 import PricingSection from "@/components/website/PricingSection";
-import CounterSection from "@/components/website/CounterSection";
-import Testimonial from "@/components/website/Testimonial";
+import Footer from "@/components/website/Footer";
+import { fetchWebsiteProductsFromBackend } from "@/lib/websiteProducts";
 import FooterH from "@/components/website/FooterH";
-import HowItWorksSection from "@/components/website/HowItWorksSection";
 
-export default function Home() {
+export default async function Home() {
+  const products = await fetchWebsiteProductsFromBackend();
+
   return (
     <main className="overflow-x-hidden">
       <Header />
       <Hero />
       <VideoSection />
-      <ProductSection />
-      <HowItWorksSection />
+      <ProductSection products={products} />
       <PricingSection />
-      <CounterSection />
-      <Testimonial />
       <FooterH />
     </main>
   );

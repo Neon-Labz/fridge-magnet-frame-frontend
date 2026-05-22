@@ -6,7 +6,7 @@ const occasionItems = [
   { id: 1, emoji: '💍', label: 'Weddings' },
   { id: 2, emoji: '🎓', label: 'Graduations' },
   { id: 3, emoji: '🎂', label: 'Birthdays' },
-  { id: 4, emoji: '👨‍👩', label: 'Families' },
+  { id: 4, emoji: '👨‍👩‍👧', label: 'Families' },
   { id: 5, emoji: '❤️', label: 'Couples' },
   { id: 6, emoji: '🏢', label: 'Corporate' },
 ];
@@ -41,7 +41,7 @@ function OccasionCard({ emoji, label }) {
 export default function PricingSection() {
   return (
     <section className={styles.container}>
-      
+      {/* Left Column - Pricing */}
       <div className={styles.pricingColumn}>
         <header className={styles.columnHeader}>
           <h2 className={styles.columnTitle}>Simple, honest pricing.</h2>
@@ -58,7 +58,6 @@ export default function PricingSection() {
             price="Rs. 1,500"
             description="Minimum 4 pieces • square magnetic tiles"
           />
-
           <PriceCard
             variant="popular"
             label="MAGNETS + FRAME"
@@ -69,6 +68,7 @@ export default function PricingSection() {
         </div>
       </div>
 
+      {/* Right Column - Occasions */}
       <div className={styles.occasionsColumn}>
         <header className={styles.columnHeader}>
           <h2 className={styles.columnTitle}>Perfect for every occasion.</h2>
@@ -83,7 +83,6 @@ export default function PricingSection() {
           ))}
         </div>
       </div>
-
     </section>
   );
 }

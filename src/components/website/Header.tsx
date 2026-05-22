@@ -3,12 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+
+import { useCart } from "@/context/CartContext";
+import {
+  clearWebsiteAuthSession,
+  useWebsiteAuthSession,
+} from "@/hooks/useWebsiteAuthSession";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const { totalQuantity } = useCart();
+  const { isAuthenticated } = useWebsiteAuthSession();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -23,7 +33,6 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full h-[75px] bg-white/95 backdrop-blur-md border-b border-[#E5E5EA]/80 shadow-sm">
-
       <div className="flex h-full items-center justify-between max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
 
         {/* LOGO */}
@@ -58,37 +67,52 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
 
           {/* CART */}
-          <Link href="/cart" className="relative">
-            <ShoppingCart className="h-5 w-5 text-[#475569] hover:text-[#BC0000]" />
-            <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-[#BC0000] text-white text-[10px] flex items-center justify-center">
-              2
-            </span>
-          </Link>
+          <button
+            onClick={() => router.push("/cart")}
+            className="relative text-[#475569] hover:text-[#BC0000]"
+            aria-label="Cart"
+          >
+            🛒
+            {totalQuantity > 0 && (
+              <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-[#BC0000] text-white text-[10px] flex items-center justify-center">
+                {totalQuantity}
+              </span>
+            )}
+          </button>
 
-          {/* LOGIN (desktop only optional) */}
-          <Link href="/login" className="hidden sm:block">
-            <button className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]">
-              Login
+          {/* LOGIN / LOGOUT */}
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                clearWebsiteAuthSession();
+                router.push("/");
+              }}
+              className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]"
+            >
+              Logout
             </button>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <button className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]">
+                Login
+              </button>
+            </Link>
+          )}
 
-          {/* BURGER MENU */}
+          {/* MOBILE MENU ICON */}
           <button
             className="md:hidden text-[#475569]"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-
         </div>
       </div>
 
       {/* MOBILE MENU */}
       {isOpen && (
         <div className="md:hidden border-t border-[#E5E5EA] bg-white px-6 py-4">
-
           <div className="flex flex-col gap-4">
-
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -104,27 +128,14 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* CART MOBILE
-            <Link
-              href="/cart"
-              onClick={closeMenu}
-              className="flex items-center gap-2 text-[#475569]"
-            >
-              <ShoppingCart size={18} />
-              Cart
-            </Link> */}
-
-            {/* LOGIN MOBILE */}
             <Link href="/login" onClick={closeMenu}>
               <button className="w-full h-[42px] rounded-[8px] bg-[#BC0000] text-white font-semibold">
                 Login
               </button>
             </Link>
-
           </div>
         </div>
       )}
-
     </header>
   );
 }
