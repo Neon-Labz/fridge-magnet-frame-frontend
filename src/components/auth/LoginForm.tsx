@@ -136,8 +136,10 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
           responseData?.data?.token ||
           responseData?.data?.accessToken ||
           responseData?.data?.access_token
+        // API may return the user at the root or nested inside `data`.
+        // Check both shapes and prefer the first defined role.
         const role =
-          responseData?.user?.role ||
+          responseData?.user?.role ??
           responseData?.data?.user?.role
         const isAdmin = role === 'admin'
 
