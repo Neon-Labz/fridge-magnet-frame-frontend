@@ -6,7 +6,7 @@ export default function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative mt-[108px] md:mt-[75px] h-auto md:h-[782px] w-full overflow-hidden">
+    <section className="relative mt-[70px] md:mt-[75px] h-auto md:h-[782px] w-full overflow-hidden">
       
       {/* BACKGROUND IMAGE */}
       <div
@@ -20,7 +20,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[#002B73]/20" />
 
       {/* CONTENT WRAPPER */}
-      <div className="relative z-10 flex items-start md:items-stretch px-4 sm:px-6 lg:px-[100px] py-10 md:py-0">
+      <div className="relative z-10 flex items-start md:items-stretch px-4 sm:px-6 lg:px-[100px] py-10 md:py-15">
 
         {/* GLASS BOX */}
         <div className="
@@ -38,7 +38,7 @@ export default function Hero() {
         ">
 
           {/* TEXT CONTAINER */}
-          <div className="w-full md:w-[620px]">
+          <div className="w-full">
 
             {/* TITLE */}
             <h1 className="font-manrope text-[28px] md:text-[52px] font-bold leading-[1.05] md:leading-[62px] tracking-[-0.5px] md:tracking-[-1px] text-[#032d76]">
@@ -48,7 +48,7 @@ export default function Hero() {
             </h1>
 
             {/* PARAGRAPH */}
-            <p className="mt-4 md:mt-[34px] text-[14px] md:text-[18px] leading-[1.5] md:leading-[36px] text-black/75">
+            <p className="mt-4 md:mt-[34px] text-[14px] md:text-[20px] leading-[1.5] md:leading-[36px] text-black/80">
               Transform your digital memories into museum-grade physical
               heirlooms. Handcrafted precision for the moments that define you.
             </p>

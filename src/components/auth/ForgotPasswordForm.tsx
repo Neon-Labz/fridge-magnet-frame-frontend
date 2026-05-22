@@ -87,8 +87,8 @@ export default function ForgotPasswordForm() {
       {/* FORM */}
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
         {/* EMAIL */}
-        <div className="relative border-b-2 border-gray-700 pb-2 m-2b-3">
-          <Mail className="absolute left-0 top-0 w-5 h-5" />
+        <div className="relative border-b-2 border-gray-700 pb-2 m-2b-3 py-2 pl-5">
+          <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5" />
 
           <input
             {...register("email")}

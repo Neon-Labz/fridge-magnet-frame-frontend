@@ -93,7 +93,7 @@ function CartItem({
         {/* BOTTOM ROW */}
         <div className="flex items-center justify-between">
           {/* QUANTITY */}
-          <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+          <div className="flex items-center border border-gray-300 w-[130px] sm:w-64 rounded-md overflow-hidden">
             <button
               type="button"
               onClick={() =>

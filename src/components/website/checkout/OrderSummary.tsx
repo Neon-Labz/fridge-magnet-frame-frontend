@@ -47,7 +47,7 @@ export default function OrderSummary({
   const isDisabled = disabled || !hasItems;
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm py-6">
       {/* Header */}
       <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1C1F] mb-6 px-4 sm:px-6">
         Order Summary

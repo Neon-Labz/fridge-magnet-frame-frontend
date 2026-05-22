@@ -22,7 +22,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10">
 
         {/* ✅ RESPONSIVE GRID (Mobile → Tablet → Desktop) */}
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-15 sm:grid-cols-4 xl:grid-cols-4">
 
           {/* LOGO + DESCRIPTION */}
           <div>
@@ -97,7 +97,7 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full bg-transparent px-4 text-[15px] outline-none placeholder:text-[#94A3B8]"
+                className="w-full bg-transparent px-2 text-[15px] outline-none placeholder:text-[#94A3B8]"
               />
 
               <button className="flex w-[56px] items-center justify-center bg-[#002B73] text-white hover:bg-[#001F5C]">

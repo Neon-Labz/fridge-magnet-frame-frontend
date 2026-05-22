@@ -93,7 +93,7 @@ export default function RegisterForm() {
           <User className="absolute left-0 top-3 w-5 h-5" />
           <input
             {...register("fullName")}
-            placeholder="Full Name"
+            placeholder="    Full Name"
             className={inputClass}
           />
           <p className="text-red-500 text-xs">{errors.fullName?.message}</p>
@@ -104,7 +104,7 @@ export default function RegisterForm() {
           <Mail className="absolute left-0 top-3 w-5 h-5" />
           <input
             {...register("email")}
-            placeholder="Email"
+            placeholder="    Email"
             className={inputClass}
           />
           <p className="text-red-500 text-xs">{errors.email?.message}</p>
@@ -116,14 +116,14 @@ export default function RegisterForm() {
           <input
             {...register("password")}
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="    Password"
             className={inputClass}
           />
 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-3 w-[26px] h-[26px]"
+            className="absolute right-0 top-20 w-[26px] h-[26px]"
           >
             {showPassword ? (
               <Eye className="w-5 h-5" />

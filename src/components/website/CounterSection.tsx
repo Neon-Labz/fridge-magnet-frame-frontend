@@ -62,7 +62,7 @@ export default function GalleryOfferSection({
   const formatTime = (time: number) => time.toString().padStart(2, "0");
 
   return (
-    <section className="w-full bg-[#f9f9fe] pt-[40px] lg:pt-[10px] pb-[40px] lg:pb-[100px]">
+    <section className="w-full bg-[#f9f9fe] pt-[40px] lg:pt-[10px] pb-[40px] lg:pb-[20px]">
       <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-[100px]">
         
         <div

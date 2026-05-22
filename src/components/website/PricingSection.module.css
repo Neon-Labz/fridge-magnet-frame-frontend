@@ -2,8 +2,6 @@
    CONTAINER
 ========================= */
 .container {
-  width: 100%;
-  max-width: 1800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -15,8 +13,10 @@
 /* TABLET */
 @media (min-width: 768px) {
   .container {
-    padding: 70px 40px;
+    padding: 10px 40px;
     gap: 60px;
+    padding-left:100px;
+    padding-right:90px;
   }
 }
 
@@ -77,12 +77,12 @@
 /* DESKTOP */
 @media (min-width: 1280px) {
   .columnTitle {
-    font-size: 34px;
+    font-size: 32px;
     line-height: 44px;
   }
 
   .columnSubtext {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 26px;
   }
 }
@@ -94,7 +94,6 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
-  height: 100%;
 }
 
 @media (min-width: 1280px) {
@@ -146,7 +145,7 @@
   right: 0;
   background: #dc2626;
   color: white;
-  padding: 6px 16px;
+  padding: 6px 40px;
   font-size: 12px;
   font-weight: 700;
   transform: rotate(45deg) translate(30%, -50%);
@@ -167,7 +166,7 @@
 
 .cardTitle {
   margin-top: 10px;
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 700;
   line-height: 30px;
   color: #1F2937;
@@ -186,7 +185,7 @@
 }
 
 .priceAmount {
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 900;
   color: #dc2626;
   line-height: 1;
@@ -223,7 +222,7 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  min-height: 140px;
+  min-height: 130px;
   padding: 24px 16px;
   background: white;
   border: 1px solid #f3f4f6;

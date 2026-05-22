@@ -61,13 +61,13 @@ export default function AuthModal() {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-[388px] h-[500px] mt-[-28px] bg-[#F5F5F5] rounded-[25px] shadow-2xl px-10 py-10 flex flex-col">
+      <div className="relative w-full max-w-[388px] h-[550px] mt-[-28px] bg-[#F5F5F5] rounded-[25px] shadow-2xl px-10 py-10 flex flex-col">
         {/* Close */}
         <button
           onClick={handleClose}
-          className="absolute top-[21px] right-[20px] w-8 h-8 flex items-center justify-center"
+          className="absolute top-[21px] right-[-125px] w-80 h-8 flex items-center justify-center"
         >
-          <X className="w-6 h-6 text-black" strokeWidth={2} />
+          <X className="w-8 h-8 text-black" strokeWidth={2} />
         </button>
 
         {/* Content */}

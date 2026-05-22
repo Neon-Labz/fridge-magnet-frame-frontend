@@ -35,16 +35,29 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 z-50 w-full h-[75px] bg-white/95 backdrop-blur-md border-b border-[#E5E5EA]/80 shadow-sm">
       <div className="flex h-full items-center justify-between max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
 
-        {/* LOGO */}
-        <Link href="/" onClick={closeMenu}>
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            width={140}
-            height={50}
-            className="h-auto w-[110px] sm:w-[130px] object-contain"
-          />
-        </Link>
+        {/* LEFT SIDE - MOBILE MENU + LOGO */}
+        <div className="flex items-center gap-3">
+
+          {/* MOBILE MENU ICON */}
+          <button
+            className="md:hidden text-[#475569]"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Menu"
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* LOGO */}
+          <Link href="/" onClick={closeMenu}>
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={140}
+              height={50}
+              className="h-auto w-[110px] sm:w-[130px] object-contain"
+            />
+          </Link>
+        </div>
 
         {/* DESKTOP MENU */}
         <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium">
@@ -63,18 +76,19 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-4">
+        {/* RIGHT SIDE - CART + LOGIN */}
+        <div className="flex items-center gap-3">
 
           {/* CART */}
           <button
             onClick={() => router.push("/cart")}
-            className="relative text-[#475569] hover:text-[#BC0000]"
+            className="relative text-[#475569] hover:text-[#BC0000] text-[20px]"
             aria-label="Cart"
           >
             🛒
+
             {totalQuantity > 0 && (
-              <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-[#BC0000] text-white text-[10px] flex items-center justify-center">
+              <span className="absolute -top-[-6px] -right-[-4px] sm:top-[-7px] sm:right-[-10px] h-4 w-4 rounded-full bg-[#BC0000] text-white text-[10px] flex items-center justify-center">
                 {totalQuantity}
               </span>
             )}
@@ -87,25 +101,17 @@ export default function Navbar() {
                 clearWebsiteAuthSession();
                 router.push("/");
               }}
-              className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]"
+              className="h-[38px] rounded-[8px] bg-[#BC0000] px-4 sm:px-5 text-white text-sm font-semibold hover:bg-[#a10000]"
             >
               Logout
             </button>
           ) : (
             <Link href="/login">
-              <button className="h-[40px] rounded-[8px] bg-[#BC0000] px-5 text-white font-semibold hover:bg-[#a10000]">
+              <button className="h-[38px] rounded-[8px] bg-[#BC0000] px-4 sm:px-5 text-white text-sm font-semibold hover:bg-[#a10000]">
                 Login
               </button>
             </Link>
           )}
-
-          {/* MOBILE MENU ICON */}
-          <button
-            className="md:hidden text-[#475569]"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
 
@@ -127,12 +133,6 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-
-            <Link href="/login" onClick={closeMenu}>
-              <button className="w-full h-[42px] rounded-[8px] bg-[#BC0000] text-white font-semibold">
-                Login
-              </button>
-            </Link>
           </div>
         </div>
       )}
