@@ -27,63 +27,56 @@ export default function SpecialPackages() {
   ];
 
   return (
-    <section className="w-full bg-white py-[40px]">
-      <div className="mx-auto max-w-[1800px] rounded-[30px] border border-[#E5E7EB] bg-white px-[20px] py-[38px] shadow-sm">
-
+    <section className="bg-white py-8 md:py-10">
+      <div className="mx-auto max-w-[1235px] rounded-[32px] border border-[#E5E7EB] bg-white px-4 py-6 shadow-sm sm:px-6 sm:py-8 md:px-10 md:py-10">
         {/* TITLE */}
-        <div className="mb-[30px] flex items-center gap-[10px]">
-          <span className="text-[32px]">👑</span>
+        <div className="mb-6 flex items-center gap-2">
+          <span className="text-xl sm:text-2xl">👑</span>
 
-          <h2 className="font-inter text-[36px] font-extrabold uppercase tracking-[3px] text-[#0F172A]">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold uppercase tracking-wide text-[#0F172A]">
             Special Packages
           </h2>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 gap-[24px] md:grid-cols-2">
-
+        {/* GRID 2 + 2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {packages.map((item, index) => (
             <div
               key={index}
-              className="flex min-h-[160px] items-center justify-between rounded-[24px] border border-[#F1D87A] bg-[#FFFCF5] px-[38px] py-[28px]"
+              className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 rounded-[24px] border border-[#F1D87A] bg-[#FFFCF5] p-5"
             >
-              {/* LEFT */}
               <div>
-                <h3 className="max-w-[340px] font-inter text-[24px] font-extrabold leading-[36px] text-[#172033]">
-                  <span className="mr-[6px]">{item.icon}</span>
+                <h3 className="text-base sm:text-lg font-bold text-[#172033] flex items-center gap-2">
+                  <span>{item.icon}</span>
                   {item.title}
                 </h3>
 
-                <p className="mt-[10px] font-inter text-[16px] italic font-semibold text-[#66758F]">
+                <p className="text-sm sm:text-base text-[#66758F] mt-1">
                   {item.subtitle}
                 </p>
               </div>
 
-              {/* RIGHT */}
-              <h4 className="whitespace-nowrap font-inter text-[34px] font-extrabold text-[#B85A00]">
+              <h4 className="text-xl sm:text-2xl font-black text-[#B85A00] whitespace-nowrap">
                 {item.price}
               </h4>
             </div>
           ))}
         </div>
 
-        {/* CORPORATE */}
-        <div className="mt-[24px] flex min-h-[160px] items-center justify-between rounded-[24px] border border-[#F1D87A] bg-[#FFFCF5] px-[38px] py-[28px]">
-
-          {/* LEFT */}
+        {/* CORPORATE FULL WIDTH */}
+        <div className="mt-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-[24px] border border-[#F1D87A] bg-[#FFFCF5] px-5 py-5 sm:px-7 sm:py-6">
           <div>
-            <h3 className="font-inter text-[24px] font-extrabold leading-[36px] text-[#172033]">
-              <span className="mr-[6px]">🏢</span>
+            <h3 className="text-base sm:text-lg font-bold text-[#172033] flex items-center gap-2">
+              <span>🏢</span>
               Corporate — 50 magnets
             </h3>
 
-            <p className="mt-[10px] font-inter text-[16px] italic font-semibold text-[#66758F]">
+            <p className="mt-1 text-sm sm:text-base text-[#66758F] font-medium">
               Branded bulk order
             </p>
           </div>
 
-          {/* RIGHT */}
-          <h4 className="whitespace-nowrap font-inter text-[42px] font-extrabold text-[#B85A00]">
+          <h4 className="text-lg sm:text-xl md:text-2xl font-black text-[#B85A00] whitespace-nowrap">
             Rs. 11,000
           </h4>
         </div>

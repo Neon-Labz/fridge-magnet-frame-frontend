@@ -116,11 +116,11 @@ function ShopViewProductDetailsSection({
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
         <div className="flex flex-col gap-6">
-          <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
-            <Image
+          <div className="relative flex aspect-[4/5] w-full max-h-[575px] max-w-[480px] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">            
+          <Image
               src={mainImageSource}
               alt={getMainImageAlt()}
               width={500}
@@ -228,7 +228,7 @@ function ShopViewProductDetailsSection({
             {description}
           </p>
 
-          <hr className="mb-8 border-slate-200" />
+          <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
 
           <div className="mb-8">
             <PersonalizationSection

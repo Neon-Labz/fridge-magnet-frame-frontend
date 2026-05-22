@@ -1,201 +1,331 @@
+/* =========================
+   CONTAINER
+========================= */
 .container {
   width: 100%;
-  max-width: 1780px;
+  max-width: 1800px;
   margin: 0 auto;
-  padding: 100px 80px 60px;
   display: flex;
-  gap: 60px;
-  align-items: flex-start;
-  padding-left: 100px;
-  padding-right: 100px;
-    background-color: #F9F9FE;
-
+  flex-direction: column;
+  gap: 50px;
+  padding: 50px 16px;
+  background-color: #F9F9FE;
 }
 
-/* COLUMNS */
+/* TABLET */
+@media (min-width: 768px) {
+  .container {
+    padding: 70px 40px;
+    gap: 60px;
+  }
+}
+
+/* LARGE DESKTOP ONLY */
+@media (min-width: 1280px) {
+  .container {
+    flex-direction: row;
+    align-items: stretch;
+
+    gap: 60px;
+
+    padding-top: 25px;
+    padding-bottom: 60px;
+
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+/* =========================
+   COLUMNS
+========================= */
 .pricingColumn,
 .occasionsColumn {
   flex: 1;
-}
 
-/* COLUMN HEADER */
-.columnHeader {
-  margin-bottom: 34px;
-}
-
-.columnTitle {
-  font-size: 34px;
-  font-weight: 800;
-  color: #002b73;
-  margin: 0;
-  line-height: 44px;
-  letter-spacing: -0.5px;
-}
-
-.columnSubtext {
-  margin-top: 10px;
-  max-width: 440px;
-  font-size: 16px;
-  color: #64748b;
-  line-height: 26px;
-}
-
-/* PRICE CARDS GRID */
-.priceCardsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-/* PRICE CARD */
-.priceCard {
-  position: relative;
-  padding: 42px;
-  border-radius: 14px;
-  border: 2px solid;
-  background: white;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-height: 260px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
 }
 
+/* =========================
+   COLUMN HEADER
+========================= */
+.columnHeader {
+  margin-bottom: 28px;
+}
+
+/* TITLE */
+.columnTitle {
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 34px;
+
+  color: #002B73;
+}
+
+/* SUBTEXT */
+.columnSubtext {
+  margin-top: 10px;
+
+  max-width: 440px;
+
+  font-size: 14px;
+  line-height: 24px;
+
+  color: #64748B;
+}
+
+/* TABLET */
+@media (min-width: 768px) {
+  .columnTitle {
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .columnSubtext {
+    font-size: 15px;
+    line-height: 25px;
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 1280px) {
+  .columnTitle {
+    font-size: 34px;
+    line-height: 44px;
+  }
+
+  .columnSubtext {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+/* =========================
+   PRICE GRID
+========================= */
+.priceCardsGrid {
+  display: grid;
+
+  grid-template-columns: 1fr;
+
+  gap: 20px;
+
+  height: 100%;
+}
+
+/* LARGE DESKTOP ONLY */
+@media (min-width: 1280px) {
+  .priceCardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================
+   PRICE CARD
+========================= */
+.priceCard {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 250px;
+  height: 100%;
+
+  padding: 28px;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+  border: 2px solid;
+
+  background: #FFFFFF;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+/* DESKTOP */
+@media (min-width: 1280px) {
+  .priceCard {
+    min-height: 280px;
+    padding: 40px;
+  }
+}
+
+/* CARD VARIANTS */
 .priceCard.default {
-  border-color: #fef9c3;
+  border-color: #FEF9C3;
 }
 
 .priceCard.popular {
-  border-color: #bfdbfe;
-  background: #eff6ff;
+  border-color: #BFDBFE;
+  background: #EFF6FF;
 }
 
-/* POPULAR RIBBON */
+/* =========================
+   RIBBON
+========================= */
 .ribbon {
   position: absolute;
+
   top: 18px;
-  right: -45px;
-  background: #dc2626;
+  right: -42px;
+
+  background: #DC2626;
   color: white;
+
   padding: 6px 40px;
-  font-size: 12px;
-  font-weight: 900;
+
+  font-size: 11px;
+  font-weight: 800;
   letter-spacing: 1px;
+
   transform: rotate(45deg);
+
   white-space: nowrap;
 }
 
-/* CARD TEXT */
+/* =========================
+   CARD TEXT
+========================= */
 .cardLabel {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: #6b7280;
+
+  color: #6B7280;
+
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .cardTitle {
-  font-size: 24px;
+  margin-top: 10px;
+
+  font-size: 22px;
   font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  line-height: 1.3;
+  line-height: 30px;
+
+  color: #1F2937;
 }
 
 .priceSection {
   display: flex;
   align-items: baseline;
+
   gap: 8px;
-  margin: 8px 0;
+
+  margin: 14px 0;
 }
 
 .pricePrefix {
   font-size: 14px;
-  color: #6b7280;
+
+  color: #6B7280;
 }
 
 .priceAmount {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 900;
-  color: #dc2626;
+
+  color: #DC2626;
+}
+
+/* DESKTOP */
+@media (min-width: 1280px) {
+  .priceAmount {
+    font-size: 25px;
+  }
 }
 
 .cardDescription {
   font-size: 14px;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.5;
+  line-height: 24px;
+
+  color: #6B7280;
 }
 
-/* OCCASIONS */
+/* =========================
+   OCCASIONS GRID
+========================= */
 .occasionsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 16px;
+
+  height: 100%;
 }
 
+/* TABLET */
+@media (min-width: 768px) {
+  .occasionsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* =========================
+   OCCASION CARD
+========================= */
 .occasionCard {
-  background: white;
-  border: 1px solid #f3f4f6;
-  border-radius: 10px;
-  padding: 26px 20px;
-  min-height: 135px;
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  cursor: pointer;
+
+  min-height: 130px;
+  height: 100%;
+
+  padding: 24px 18px;
+
+  background: white;
+
+  border: 1px solid #F1F5F9;
+  border-radius: 14px;
+
   transition: all 0.3s ease;
 }
 
 .occasionCard:hover {
-  border-color: #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #E2E8F0;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
+/* EMOJI */
 .occasionEmoji {
-  font-size: 32px;
+  font-size: 30px;
   line-height: 1;
 }
 
+/* LABEL */
 .occasionLabel {
-  font-size: 15px;
+  margin-top: 12px;
+
+  font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
-  margin: 0;
+
   text-align: center;
+
+  color: #1F2937;
 }
 
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-  .container {
-    padding: 50px 40px;
-    flex-direction: column;
-    gap: 40px;
+/* DESKTOP */
+@media (min-width: 1280px) {
+  .occasionCard {
+    min-height: 145px;
   }
 
-  .priceCardsGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .container {
-    padding: 40px 16px;
+  .occasionEmoji {
+    font-size: 34px;
   }
 
-  .columnTitle {
-    font-size: 26px;
-    line-height: 34px;
-  }
-
-  .priceCard {
-    padding: 28px;
-  }
-
-  .occasionsGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .occasionLabel {
+    font-size: 15px;
   }
 }

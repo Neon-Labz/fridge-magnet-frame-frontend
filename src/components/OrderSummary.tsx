@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock } from 'lucide-react';
+import { Lock } from "lucide-react";
 import styles from "./OrderSummary.module.css";
 
 export default function OrderSummary({
@@ -12,41 +12,34 @@ export default function OrderSummary({
 }) {
   return (
     <aside className={styles.orderSummary}>
-      <div className={styles.headingWrapper}>
-        <h2 className={styles.heading}>Order Summary</h2>
-      </div>
+      
+      <h2 className={styles.heading}>Order Summary</h2>
 
       <div className={styles.rows}>
         <div className={styles.row}>
-          <div className={styles.label}>Subtotal</div>
-          <div className={styles.value}>Rs{subtotal.toFixed(2)}</div>
+          <span>Subtotal</span>
+          <span>Rs. {subtotal.toFixed(2)}</span>
         </div>
 
         <div className={styles.row}>
-          <div className={styles.label}>Quantity</div>
-          <div className={styles.value}>{quantity}</div>
+          <span>Quantity</span>
+          <span>{quantity}</span>
         </div>
       </div>
 
-      <div className={styles.dividerContainer} />
+      <div className={styles.divider} />
 
       <div className={styles.totalRow}>
-        <div className="">Total</div>
-        <div className={`${styles.totalValue}`}>Rs{subtotal.toFixed(2)}</div>
+        <span>Total</span>
+        <span className={styles.total}>Rs. {subtotal.toFixed(2)}</span>
       </div>
 
-      <div className={styles.checkoutWrapper}>
-        <button type="button" className={styles.checkoutBtn}>
-          <span className={styles.checkoutText}>Check Out</span>
-        </button>
-      </div>
+      <button className={styles.button}>Checkout</button>
 
-      <div className={styles.infoContainer}>
-        <Lock className={styles.icon} size={16} strokeWidth={2.5} />
-        <div className={styles.infoText}>Secure 256-bit SSL encrypted checkout</div>
+      <div className={styles.secure}>
+        <Lock size={14} />
+        Secure 256-bit SSL checkout
       </div>
-
-      <p className={styles.secureNote} />
     </aside>
   );
 }

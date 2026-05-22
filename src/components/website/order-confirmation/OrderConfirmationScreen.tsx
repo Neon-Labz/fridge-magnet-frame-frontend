@@ -36,7 +36,7 @@ export default function OrderConfirmationScreen() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F9F9FE] text-[#1A1C1F]">
+    <div className="min-h-[850px] bg-[#F9F9FE] text-[#1A1C1F]">
       <main className="mx-auto max-w-[1280px] px-4 pb-16 pt-20 sm:px-6 lg:px-8">
         <section className="flex flex-col items-center gap-6 text-center">
           <div className="grid h-20 w-20 place-items-center rounded-full bg-[#0040A1] shadow-[0_16px_40px_rgba(0,0,0,0.08)]">

@@ -32,9 +32,7 @@ function PriceCard({ variant = 'default', label, title, price, description }) {
 function OccasionCard({ emoji, label }) {
   return (
     <div className={styles.occasionCard}>
-      <div className={styles.occasionEmoji}>
-        {emoji}
-      </div>
+      <div className={styles.occasionEmoji}>{emoji}</div>
       <p className={styles.occasionLabel}>{label}</p>
     </div>
   );
@@ -43,6 +41,7 @@ function OccasionCard({ emoji, label }) {
 export default function PricingSection() {
   return (
     <section className={styles.container}>
+      
       <div className={styles.pricingColumn}>
         <header className={styles.columnHeader}>
           <h2 className={styles.columnTitle}>Simple, honest pricing.</h2>
@@ -80,14 +79,11 @@ export default function PricingSection() {
 
         <div className={styles.occasionsGrid}>
           {occasionItems.map((item) => (
-            <OccasionCard
-              key={item.id}
-              emoji={item.emoji}
-              label={item.label}
-            />
+            <OccasionCard key={item.id} emoji={item.emoji} label={item.label} />
           ))}
         </div>
       </div>
+
     </section>
   );
 }

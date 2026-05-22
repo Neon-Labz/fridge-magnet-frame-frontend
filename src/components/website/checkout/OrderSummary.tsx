@@ -39,8 +39,8 @@ export default function OrderSummary({ items, subtotal, onPlaceOrder }: OrderSum
   const hasItems = items.length > 0;
 
   return (
-    <div className="max-w-[486px] rounded-[25px] bg-[#F4F5F9] p-5 lg:p-6">
-      <div className="rounded-[25px] border border-[#D8DBE5] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+    <div>
+      <div className="rounded-2xl border border-[#D8DBE5] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="border-b border-[#C3C6D4] px-6 pt-6 pb-4">
           <h2 className="font-manrope text-[32px] font-semibold tracking-[-0.01em] text-[#1A1C1F]">
             Order Summary

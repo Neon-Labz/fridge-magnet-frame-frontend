@@ -33,7 +33,7 @@ export default function GalleryOfferSection({
     minutes: initialMinutes,
   });
 
-  // Countdown
+  /* COUNTDOWN */
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -59,79 +59,153 @@ export default function GalleryOfferSection({
     return () => clearInterval(timer);
   }, []);
 
-  // Format time
+  /* FORMAT */
   const formatTime = (time: number) =>
     time.toString().padStart(2, "0");
 
   return (
-<section className="w-full bg-[#f9f9fe] px-[100px] pt-[60px]">      
-      <div
-        className="relative mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between overflow-hidden rounded-[28px] p-8 md:p-12 lg:min-h-[340px] lg:flex-row lg:px-20"
-        style={{
-          background:
-            "linear-gradient(105deg, #071E54 75%, #133074 75%)",
-          
-        }}
-      >
+    <section className="w-full bg-[#f9f9fe] pt-[40px] lg:pt-[10px] pb-[40px] lg:pb-[100px]">
 
-        {/* LEFT CONTENT */}
-        {/* LEFT */}
-        <div className="z-10 w-[390px]">
-          <div className="mb-[18px] inline-flex rounded-full text-white/95 bg-[#b11010] px-[14px] py-[4px] text-[12px] font-bold tracking-[2px]">
-            LIMITED RELEASE
+      <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-[100px]">
+
+        <div
+          className="
+            relative
+            overflow-hidden
+            rounded-[24px]
+            px-5 py-8
+            sm:px-8 sm:py-10
+            lg:px-16 lg:py-14
+          "
+          style={{
+            background:
+              "linear-gradient(105deg, #071E54 75%, #133074 75%)",
+          }}
+        >
+
+          {/* MAIN FLEX */}
+          <div
+            className="
+              flex flex-col
+              items-center
+              text-center
+              gap-2
+
+              xl:flex-row
+              xl:items-center
+              xl:justify-between
+              xl:text-left
+            "
+          >
+
+            {/* LEFT CONTENT */}
+            <div className="z-10 w-full max-w-[420px]">
+
+              <div className="mb-[18px] inline-flex rounded-full bg-[#b11010] px-[14px] py-[5px] text-[11px] font-bold tracking-[2px] text-white/95 sm:text-[12px]">
+                LIMITED RELEASE
+              </div>
+
+              <h2 className="font-manrope text-[28px] font-bold leading-[36px] text-white/95 sm:text-[34px] sm:leading-[42px]">
+                Limited Time Gallery
+                <br />
+                Opening Offer
+              </h2>
+
+              <p className="mt-[10px] font-inter text-[15px] leading-[24px] text-white/90 sm:text-[17px]">
+                Elevate your home with 20% off all Gallery Frames.
+                Exclusive seasonal pricing.
+              </p>
+
+            </div>
+
+            {/* TIMER */}
+            <div
+              className="
+                z-10
+                flex items-center justify-center
+                gap-4 sm:gap-6 lg:gap-7
+                text-center text-white/95
+                flex-wrap
+              "
+            >
+
+              {/* DAYS */}
+              <div>
+                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+                  {formatTime(timeLeft.days)}
+                </div>
+
+                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                  DAYS
+                </div>
+              </div>
+
+              <div className="mb-[16px] text-[26px] font-bold text-[#D90000] sm:text-[34px]">
+                :
+              </div>
+
+              {/* HOURS */}
+              <div>
+                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+                  {formatTime(timeLeft.hours)}
+                </div>
+
+                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                  HOURS
+                </div>
+              </div>
+
+              <div className="mb-[16px] text-[26px] font-bold text-[#D90000] sm:text-[34px]">
+                :
+              </div>
+
+              {/* MINUTES */}
+              <div>
+                <div className="font-manrope text-[38px] font-bold leading-none sm:text-[48px]">
+                  {formatTime(timeLeft.minutes)}
+                </div>
+
+                <div className="mt-[6px] text-[11px] font-medium tracking-[2px] text-white/60 sm:text-[12px]">
+                  MINS
+                </div>
+              </div>
+
+            </div>
+
+            {/* BUTTON */}
+            <button
+              className="
+                z-10
+                flex items-center justify-center
+
+                h-[54px]
+                w-full
+                max-w-[220px]
+
+                rounded-[10px]
+                bg-white
+
+                px-6
+
+                font-inter
+                text-[14px]
+                font-bold
+                text-[#07357E]
+
+                transition-all
+                hover:scale-[1.02]
+
+                sm:h-[62px]
+                sm:text-[15px]
+
+                xl:w-[160px]
+              "
+            >
+              Claim Offer
+            </button>
+
           </div>
-
-          <h2 className="font-manrope text-[34px] text-white/95 font-bold leading-[42px]">
-            Limited Time Gallery
-            <br />
-            Opening Offer
-          </h2>
-
-          <p className="mt-[8px] w-[360px] font-inter text-[17px] leading-[24px] text-white/95">
-            Elevate your home with 20% off all Gallery Frames. Exclusive seasonal
-            pricing.
-          </p>
         </div>
-
-        {/* TIMER */}
-        <div className="z-10 flex items-center justify-center gap-[28px] text-center text-white/95">
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.days)}
-            </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              DAYS
-            </div>
-          </div>
-
-          <div className="mb-[20px] text-[34px] font-bold text-[#D90000]">:</div>
-
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.hours)}
-            </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              HOURS
-            </div>
-          </div>
-
-          <div className="mb-[20px] text-[34px] font-bold text-[#D90000]">:</div>
-
-          <div>
-            <div className="font-manrope text-[48px] font-bold leading-none">
-              {formatTime(timeLeft.minutes)}
-            </div>
-            <div className="mt-[5px] text-[12px] font-medium tracking-[2px] text-white/60">
-              MINS
-            </div>
-          </div>
-        </div>
-
-        {/* BUTTON */}
-        <button className="z-10 h-[62px] w-[160px] rounded-[7px] bg-white font-inter text-[15px] font-bold leading-[24px] text-[#07357E]">
-          Claim
-          Offer
-        </button>
       </div>
     </section>
   );

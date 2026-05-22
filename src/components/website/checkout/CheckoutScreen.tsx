@@ -46,7 +46,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9FE] py-12">
+    <div className="bg-[#F9F9FE] py-12">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="max-w-[1216px]">
           <h1 className="font-manrope text-4xl font-bold tracking-[-0.02em] text-[#0040A1] sm:text-5xl lg:text-[48px] lg:leading-[56px]">

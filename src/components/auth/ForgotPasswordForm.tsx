@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Mail } from 'lucide-react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import { apiClient } from '@/lib/api'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Mail } from "lucide-react";
+import { useAuthModal } from "@/hooks/useAuthModal";
+import { apiClient } from "@/lib/api";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
-})
+  email: z.string().email("Invalid email address"),
+});
 
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordForm() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const { switchView } = useAuthModal()
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const { switchView } = useAuthModal();
 
   const {
     register,
@@ -26,116 +26,100 @@ export default function ForgotPasswordForm() {
     formState: { errors },
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
-  })
+  });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setLoading(true)
-    setError('')
-    setSuccess(false)
+    setLoading(true);
+    setError("");
+    setSuccess(false);
 
     try {
-      const response = await apiClient.forgotPassword(data)
-      
+      const response = await apiClient.forgotPassword(data);
+
       if (response.success) {
-        setSuccess(true)
-        console.log('Reset link sent:', response.data)
+        setSuccess(true);
       } else {
-        setError(response.error || 'An error occurred')
+        setError(response.error || "Something went wrong");
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError("Unexpected error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (success) {
     return (
-      <div className="space-y-6">
-        {/* Success Message */}
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
+      <div className="w-full max-w-[288px] mx-auto flex flex-col gap-6 text-center">
+        <div>
+          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            ✔
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Check Your Email</h2>
-          <p className="text-gray-600">
-            We&apos;ve sent password reset instructions to your email address.
+
+          <h2 className="text-[24px] font-bold mb-2">Check Your Email</h2>
+
+          <p className="text-[14px] text-gray-600">
+            Reset link sent successfully.
           </p>
         </div>
 
-        {/* Back to Login */}
-        <div className="text-center">
-          <button
-            onClick={() => switchView('login')}
-            className="text-sm text-gray-600 hover:text-red-600 transition-colors"
-          >
-            ← Back to Login
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Title */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h2>
-        <p className="text-gray-600 text-sm">
-          Enter your email address and we&apos;ll send you a link to reset your password.
-        </p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Email Input */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Mail className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            {...register('email')}
-            type="email"
-            placeholder="Email"
-            className={`
-              w-full pl-10 pr-3 py-3 border-b-2 bg-transparent
-              focus:outline-none focus:border-red-600 transition-colors
-              ${errors.email ? 'border-red-500' : 'border-gray-300'}
-            `}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-sm text-red-600">{errors.email.message}</p>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            {error}
-          </div>
-        )}
-
-        {/* Send Reset Link Button */}
         <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? 'Sending...' : 'Send Reset Link'}
-        </button>
-      </form>
-
-      {/* Back to Login */}
-      <div className="text-center">
-        <button
-          onClick={() => switchView('login')}
-          className="text-sm text-gray-600 hover:text-red-600 transition-colors"
+          onClick={() => switchView("login")}
+          className="text-[14px] text-blue-600 hover:underline cursor-pointer"
         >
           ← Back to Login
         </button>
       </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-[288px] mx-auto flex flex-col gap-4">
+      {/* TITLE */}
+      <div className="text-center">
+        <h2 className="text-[28px] font-bold">Forgot Password</h2>
+
+        <p className="text-[13px] text-gray-500 mt-2 mb-4">
+          Enter your email to receive reset link
+        </p>
+      </div>
+
+      {/* FORM */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
+        {/* EMAIL */}
+        <div className="relative border-b-2 border-gray-700 pb-2 m-2b-3">
+          <Mail className="absolute left-0 top-0 w-5 h-5" />
+
+          <input
+            {...register("email")}
+            placeholder="Email"
+            className="w-full pl-8 bg-transparent outline-none text-[14px] font-semibold"
+          />
+        </div>
+
+        {errors.email && (
+          <p className="text-[12px] text-red-600">{errors.email.message}</p>
+        )}
+
+        {error && <p className="text-[12px] text-red-600">{error}</p>}
+
+        {/* BUTTON */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-[48px] bg-[#BC0101] text-white rounded-lg font-semibold hover:bg-[#a00000] cursor-pointer disabled:opacity-50"
+        >
+          {loading ? "Sending..." : "Send Reset Link"}
+        </button>
+      </form>
+
+      {/* BACK */}
+      <button
+        onClick={() => switchView("login")}
+        className="text-[14px] pt-3 text-blue-600 hover:underline cursor-pointer text-center"
+      >
+        ← Back to Login
+      </button>
     </div>
-  )
+  );
 }

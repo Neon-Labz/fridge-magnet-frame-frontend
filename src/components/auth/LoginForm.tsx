@@ -1,250 +1,163 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Mail, Lock } from 'lucide-react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import { apiClient } from '@/lib/api'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuthModal } from "@/hooks/useAuthModal";
+import { apiClient } from "@/lib/api";
 
-const styles = `
-  .login-input {
-    font-size: 14px;
-    font-weight: 600;
-    color: #111827;
-    border-bottom: 2px solid #374151;
-  }
-  .login-forgot-btn {
-    font-size: 13px;
-    color: #2563EB;
-  }
-  .login-divider {
-    display: flex;
-    align-items: center;
-    margin: 16px 0;
-  }
-  .login-divider-line {
-    flex: 1;
-    border-top: 1px solid #E5E7EB;
-  }
-  .login-divider-text {
-    padding: 0 8px;
-    font-size: 12px;
-    color: #6B7280;
-    background: white;
-  }
-  .login-google-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 8px;
-  }
-  .login-google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-  }
-  .login-google-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .login-google-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #111827;
-  }
-  .login-footer {
-    font-size: 13px;
-    color: #6B7280;
-  }
-  .login-footer-link {
-    font-size: 13px;
-    color: #2563EB;
-    font-weight: 500;
-  }
-`
+interface LoginFormProps {
+  redirectTo?: string;
+  tokenKey?: string;
+  showSecondaryActions?: boolean;
+}
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 type LoginResponseData = {
-  token?: string
-  accessToken?: string
-  access_token?: string
+  token?: string;
+  accessToken?: string;
+  access_token?: string;
   data?: {
-    token?: string
-    accessToken?: string
-    access_token?: string
-  }
-}
+    token?: string;
+    accessToken?: string;
+    access_token?: string;
+  };
+};
 
-type LoginFormProps = {
-  redirectTo?: string
-  tokenKey?: string
-}
+export default function LoginForm({
+  redirectTo,
+  tokenKey = "token",
+  showSecondaryActions = true,
+}: LoginFormProps) {
+  const { openModal } = useAuthModal();
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormProps) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const { switchView } = useAuthModal()
-  const router = useRouter()
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  })
+  const { register, handleSubmit } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await apiClient.login(data)
-      
-      if (response.success) {
-        const responseData = response.data as LoginResponseData | undefined
-        const token =
-          responseData?.token ||
-          responseData?.accessToken ||
-          responseData?.access_token ||
-          responseData?.data?.token ||
-          responseData?.data?.accessToken ||
-          responseData?.data?.access_token
+      const response = await apiClient.login(data);
 
-        if (token) {
-          setTimeout(() => {
-            localStorage.setItem(tokenKey, token)
-            document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
-
-            if (redirectTo) {
-              router.replace(redirectTo)
-            }
-          }, 0)
-        } else if (redirectTo) {
-          router.replace(redirectTo)
-        }
-      } else {
-        setError(response.error || 'Login failed')
+      if (!response.success) {
+        setError(response.error || "Login failed");
+        return;
       }
+
+      const responseData = response.data as LoginResponseData | undefined;
+      const token =
+        responseData?.token ||
+        responseData?.accessToken ||
+        responseData?.access_token ||
+        responseData?.data?.token ||
+        responseData?.data?.accessToken ||
+        responseData?.data?.access_token;
+
+      window.setTimeout(() => {
+        if (token) {
+          localStorage.setItem(tokenKey, token);
+          document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`;
+        }
+
+        if (redirectTo) {
+          router.replace(redirectTo);
+        }
+      }, 0);
     } catch {
-      setError('An unexpected error occurred')
+      setError("An unexpected error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <>
-      <style>{styles}</style>
-      <div className="space-y-5">
-        {/* Title */}
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
-        </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full max-w-[288px] mx-auto flex flex-col gap-5 text-gray-950"
+    >
+      {/* TITLE */}
+      <h2 className="text-center text-[30px] font-bold leading-[38px] mb-2">
+        Welcome back
+      </h2>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* Email Input */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5" style={{ color: '#111827' }} />
-            </div>
-            <input
-              {...register('email')}
-              type="email"
-              placeholder="Email"
-              className={`
-                login-input
-                w-full pl-10 pr-3 py-3 bg-transparent
-                focus:outline-none focus:border-gray-900 transition-colors
-                ${errors.email ? 'border-red-500' : ''}
-              `}
-            />
-          </div>
-          {errors.email && (
-            <p className="text-sm text-red-600">{errors.email.message}</p>
-          )}
+      {/* EMAIL */}
+      <div className="relative border-b-2 border-gray-700 pb-2 mb-3">
+        <Mail className="absolute left-0 top-0 w-5 h-5 text-gray-950" />
+        <input
+          {...register("email")}
+          placeholder="Email"
+          className="w-full pl-8 bg-transparent outline-none text-[14px] font-semibold text-gray-950 placeholder:text-gray-400"
+        />
+      </div>
 
-          {/* Password Input */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5" style={{ color: '#111827' }} />
-            </div>
-            <input
-              {...register('password')}
-              type="password"
-              placeholder="Password"
-              className={`
-                login-input
-                w-full pl-10 pr-3 py-3 bg-transparent
-                focus:outline-none focus:border-gray-900 transition-colors
-                ${errors.password ? 'border-red-500' : ''}
-              `}
-            />
-          </div>
-          {errors.password && (
-            <p className="text-sm text-red-600">{errors.password.message}</p>
-          )}
+      {/* PASSWORD */}
+      <div className="relative border-b-2 border-gray-700 pb-2 ">
+        <Lock className="absolute left-0 top-0 w-5 h-5 text-gray-950" />
+        <input
+          {...register("password")}
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          className="w-full pl-8 pr-8 bg-transparent outline-none text-[14px] font-semibold text-gray-950 placeholder:text-gray-400"
+        />
 
-          {/* Forgot Password Link */}
-          <div className="text-right mt-1">
-            <button
-              type="button"
-              onClick={() => switchView('forgot-password')}
-              className="login-forgot-btn hover:underline transition-colors"
-            >
-              Forgot password?
-            </button>
-          </div>
+        {/* EYE TOGGLE */}
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-0 top-0 w-[26px] h-[26px] cursor-pointer text-gray-950"
+        >
+          {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+        </button>
+      </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-              {error}
-            </div>
-          )}
-
-          {/* Sign In Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-red-600 text-white py-4 px-4 rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
-
-        {/* Divider */}
-        <div className="login-divider">
-          <div className="login-divider-line" />
-          <div className="login-divider-text">OR</div>
-          <div className="login-divider-line" />
-        </div>
-
-        {/* Google Login Button */}
-        <div className="login-google-container">
+      {showSecondaryActions && (
+        <div className="text-right">
           <button
             type="button"
-            className="login-google-btn hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            onClick={() => openModal("forgot-password")}
+            className="text-[14px] font-semibold text-blue-600 hover:underline cursor-pointer"
+          >
+            Forgot password?
+          </button>
+        </div>
+      )}
+
+      {/* SIGN IN */}
+      {error && (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full h-[48px] bg-[#BC0101] text-white rounded-lg font-semibold hover:bg-[#a00000] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loading ? "Signing in..." : "Sign in"}
+      </button>
+
+      {showSecondaryActions && (
+        <>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-[2px] bg-gray-300" />
+            <span className="text-[12px] text-gray-500">OR</span>
+            <div className="flex-1 h-[2px] bg-gray-300" />
+          </div>
+
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 cursor-pointer w-full h-[48px] bg-transparent border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <div className="login-google-icon">
               <svg width="20" height="20" viewBox="0 0 24 24">
@@ -266,25 +179,22 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
                 />
               </svg>
             </div>
-            <span className="login-google-text">
-              Sign in with Google
-            </span>
-          </button>
-        </div>
 
-        {/* Register Link */}
-        <div className="text-center mt-1">
-          <span className="login-footer">
-            Don&apos;t have an account?{' '}
+            <span className="text-[16px] font-normal">Sign in with Google</span>
+          </button>
+
+          <p className="text-center text-[16px]">
+            Don&apos;t have an account?{" "}
             <button
-              onClick={() => switchView('register')}
-              className="login-footer-link hover:underline transition-colors"
+              type="button"
+              onClick={() => openModal("register")}
+              className="text-blue-600 hover:underline cursor-pointer"
             >
               Register
             </button>
-          </span>
-        </div>
-      </div>
-    </>
-  )
+          </p>
+        </>
+      )}
+    </form>
+  );
 }

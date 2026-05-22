@@ -26,7 +26,7 @@ const contactCards: ContactCard[] = [
   {
     id: "phone",
     label: "PHONE",
-    value: "+ 075 391 2534",
+    value: "+94 75 391 2534",
     subtext: "Mon-Fri, 9am - 6pm",
     icon: Phone,
   },
@@ -41,6 +41,7 @@ const contactCards: ContactCard[] = [
     id: "address",
     label: "ADDRESS",
     value: "Kokuvil West, Jaffna",
+    subtext: "Find us here",
     icon: MapPin,
   },
 ];
@@ -52,14 +53,9 @@ const socialIcons: SocialIcon[] = [
   { id: "tiktok", label: "TikTok", imagePath: "/tiktok-icon.svg" },
 ];
 
-function CompanyInfoCard({
-  label,
-  value,
-  subtext,
-  icon: Icon,
-}: ContactCard) {
+function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
   return (
-    <article className="flex items-start gap-4 rounded-[12px] border border-[#C3C6D4] bg-white p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
+    <article className="flex items-center gap-4 rounded-[12px] border border-[#C3C6D4] bg-white p-3 shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#0040A1]/10 text-[#0040A1]">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
@@ -68,7 +64,7 @@ function CompanyInfoCard({
         <p className="font-inter text-[14px] font-medium uppercase tracking-[0.02em] text-[#747784]">
           {label}
         </p>
-        <p className="font-inter text-[18px] font-semibold leading-[1.35] text-[#1B1E2A]">
+        <p className="font-inter text-[16px] font-semibold leading-[1.35] text-[#1B1E2A]">
           {value}
         </p>
         {subtext && (
@@ -83,8 +79,8 @@ function CompanyInfoCard({
 
 export default function OurCompanySection() {
   return (
-    <div className="w-full" aria-labelledby="our-company-title">
-      <header className="flex flex-col gap-4">
+    <div className="w-full md:pl-4 lg:pl-6" aria-labelledby="our-company-title">
+      <header className="flex flex-col gap-2">
         <h1
           id="our-company-title"
           className="font-manrope text-[30px] font-bold leading-[1.2] text-[#002B73]"
@@ -92,19 +88,19 @@ export default function OurCompanySection() {
           Our Company
         </h1>
 
-        <p className="font-inter text-[18px] leading-[29px] text-[#434652]">
-          We are here to support your business inquiries and partnerships.
+        <p className="font-inter text-[16px] leading-[29px] text-[#434652]">
+          We are here to support your business inquiries and partnerships. 
           Reach out through phone, email, or visit us in person.
         </p>
       </header>
 
-      <div className="mt-6 flex flex-col gap-4">
+      <div className="mt-6 flex flex-col gap-2">
         {contactCards.map((card) => (
           <CompanyInfoCard key={card.id} {...card} />
         ))}
       </div>
 
-      <div className="flex flex-col gap-4 border-t border-[#D6D8E2] pt-6">
+      <div className="flex flex-col gap-4 pt-6">
         <p className="font-inter text-[14px] font-medium uppercase tracking-[0.04em] text-[#747784]">
           FOLLOW US
         </p>
