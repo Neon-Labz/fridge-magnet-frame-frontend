@@ -78,8 +78,8 @@ export default function ProductsSection() {
 
   if (loading) {
     return (
-      <section className="w-full bg-[#F9F9FE] pt-[88px] pb-[158px]">
-        <div className="mx-auto max-w-[1800px] px-[20px]">
+      <section className="w-full bg-[#F9F9FE] pt-12 pb-16">
+        <div className="mx-auto max-w-[1800px] px-4 md:px-6">
           <p className="text-center text-slate-500">Loading products...</p>
         </div>
       </section>
@@ -97,18 +97,18 @@ export default function ProductsSection() {
   }
 
   return (
-    <section className="w-full bg-[#F9F9FE]  ">
-      <div className="mx-auto w-full max-w-[1800px] px-[100px] ">
-        <div className="mb-[52px]">
-          <h2 className="font-manrope text-[35px] font-bold leading-[44px] tracking-[-0.35px] text-[#002B73]">Curated Classics</h2>
-          <p className="mt-[8px] font-inter text-[17px] leading-[26px] text-[#434652]">The foundation of every great gallery wall.</p>
+    <section className="w-full bg-[#F9F9FE]">
+      <div className="mx-auto w-full max-w-[1800px] px-4 md:px-24">
+        <div className="mb-6">
+          <h2 className="font-manrope text-[26px] md:text-[35px] font-bold leading-[1.1] text-[#002B73]">Curated Classics</h2>
+          <p className="mt-2 font-inter text-[14px] md:text-[17px] leading-[1.4] text-[#434652]">The foundation of every great gallery wall.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-[28px] md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {products.map((p) => (
             <div key={p._id} className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white">
 
-              <div className="relative h-[450px] w-full cursor-pointer group bg-[#F4F3ED] flex items-center justify-center" onClick={() => handleImageClick(p._id)}>
+              <div className="relative h-[280px] md:h-[450px] w-full cursor-pointer group bg-[#F4F3ED] flex items-center justify-center" onClick={() => handleImageClick(p._id)}>
                 {p.primaryImage?.secure_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.primaryImage.secure_url} alt={p.productName} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
@@ -123,16 +123,16 @@ export default function ProductsSection() {
                 )}
               </div>
 
-              <div className="p-[26px]">
-                <h3 className="font-manrope text-[26px] font-semibold leading-[35px] text-[#1A1C1F]">{p.productName}</h3>
-                <p className="mt-[8px] font-inter text-[15px] leading-[22px] text-[#434652]">{p.description}</p>
+              <div className="p-4 md:p-[26px]">
+                <h3 className="font-manrope text-[18px] md:text-[26px] font-semibold leading-[1.2] text-[#1A1C1F]">{p.productName}</h3>
+                <p className="mt-2 font-inter text-[13px] md:text-[15px] leading-[1.4] text-[#434652]">{p.description}</p>
 
-                <div className="mt-[18px] flex items-center justify-between">
-                  <span className="font-inter text-[22px] font-semibold text-[#002B73]">Rs {p.price.toFixed(2)}</span>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="font-inter text-[18px] md:text-[22px] font-semibold text-[#002B73]">Rs {p.price.toFixed(2)}</span>
 
                   <button
                     onClick={() => handleAddToCart(p)}
-                    className={`rounded-[8px] px-[16px] py-[12px] text-[15px] font-semibold text-white transition-all ${
+                    className={`rounded-[8px] px-3 md:px-[16px] py-2 md:py-[12px] text-[14px] md:text-[15px] font-semibold text-white transition-all ${
                       addedProduct === p._id ? 'bg-[#008000]' : 'bg-[#BC0000] hover:bg-[#a00000]'
                     }`}
                   >
