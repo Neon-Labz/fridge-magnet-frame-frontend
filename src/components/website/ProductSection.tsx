@@ -14,12 +14,14 @@ interface ProductsSectionProps {
 export default function ProductsSection({ products }: ProductsSectionProps) {
   const router = useRouter();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
+  const setSelectedProductId = useFrameStore((state) => state.setSelectedProductId);
   const { addToCart } = useCart();
   const { addToast } = useToastStore();
 
   const handleImageClick = (product: WebsiteProduct) => {
     setSelectedFrame(product.frameType);
-    router.push(`/shop?productId=${encodeURIComponent(product.id)}`);
+    setSelectedProductId(product.id);
+    router.push(`/shop?productId=${encodeURIComponent(product.id)}&frameType=${encodeURIComponent(product.frameType)}`);
   };
 
   const handleAddToCart = (
@@ -81,12 +83,18 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                 className="relative block h-[170px] w-full overflow-hidden sm:h-[220px] md:h-[350px]"
                 aria-label={`View ${p.title} in shop`}
               >
-                <Image
-                  src={p.image || '/product-1.png'}
-                  alt={p.title}
-                  fill
-                  className="object-cover"
-                />
+                {p.image ? (
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-center text-sm font-medium text-slate-400">
+                    No image available
+                  </div>
+                )}
 
                 {p.badge && (
                   <span className="absolute left-[18px] top-[18px] rounded-full bg-[#002B73] px-[12px] py-[4px] text-[13px] font-semibold text-white">
