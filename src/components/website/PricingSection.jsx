@@ -6,7 +6,7 @@ const occasionItems = [
   { id: 1, emoji: '💍', label: 'Weddings' },
   { id: 2, emoji: '🎓', label: 'Graduations' },
   { id: 3, emoji: '🎂', label: 'Birthdays' },
-  { id: 4, emoji: '👨‍👩', label: 'Families' },
+  { id: 4, emoji: '👨‍👩‍👧', label: 'Families' },
   { id: 5, emoji: '❤️', label: 'Couples' },
   { id: 6, emoji: '🏢', label: 'Corporate' },
 ];
@@ -32,21 +32,7 @@ function PriceCard({ variant = 'default', label, title, price, description }) {
 function OccasionCard({ emoji, label }) {
   return (
     <div className={styles.occasionCard}>
-      <div 
-        className={styles.occasionEmoji}
-        style={{
-          fontFamily: "'Liberation Sans'",
-          fontSize: '30px',
-          color: '#111827',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '22.5px',
-          height: '36px',
-        }}
-      >
-        {emoji}
-      </div>
+      <div className={styles.occasionEmoji}>{emoji}</div>
       <p className={styles.occasionLabel}>{label}</p>
     </div>
   );

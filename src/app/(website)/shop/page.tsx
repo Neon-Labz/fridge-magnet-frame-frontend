@@ -1,15 +1,30 @@
-import { Metadata } from 'next';
-import ShopViewProductDetailsSection from '@/components/website/ShopViewProductDetailsSection';
+import ShopClientWrapper from './ShopClientWrapper'
+import { apiClient } from '@/lib/api'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Magnate picture with black frame | Magnify',
-  description: 'Preserve your most cherished memories with our artisan-crafted Heritage Oak frames.',
-};
+  title: 'Shop | Magnify',
+  description: 'Browse our artisan-crafted Heritage Oak frames.',
+}
 
-export default function ShopProductDetailsPage() {
+export default async function ShopPage() {
+  const res = await apiClient.getProducts()
+
+  let products: any[] = []
+
+  if (res.success && res.data) {
+    if (Array.isArray(res.data)) {
+      products = res.data
+    } else if (Array.isArray((res.data as any).data)) {
+      products = (res.data as any).data
+    } else if (Array.isArray((res.data as any).products)) {
+      products = (res.data as any).products
+    }
+  }
+
   return (
     <main>
-      <ShopViewProductDetailsSection />
+      <ShopClientWrapper products={products} />
     </main>
-  );
+  )
 }

@@ -3,7 +3,7 @@ import type { Order } from '@/types/order';
 export const ORDERS: Order[] = [
   {
     id: '1',
-    orderId: '#MG-82910',
+    orderId: '#MG-82912',
     customerName: 'Eleanor Herbert',
     customerInitials: 'EH',
     customerId: 'C-90122',
@@ -52,7 +52,7 @@ export const ORDERS: Order[] = [
     customerInitials: 'MP',
     customerId: 'C-90101',
     qty: 1,
-    status: 'cancelled',
+    status: 'canceled',
     email: 'marcus@example.com',
     totalValue: 150,
   },
@@ -107,7 +107,7 @@ export const ORDERS: Order[] = [
     customerInitials: 'SC',
     customerId: 'C-90502',
     qty: 2,
-    status: 'cancelled',
+    status: 'canceled',
     email: 'sophie@example.com',
     totalValue: 300,
   },
