@@ -9,6 +9,7 @@ import OrderSummary, { SummaryItem } from "./OrderSummary";
 import { saveOrder } from "@/services/cartService";
 import { useCart } from '@/context/CartContext';
 import { useFrameStore } from "@/store/frameStore";
+import { useWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 import { Truck, UserRound, AlertCircle } from "lucide-react";
 
 const generateOrderNumber = () => {
@@ -20,6 +21,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
+  const { isAuthenticated } = useWebsiteAuthSession();
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
   const items = useMemo<SummaryItem[]>(
     () => cartItems.map((i) => ({ id: i.id, name: i.title, price: i.price, quantity: i.quantity, image: i.image, frameType: i.frameType, colorOption: i.colorOption })),
@@ -103,6 +105,11 @@ export default function CheckoutScreen() {
   }, [form]);
 
   const handlePlaceOrder = () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
     // Mark all fields as touched to show validation errors
     setTouched({
       firstName: true,
@@ -147,6 +154,12 @@ export default function CheckoutScreen() {
         </div>
 
         <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-[1.5fr_1fr]">
+          {!isAuthenticated && (
+            <div className="lg:col-span-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Please log in before placing an order.
+            </div>
+          )}
+
           <div className="space-y-6 sm:space-y-8 lg:space-y-8">
             <Card>
               <CardHeader>
