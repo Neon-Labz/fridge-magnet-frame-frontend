@@ -120,6 +120,73 @@ export default function Header() {
           )}
         </div>
       </nav>
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          header {
+            height: auto;
+          }
+
+          nav {
+            height: auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-areas:
+              "logo actions"
+              "links links";
+            align-items: center;
+            gap: 4px 8px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+          }
+
+          nav > :nth-child(1) {
+            grid-area: logo;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: auto;
+          }
+
+          nav > :nth-child(2) {
+            grid-area: links;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 0;
+          }
+
+          nav > :nth-child(3) {
+            grid-area: actions;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: auto;
+            gap: 8px;
+          }
+
+          nav > :nth-child(3) > * {
+            flex-shrink: 0;
+          }
+
+          nav > :nth-child(3) button {
+            height: 32px;
+            padding-left: 10px;
+            padding-right: 10px;
+            font-size: 12px;
+          }
+
+          nav > :nth-child(3) .relative {
+            font-size: 17px;
+          }
+
+          nav > :nth-child(1) img {
+            width: 96px !important;
+          }
+        }
+      `}</style>
     </header>
   );
 }
