@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Mail, Lock } from 'lucide-react'
 import { useAuthModal } from '@/hooks/useAuthModal'
 import { apiClient } from '@/lib/api'
+import { dispatchWebsiteAuthChanged } from '@/hooks/useWebsiteAuthSession'
 
 const styles = `
   .login-input {
@@ -86,8 +87,11 @@ type LoginFormData = z.infer<typeof loginSchema>
 type LoginResponseData = {
   token?: string
   accessToken?: string
+  access_token?: string
   data?: {
     token?: string
+    accessToken?: string
+    access_token?: string
   }
 }
 
@@ -122,12 +126,16 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
         const token =
           responseData?.token ||
           responseData?.accessToken ||
-          responseData?.data?.token
+          responseData?.access_token ||
+          responseData?.data?.token ||
+          responseData?.data?.accessToken ||
+          responseData?.data?.access_token
 
         if (token) {
           setTimeout(() => {
             localStorage.setItem(tokenKey, token)
             document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
+            dispatchWebsiteAuthChanged()
 
             if (redirectTo) {
               router.replace(redirectTo)

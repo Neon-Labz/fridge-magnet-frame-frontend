@@ -33,12 +33,12 @@ export default function GalleryOfferSection({
     minutes: initialMinutes,
   });
 
-  // Client-side countdown effect
+  // Countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         let { days, hours, minutes } = prev;
-        
+
         if (minutes > 0) {
           minutes -= 1;
         } else if (hours > 0) {
@@ -51,80 +51,73 @@ export default function GalleryOfferSection({
         } else {
           clearInterval(timer);
         }
-        
+
         return { days, hours, minutes };
       });
-    }, 60000); // update every minute
+    }, 60000);
 
     return () => clearInterval(timer);
   }, []);
 
-  // Format numbers to have leading zero
-  const formatTime = (time: number) => time.toString().padStart(2, "0");
+  // Format time
+  const formatTime = (time: number) =>
+    time.toString().padStart(2, "0");
 
   return (
-    <section
-      className="w-full flex justify-center px-[20px] py-[80px] lg:py-[120px]"
-    >
+    <section className="w-full bg-[#f9f9fe] px-[100px] pt-[60px]">
       <div
-        className="w-full max-w-[1800px] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 lg:px-20 relative"
+        className="relative mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between overflow-hidden rounded-[28px] p-8 md:p-12 lg:min-h-[340px] lg:flex-row lg:px-20"
         style={{
-          minHeight: "321px",
-          background: "linear-gradient(105deg, #071E54 75%, #133074 75%)",
-          color: "white"
+          background: 'linear-gradient(105deg, #071E54 75%, #133074 75%)',
         }}
       >
-        {/* Left Content */}
-        <div className="flex flex-col items-start max-w-2xl z-10 space-y-4">
-          <div 
-            className="text-xs font-bold px-3 py-1 rounded-full tracking-wider"
-            style={{ backgroundColor: "#BC0000", color: "white" }}
-          >
+        {/* LEFT */}
+        <div className="z-10 w-[390px]">
+          <div className="mb-[18px] inline-flex rounded-full text-white/95 bg-[#b11010] px-[14px] py-[4px] text-[12px] font-bold tracking-[2px]">
             LIMITED RELEASE
           </div>
-          
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-            Limited Time Gallery Opening Offer
+
+          <h2 className="font-manrope text-[34px] text-white/95 font-bold leading-[42px]">
+            Limited Time Gallery
+            <br />
+            Opening Offer
           </h2>
-          
-          <p className="text-base md:text-lg opacity-90 max-w-md">
-            Elevate your home with 20% off all Gallery Frames. Exclusive seasonal pricing.
+
+          <p className="mt-[8px] w-[360px] font-inter text-[17px] leading-[24px] text-white/95">
+            Elevate your home with 20% off all Gallery Frames. Exclusive seasonal
+            pricing.
           </p>
         </div>
 
-        {/* Right Content: Timer & Button */}
-        <div className="flex flex-col md:flex-row items-center mt-8 lg:mt-0 gap-8 z-10">
-          
-          {/* Countdown Timer */}
+        {/* RIGHT: timer + button */}
+        <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-center md:justify-end z-10">
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.days)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">DAYS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.days)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">DAYS</span>
             </div>
-            
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
-            
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: '#BC0000' }}>:</div>
+
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.hours)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">HOURS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.hours)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">HOURS</span>
             </div>
-            
-            <div className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#BC0000" }}>:</div>
-            
+
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold" style={{ color: '#BC0000' }}>:</div>
+
             <div className="flex flex-col items-center">
-              <span className="text-4xl md:text-5xl font-bold">{formatTime(timeLeft.minutes)}</span>
-              <span className="text-xs font-medium tracking-widest mt-1 opacity-80">MINS</span>
+              <span className="text-4xl md:text-5xl lg:text-6xl font-bold">{formatTime(timeLeft.minutes)}</span>
+              <span className="text-xs font-medium tracking-widest mt-2 opacity-80">MINS</span>
             </div>
           </div>
 
-          {/* Button */}
-          <button 
-            className="whitespace-nowrap font-semibold text-sm md:text-base px-8 py-4 rounded shadow-lg transition-transform hover:scale-105"
-            style={{ backgroundColor: "white", color: "#071E54" }}
+          <button
+            className="font-semibold text-sm md:text-base px-8 py-3 md:py-4 rounded-lg shadow-lg transition-all hover:shadow-xl active:scale-95"
+            style={{ backgroundColor: 'white', color: '#071E54' }}
           >
             Claim Offer
           </button>
-
         </div>
       </div>
     </section>
