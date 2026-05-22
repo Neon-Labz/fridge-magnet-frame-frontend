@@ -1,25 +1,17 @@
 import Header from "@/components/website/Header";
 import Hero from "@/components/website/Hero";
-import VideoSection from "@/components/website/VideoSection";
-import ProductsSection from "@/components/website/ProductsSection";
+import ProductSection from "@/components/website/ProductSection";
 import PricingSection from "@/components/website/PricingSection";
-import CounterSection from "@/components/website/CounterSection";
-import Testimonial from "@/components/website/Testimonial";
-import FooterH from "@/components/website/FooterH";
-import HowItWorksSection from "@/components/website/HowItWorksSection";
+import Footer from "@/components/website/Footer";
 
 export default function Home() {
   return (
     <main>
       <Header />
       <Hero />
-      <VideoSection />
-      <ProductsSection />
-      <HowItWorksSection />
+      <ProductSection />
       <PricingSection />
-      <CounterSection />
-      <Testimonial />
-      <FooterH />
+      <Footer />
     </main>
   );
 }

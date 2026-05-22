@@ -1,69 +1,65 @@
 .container {
-  width: 100%;
-  max-width: 1780px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 100px 80px 60px;
+  padding: 60px 20px;
   display: flex;
   gap: 60px;
   align-items: flex-start;
-  padding-left: 100px;
-  padding-right: 100px;
-    background-color: #F9F9FE;
-
 }
 
-/* COLUMNS */
-.pricingColumn,
+/* ===== COLUMNS ===== */
+.pricingColumn {
+  flex: 1;
+}
+
 .occasionsColumn {
   flex: 1;
 }
 
-/* COLUMN HEADER */
+/* ===== COLUMN HEADER ===== */
 .columnHeader {
-  margin-bottom: 34px;
+  margin-bottom: 40px;
 }
 
 .columnTitle {
-  font-size: 34px;
-  font-weight: 800;
-  color: #002b73;
-  margin: 0;
-  line-height: 44px;
-  letter-spacing: -0.5px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  line-height: 1.3;
 }
 
 .columnSubtext {
-  margin-top: 10px;
-  max-width: 440px;
   font-size: 16px;
-  color: #64748b;
-  line-height: 26px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
 }
 
-/* PRICE CARDS GRID */
+/* ===== PRICE CARDS GRID ===== */
 .priceCardsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-/* PRICE CARD */
+/* ===== PRICE CARD ===== */
 .priceCard {
   position: relative;
-  padding: 42px;
-  border-radius: 14px;
+  padding: 32px;
+  border-radius: 12px;
   border: 2px solid;
   background: white;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 260px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  min-height: 300px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .priceCard.default {
   border-color: #fef9c3;
+  background: white;
 }
 
 .priceCard.popular {
@@ -74,27 +70,29 @@
 /* POPULAR RIBBON */
 .ribbon {
   position: absolute;
-  top: 18px;
-  right: -45px;
+  top: 0;
+  right: 0;
   background: #dc2626;
   color: white;
-  padding: 6px 40px;
+  padding: 6px 16px;
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  transform: rotate(45deg);
-  white-space: nowrap;
+  font-weight: 700;
+  transform: rotate(45deg) translate(30%, -50%);
+  transform-origin: center center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* CARD TEXT */
+/* CARD LABEL */
 .cardLabel {
   font-size: 12px;
   font-weight: 700;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin: 0;
 }
 
+/* CARD TITLE */
 .cardTitle {
   font-size: 24px;
   font-weight: 700;
@@ -103,6 +101,7 @@
   line-height: 1.3;
 }
 
+/* PRICE SECTION */
 .priceSection {
   display: flex;
   align-items: baseline;
@@ -119,8 +118,10 @@
   font-size: 32px;
   font-weight: 900;
   color: #dc2626;
+  line-height: 1;
 }
 
+/* CARD DESCRIPTION */
 .cardDescription {
   font-size: 14px;
   color: #6b7280;
@@ -128,56 +129,61 @@
   line-height: 1.5;
 }
 
-/* OCCASIONS */
+/* ===== OCCASIONS GRID ===== */
 .occasionsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 20px;
 }
 
+/* ===== OCCASION CARD ===== */
 .occasionCard {
   background: white;
   border: 1px solid #f3f4f6;
-  border-radius: 10px;
-  padding: 26px 20px;
-  min-height: 135px;
+  border-radius: 8px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
+  min-height: 160px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .occasionCard:hover {
   border-color: #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .occasionEmoji {
-  font-size: 32px;
+  font-size: 40px;
   line-height: 1;
 }
 
 .occasionLabel {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
   text-align: center;
 }
 
-/* RESPONSIVE */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .container {
-    padding: 50px 40px;
+    width: 100%;
     flex-direction: column;
     gap: 40px;
   }
 
   .priceCardsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .columnTitle {
+    font-size: 28px;
   }
 }
 
@@ -187,15 +193,32 @@
   }
 
   .columnTitle {
-    font-size: 26px;
-    line-height: 34px;
+    font-size: 24px;
+  }
+
+  .columnSubtext {
+    font-size: 14px;
   }
 
   .priceCard {
-    padding: 28px;
+    padding: 24px;
   }
 
   .occasionsGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .occasionCard {
+    padding: 24px 16px;
+    min-height: 140px;
+  }
+
+  .occasionEmoji {
+    font-size: 32px;
+  }
+
+  .occasionLabel {
+    font-size: 14px;
   }
 }
