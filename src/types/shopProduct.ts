@@ -4,6 +4,8 @@ export interface ShopProductImage {
 
 export interface ShopProduct {
   _id?: string;
+  id?: string;
+  productId?: string;
   productName?: string;
   price?: number | string;
   description?: string;
