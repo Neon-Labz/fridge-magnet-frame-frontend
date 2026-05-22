@@ -42,8 +42,6 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
     });
 
     addToast('Product added to cart successfully!', 'success');
-
-    router.push("/cart");
   };
 
   return (

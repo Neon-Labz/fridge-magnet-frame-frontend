@@ -38,7 +38,7 @@ export default function ShopViewProductDetailsSection({
   const { addToast } = useToastStore();
   const { isAuthenticated } = useWebsiteAuthSession();
 
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(4);
   
   const handlePersonalizationChange = useCallback(
     (_state: PersonalizationState) => {
@@ -81,6 +81,20 @@ export default function ShopViewProductDetailsSection({
     });
 
     addToast("Product added to cart successfully!", "success");
+    router.push('/cart');
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (quantity <= 4) {
+      addToast("You must select a minimum of 4 magnets.", "error");
+      return;
+    }
+
+    setQuantity((current) => current - 1);
+  };
+
+  const handleIncreaseQuantity = () => {
+    setQuantity((current) => current + 1);
   };
 
   const handleBuyNow = () => {
@@ -157,7 +171,8 @@ export default function ShopViewProductDetailsSection({
 
             <div className="flex w-fit items-center rounded-[4px] border border-slate-200">
               <button
-                onClick={() => setQuantity((p) => Math.max(1, p - 1))}
+                type="button"
+                onClick={handleDecreaseQuantity}
                 className="flex h-10 w-10 items-center justify-center"
               >
                 −
@@ -168,7 +183,8 @@ export default function ShopViewProductDetailsSection({
               </div>
 
               <button
-                onClick={() => setQuantity((p) => p + 1)}
+                type="button"
+                onClick={handleIncreaseQuantity}
                 className="flex h-10 w-10 items-center justify-center"
               >
                 +
