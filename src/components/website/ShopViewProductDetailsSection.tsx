@@ -5,7 +5,9 @@ import PersonalizationSection, { PersonalizationState } from "./PersonalizationS
 import { useFrameStore } from "@/store/frameStore";
 import { useCart } from "@/context/CartContext";
 import { useToastStore } from "@/store/toastStore";
+import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
 import type { ShopProduct } from "@/types/shopProduct";
+import { useRouter } from "next/navigation";
 
 interface ShopViewProductDetailsSectionProps {
   products: ShopProduct[];
@@ -29,10 +31,12 @@ function toStringArray(value: unknown): string[] {
 export default function ShopViewProductDetailsSection({
   products,
 }: ShopViewProductDetailsSectionProps) {
+  const router = useRouter();
   const selectedFrame = useFrameStore((s) => s.selectedFrame);
 
   const { addToCart } = useCart();
   const { addToast } = useToastStore();
+  const { isAuthenticated } = useWebsiteAuthSession();
 
   const [quantity, setQuantity] = useState(1);
   
@@ -77,6 +81,15 @@ export default function ShopViewProductDetailsSection({
     });
 
     addToast("Product added to cart successfully!", "success");
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    router.push('/checkout');
   };
 
   return (
@@ -172,7 +185,14 @@ export default function ShopViewProductDetailsSection({
               🛒 Add to Cart
             </button>
 
-            <button className="flex-1 rounded-[4px] bg-[#E62A24] px-6 py-3 font-medium text-white">
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!isAuthenticated}
+              className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
+                isAuthenticated ? 'bg-[#E62A24]' : 'cursor-not-allowed bg-[#E62A24]/60'
+              }`}
+            >
               Buy Now
             </button>
           </div>

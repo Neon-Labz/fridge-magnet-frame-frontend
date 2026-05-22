@@ -84,15 +84,17 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-type LoginResponseData = {
+type LoginPayload = {
   token?: string
   accessToken?: string
   access_token?: string
-  data?: {
-    token?: string
-    accessToken?: string
-    access_token?: string
+  user?: {
+    role?: string
   }
+}
+
+type LoginResponseData = LoginPayload & {
+  data?: LoginPayload
 }
 
 type LoginFormProps = {
@@ -123,26 +125,39 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
       
       if (response.success) {
         const responseData = response.data as LoginResponseData | undefined
+        const payload = responseData?.data ?? responseData
         const token =
-          responseData?.token ||
-          responseData?.accessToken ||
-          responseData?.access_token ||
-          responseData?.data?.token ||
-          responseData?.data?.accessToken ||
-          responseData?.data?.access_token
+          payload?.token ||
+          payload?.accessToken ||
+          payload?.access_token
+        const role = payload?.user?.role
+        const isAdmin = role === 'admin'
 
         if (token) {
-          setTimeout(() => {
-            localStorage.setItem(tokenKey, token)
-            document.cookie = `${tokenKey}=${token}; path=/; samesite=lax`
-            dispatchWebsiteAuthChanged()
+          localStorage.setItem(tokenKey, token)
+          document.cookie = `${tokenKey}=${encodeURIComponent(token)}; path=/; samesite=lax`
 
-            if (redirectTo) {
-              router.replace(redirectTo)
+          if (isAdmin) {
+            // Keep admin auth in sync even when login happens from website pages.
+            localStorage.setItem('adminToken', token)
+            document.cookie = `adminToken=${encodeURIComponent(token)}; path=/; samesite=lax`
+          }
+
+          dispatchWebsiteAuthChanged()
+
+          const finalRedirect =
+            redirectTo || (isAdmin ? '/dashboard/products' : tokenKey === 'token' ? '/' : undefined)
+
+          if (finalRedirect) {
+            if (finalRedirect.startsWith('/dashboard')) {
+              // Force a full navigation so middleware re-evaluates with the fresh auth cookie.
+              window.location.href = finalRedirect
+            } else {
+              router.replace(finalRedirect)
             }
-          }, 0)
-        } else if (redirectTo) {
-          router.replace(redirectTo)
+          }
+        } else {
+          setError('Login succeeded but no auth token was returned')
         }
       } else {
         setError(response.error || 'Login failed')

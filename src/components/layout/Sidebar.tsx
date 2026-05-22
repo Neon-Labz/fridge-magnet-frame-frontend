@@ -30,6 +30,8 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
     router.push('/');
   };
 

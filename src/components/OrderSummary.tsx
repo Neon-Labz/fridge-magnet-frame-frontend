@@ -2,6 +2,7 @@
 
 import { Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 import styles from "./OrderSummary.module.css";
 
 export default function OrderSummary({
@@ -12,10 +13,11 @@ export default function OrderSummary({
   quantity: number;
 }) {
   const router = useRouter();
+  const { isAuthenticated } = useWebsiteAuthSession();
 
   const handleCheckout = () => {
     try {
-      router.push('/checkout');
+      router.push(isAuthenticated ? '/checkout' : '/login');
     } catch (err) {
       console.error('Navigation to /checkout failed', err);
     }

@@ -68,6 +68,7 @@ function InputField({
 export default function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const { switchView } = useAuthModal()
 
   const {
@@ -81,11 +82,12 @@ export default function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true)
     setError('')
+    setSuccess('')
     try {
       const response = await apiClient.register(data)
       if (response.success) {
-        // Handle successful registration
-        // You might want to switch to login view or close modal here
+        setSuccess('Registration successful. Please sign in to continue.')
+        switchView('login')
       } else {
         setError(response.error || 'Registration failed')
       }
@@ -209,6 +211,12 @@ export default function RegisterForm() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+              {success}
             </div>
           )}
 
