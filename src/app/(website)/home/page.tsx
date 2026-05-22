@@ -4,12 +4,11 @@ import ProductSection from "@/components/website/ProductSection";
 import VideoSection from "@/components/website/VideoSection";
 import PricingSection from "@/components/website/PricingSection";
 import Footer from "@/components/website/Footer";
-import { apiClient } from "@/lib/api";
-import { mapBackendProductsToWebsiteProducts } from "@/lib/websiteProducts";
+import { fetchWebsiteProductsFromBackend } from "@/lib/websiteProducts";
+import FooterH from "@/components/website/FooterH";
 
 export default async function Home() {
-  const res = await apiClient.getProducts();
-  const products = res.success ? mapBackendProductsToWebsiteProducts(res.data) : [];
+  const products = await fetchWebsiteProductsFromBackend();
 
   return (
     <main>
@@ -18,7 +17,7 @@ export default async function Home() {
       <VideoSection />
       <ProductSection products={products} />
       <PricingSection />
-      <Footer />
+      <FooterH />
     </main>
   );
 }
