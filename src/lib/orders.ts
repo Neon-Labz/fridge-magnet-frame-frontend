@@ -1,4 +1,5 @@
 import type { Order, OrderStatus } from '@/types/order';
+import { ORDERS } from '@/data/orders';
 
 type ApiOrder = {
   _id?: string;
@@ -52,24 +53,69 @@ export const mapApiOrder = (order: ApiOrder): Order => ({
 });
 
 export const fetchOrders = async () => {
-  const response = await fetch('/api/v1/orders', { cache: 'no-store' });
+  let allOrders: Order[] = [];
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data?.message || `Failed to load orders: ${response.status}`);
+  // Always include mock orders as base
+  allOrders = [...ORDERS];
+
+  // Try to fetch from backend first
+  try {
+    const response = await fetch('/api/v1/orders', { cache: 'no-store' });
+
+    if (response.ok) {
+      const backendOrders = (await response.json()) as ApiOrder[];
+      const mappedOrders = backendOrders.map(mapApiOrder);
+      return [...allOrders, ...mappedOrders];
+    }
+  } catch (error) {
+    console.log('Backend not available, using localStorage');
   }
 
-  const orders = (await response.json()) as ApiOrder[];
-  return orders.map(mapApiOrder);
+  // Fall back to localStorage if backend is unavailable
+  try {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('saved-orders');
+      if (stored) {
+        const savedOrders = JSON.parse(stored) as Order[];
+        allOrders = [...allOrders, ...savedOrders];
+      }
+    }
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+  }
+
+  return allOrders;
 };
 
 export const fetchOrder = async (id: string) => {
-  const response = await fetch(`/api/v1/orders/${id}`, { cache: 'no-store' });
+  // Check mock orders first
+  const mockOrder = ORDERS.find((o) => o.id === id);
+  if (mockOrder) return mockOrder;
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data?.message || `Failed to load order: ${response.status}`);
+  // Try backend
+  try {
+    const response = await fetch(`/api/v1/orders/${id}`, { cache: 'no-store' });
+
+    if (response.ok) {
+      return mapApiOrder((await response.json()) as ApiOrder);
+    }
+  } catch (error) {
+    console.log('Backend not available, checking localStorage');
   }
 
-  return mapApiOrder((await response.json()) as ApiOrder);
+  // Check localStorage
+  try {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('saved-orders');
+      if (stored) {
+        const orders = JSON.parse(stored) as Order[];
+        const found = orders.find((o) => o.id === id);
+        if (found) return found;
+      }
+    }
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+  }
+
+  throw new Error(`Order not found: ${id}`);
 };
