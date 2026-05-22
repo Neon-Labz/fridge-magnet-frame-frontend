@@ -84,21 +84,17 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-type LoginResponseData = {
+type LoginPayload = {
   token?: string
   accessToken?: string
   access_token?: string
   user?: {
     role?: string
   }
-  data?: {
-    token?: string
-    accessToken?: string
-    access_token?: string
-    user?: {
-      role?: string
-    }
-  }
+}
+
+type LoginResponseData = LoginPayload & {
+  data?: LoginPayload
 }
 
 type LoginFormProps = {
@@ -129,18 +125,12 @@ export default function LoginForm({ redirectTo, tokenKey = 'token' }: LoginFormP
       
       if (response.success) {
         const responseData = response.data as LoginResponseData | undefined
+        const payload = responseData?.data ?? responseData
         const token =
-          responseData?.token ||
-          responseData?.accessToken ||
-          responseData?.access_token ||
-          responseData?.data?.token ||
-          responseData?.data?.accessToken ||
-          responseData?.data?.access_token
-        // API may return the user at the root or nested inside `data`.
-        // Check both shapes and prefer the first defined role.
-        const role =
-          responseData?.user?.role ??
-          responseData?.data?.user?.role
+          payload?.token ||
+          payload?.accessToken ||
+          payload?.access_token
+        const role = payload?.user?.role
         const isAdmin = role === 'admin'
 
         if (token) {
