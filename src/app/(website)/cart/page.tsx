@@ -164,7 +164,7 @@ export default function CartPage() {
 
                   return (
                   <CartItem
-                    key={`${item.id}-${item.frameType}`}
+                    key={`${item.id}-${item.frameType}-${item.colorOption ?? 'no-color'}`}
                     item={item}
                     onQuantityChange={handleQuantityChange}
                     onDelete={handleDelete}
