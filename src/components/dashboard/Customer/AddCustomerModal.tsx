@@ -75,13 +75,14 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess = () => {}, initialData =
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/customers', {
+      const url = initialData?.id
+        ? `/api/v1/customers/${initialData.id}`
+        : '/api/v1/customers';
+
+      const res = await fetch(url, {
         method: initialData?.id ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          id: initialData?.id,
-        }),
+        body: JSON.stringify(form),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

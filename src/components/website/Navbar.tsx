@@ -1,179 +1,146 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Phone, Mail, Clock, Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Menu, X, ShoppingCart } from "lucide-react";
+import { clearWebsiteAuthSession, useWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
+import { useCart } from '@/context/CartContext';
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated } = useWebsiteAuthSession();
+  const { totalQuantity } = useCart();
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Properties", href: "/properties" },
-    { name: "Projects", href: "/projects" },
-    { name: "About Us", href: "/about-us" },
-    // { name: "Branches", href: "/branches" },
-    // { name: "Blogs", href: "/blogs" },
+    { name: "Shop", href: "/shop" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
-    <>
-      {/* Top Bar */}
-      <div className="bg-dark text-white text-sm py-2 hidden md:block border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center relative">
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-2">
-              <Phone className="w-3 h-3 text-accent" />
-              +94 (77) 801 9399
-            </span>
-            <span className="flex items-center gap-2">
-              <Mail className="w-3 h-3 text-accent" />
-              info@tranquilleproperty.lk
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-3 h-3 text-accent" />
-              Mon - Sat: 9:00 AM - 6:00 PM
-            </span>
-          </div>
-          {/* <div className="flex items-center gap-4">
-            {Socialmedias.map((media) => (
-              <a
-                key={media.name}
-                href={media.link}
-                className="hover:text-primary-400 transition"
-              >
-                <media.icon className="w-4 h-4" />
-              </a>
-            ))}
-          </div> */}
-        </div>
-      </div>
+    <header className="sticky top-0 z-40 h-[75px] border-b border-[#E5E5EA] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+      
+      {/* TOP BAR */}
+      <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between px-8">
+        
+        {/* LOGO */}
+        <Link href="/" className="flex h-[42px] w-[109px] items-center">
+          <Image
+            src="/logo.png"
+            alt="Magnify Logo"
+            width={109}
+            height={42}
+            className="object-contain"
+          />
+        </Link>
 
-      {/* Main Nav */}
-      <nav
-        className={cn(
-          "fixed w-full z-50 transition-all duration-500 py-2 top-0 md:top-5",
-          isScrolled
-            ? "nav-scrolled !top-0"
-            : "bg-transparent md:bg-transparent",
-        )}
-      >
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          {isScrolled ? (
-            <Link href="/" className="flex items-center gap-3 group">
-              {/* <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-              <Home className="text-white w-6 h-6" />
-            </div> */}
-
-              <Image
-                src="/logo.png"
-                alt="Tranquille Real Estate Logo"
-                width={100}
-                height={72}
-                className="object-cover rounded-xl group-hover:rotate-12 transition-transform"
-                style={{ width: 'auto', height: 'auto' }}
-              />
+        {/* DESKTOP NAV */}
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-base text-[#475569]"
+            >
+              {link.name}
             </Link>
-          ) : (
-            <Link href="/" className="flex items-center gap-3 group">
-              {/* <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-              <Home className="text-white w-6 h-6" />
-            </div> */}
+          ))}
+        </nav>
 
-              <Image
-                src="/logo.png"
-                alt="Tranquille Real Estate Logo"
-                width={100}
-                height={100}
-                className="object-contain rounded-xl group-hover:rotate-12 transition-transform"
-                style={{ width: 'auto', height: 'auto' }}
-              />
+        {/* DESKTOP RIGHT */}
+        <div className="hidden md:flex items-center gap-6">
+          <div className="relative">
+            <ShoppingCart className="h-5 w-5 text-[#475569]" />
+            {totalQuantity > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
+                {totalQuantity}
+              </span>
+            )}
+          </div>
+
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => {
+                clearWebsiteAuthSession()
+                router.push('/')
+              }}
+              className="flex h-[40px] items-center rounded-[8px] bg-[#E61D11] px-6 text-sm font-semibold text-white"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="flex h-[40px] items-center rounded-[8px] bg-[#E61D11] px-6 text-sm font-semibold text-white"
+            >
+              Login
             </Link>
           )}
-
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className={cn(
-                  "nav-link font-medium",
-                  isScrolled
-                    ? "text-gray-700 hover:text-primary-500"
-                    : "text-white hover:text-primary-400",
-                )}
-              >
-                {link.name}
-              </a>
-            ))}
-          </div>
-
-          {/* <div className="hidden lg:flex items-center gap-4">
-            <a
-              href="#"
-              className={cn(
-                "flex items-center gap-1 font-medium hover:text-primary-400 transition",
-                isScrolled ? "text-gray-700" : "text-white",
-              )}
-            >
-              <Heart className="w-4 h-4" /> Saved
-            </a>
-            <Link
-              href="/properties"
-              className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-lg shadow-accent/30 hover:shadow-accent/50"
-            >
-              List Property
-            </Link>
-          </div> */}
-
-          {/* Mobile Toggle */}
-          <button
-            className={cn(
-              "lg:hidden text-2xl",
-              isScrolled ? "text-dark" : "text-white",
-            )}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-2xl p-6 mt-2 animate-in slide-in-from-top duration-300">
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-800 hover:text-primary-400 font-medium py-2 border-b border-gray-100"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </a>
-              ))}
-              {/* <Link
-                href="/properties"
-                className="bg-primary-500 hover:bg-primary-600 text-white text-center px-6 py-3 rounded-full font-semibold mt-2"
+        {/* MOBILE MENU BUTTON */}
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="md:hidden text-[#475569]"
+        >
+          {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* MOBILE MENU */}
+      {isMobileOpen && (
+        <div className="md:hidden border-t border-[#E5E5EA] bg-white px-6 py-4">
+          <div className="flex flex-col gap-4">
+
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileOpen(false)}
+                className="text-[#475569]"
               >
-                List Property
-              </Link> */}
+                {link.name}
+              </Link>
+            ))}
+
+            <div className="flex items-center gap-4 mt-2">
+              <div className="relative">
+                <ShoppingCart className="h-5 w-5 text-[#475569]" />
+                  {totalQuantity > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-bold text-white">
+                      {totalQuantity}
+                    </span>
+                  )}
+              </div>
+
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearWebsiteAuthSession()
+                      router.push('/')
+                    }}
+                    className="rounded-[8px] bg-[#E61D11] px-4 py-2 text-sm font-semibold text-white"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="rounded-[8px] bg-[#E61D11] px-4 py-2 text-sm font-semibold text-white"
+                  >
+                    Login
+                  </Link>
+                )}
             </div>
+
           </div>
-        )}
-      </nav>
-    </>
+        </div>
+      )}
+    </header>
   );
 }

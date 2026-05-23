@@ -4,6 +4,7 @@ import { getStorage, setStorage, removeStorage } from '../utils/localStorage';
 
 const CART_KEY = 'cart';
 const ORDER_KEY = 'latest-order';
+const SAVED_ORDERS_KEY = 'saved-orders';
 
 export interface Product {
   id: string | number;
@@ -96,7 +97,34 @@ export const clearCart = (): CartItem[] => {
 };
 
 export const saveOrder = (order: OrderRecord): OrderRecord => {
+  // Save the latest order
   setStorage(ORDER_KEY, order);
+  
+  // Also save to orders collection
+  const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
+  const savedOrders = getStorage(SAVED_ORDERS_KEY);
+  const ordersList = Array.isArray(savedOrders) ? savedOrders : [];
+  
+  // Generate unique ID using timestamp (starts at 1000+) to avoid conflicts with mock data
+  const newOrderId = String(1000 + ordersList.length);
+  
+  const newOrder = {
+    id: newOrderId,
+    orderId: order.orderNumber,
+    customerName: `${(order as any).customerDetails?.firstName || ''} ${(order as any).customerDetails?.lastName || ''}`.trim(),
+    customerInitials: `${((order as any).customerDetails?.firstName || '')[0]}${((order as any).customerDetails?.lastName || '')[0]}`.toUpperCase(),
+    customerId: `CUST-${Date.now()}`,
+    qty: totalQuantity,
+    status: 'pending' as const,
+    email: (order as any).customerDetails?.email,
+    totalValue: order.subtotal + order.shipping,
+    shippingAddress: `${(order as any).customerDetails?.street || ''}, ${(order as any).customerDetails?.city || ''}, ${(order as any).customerDetails?.state || ''} ${(order as any).customerDetails?.zip || ''}`,
+    adminNote: (order as any).customerDetails?.notes || '',
+  };
+  
+  ordersList.push(newOrder);
+  setStorage(SAVED_ORDERS_KEY, ordersList);
+  
   return order;
 };
 
