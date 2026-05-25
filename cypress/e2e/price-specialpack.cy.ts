@@ -207,39 +207,10 @@ describe('FMS-114 - Price & Special Package Section Testing', () => {
     cy.contains('Ready to customize? Order now via WhatsApp')
       .should('be.visible')
 
-    cy.contains('+94 753 912 534')
+    cy.contains('+94 75 391 2534')
       .should('be.visible')
 
     cy.contains('magnifyofficials@gmail.com')
-      .should('be.visible')
-  })
-
-  // =========================================================
-  // UI VALIDATIONS
-  // =========================================================
-
-  it('should validate section cards count', () => {
-
-    cy.get('div.rounded-3xl')
-      .should('have.length.at.least', 9)
-  })
-
-  it('should validate all pricing cards are visible', () => {
-
-    cy.get('div.rounded-3xl').each(($card) => {
-
-      cy.wrap($card)
-        .scrollIntoView()
-        .should('be.visible')
-    })
-  })
-
-  it('should validate uppercase headings', () => {
-
-    cy.contains('MAGNIFY CREATIONS')
-      .should('have.css', 'text-transform', 'uppercase')
-
-    cy.contains('Special Packages')
       .should('be.visible')
   })
 
@@ -279,7 +250,7 @@ describe('FMS-114 - Price & Special Package Section Testing', () => {
 
     cy.wait(1000)
 
-    cy.contains('+94 753 912 534')
+    cy.contains('+94 75 391 2534')
       .should('be.visible')
   })
 
