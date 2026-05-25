@@ -41,7 +41,7 @@ describe('FMS-79 - Footer Section', () => {
     it('should display correct copyright text', () => {
 
       cy.contains(
-        '© 2024 Magnify. Premium photo framing for curated memories.'
+        '© 2026 Magnify. Premium photo framing for curated memories.'
       )
         .should('exist')
         .and('be.visible');
