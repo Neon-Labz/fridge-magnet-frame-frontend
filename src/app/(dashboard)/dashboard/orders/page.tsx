@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DeleteOrderModal from '@/components/dashboard/orders/DeleteOrderModal';
 import OrderFilters, {
   type OrderFilterStatus,
@@ -10,19 +10,43 @@ import OrderHeader from '@/components/dashboard/orders/OrderHeader';
 import OrderPagination from '@/components/dashboard/orders/OrderPagination';
 import OrderStats from '@/components/dashboard/orders/OrderStats';
 import OrderTable from '@/components/dashboard/orders/OrderTable';
-import { ORDERS } from '@/data/orders';
+import { fetchOrders } from '@/lib/orders';
 import type { Order } from '@/types/order';
 
 const PAGE_SIZE = 5;
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>(ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<OrderFilterStatus>('all');
   const [sortBy, setSortBy] = useState<OrderSortBy>('default');
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
+
+  const loadOrders = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      setOrders(await fetchOrders());
+    } catch (err) {
+      setOrders([]);
+      setError(err instanceof Error ? err.message : 'Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadOrders();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const filtered =
     filterStatus === 'all'
@@ -58,22 +82,34 @@ export default function OrdersPage() {
     setSortOpen(false);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
 
-    setOrders((prevOrders) => {
-      const nextOrders = prevOrders.filter(
-        (order) => order.id !== deleteTarget.id
-      );
+    try {
+      const response = await fetch(`/api/v1/orders/${deleteTarget.id}`, {
+        method: 'DELETE',
+      });
 
-      if (page > Math.ceil(nextOrders.length / PAGE_SIZE)) {
-        setPage((currentPage) => Math.max(1, currentPage - 1));
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || `Delete failed: ${response.status}`);
       }
 
-      return nextOrders;
-    });
+      setOrders((prevOrders) => {
+        const nextOrders = prevOrders.filter(
+          (order) => order.id !== deleteTarget.id
+        );
 
-    setDeleteTarget(null);
+        if (page > Math.ceil(nextOrders.length / PAGE_SIZE)) {
+          setPage((currentPage) => Math.max(1, currentPage - 1));
+        }
+
+        return nextOrders;
+      });
+      setDeleteTarget(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete order');
+    }
   };
 
   return (
@@ -129,7 +165,13 @@ export default function OrdersPage() {
             totalItems={sorted.length}
           />
 
-          <OrderTable orders={paged} onDelete={setDeleteTarget} />
+          {loading || error ? (
+            <div className="flex flex-1 items-center justify-center p-10 text-sm font-medium" style={{ color: error ? '#BC0000' : '#434652' }}>
+              {error || 'Loading orders...'}
+            </div>
+          ) : (
+            <OrderTable orders={paged} onDelete={setDeleteTarget} />
+          )}
 
           <OrderPagination
             currentPage={safePage}
