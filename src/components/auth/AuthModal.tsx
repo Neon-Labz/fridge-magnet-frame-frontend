@@ -1,70 +1,76 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { X } from 'lucide-react'
-import { useAuthModal } from '@/hooks/useAuthModal'
-import LoginForm from '@/components/auth/LoginForm'
-import RegisterForm from '@/components/auth/RegisterForm'
-import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
-import ResetPasswordForm from '@/components/auth/ResetPasswordForm'
+import { useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
+import { useAuthModal } from "@/hooks/useAuthModal";
+
+import LoginForm from "@/components/auth/LoginForm";
+import RegisterForm from "@/components/auth/RegisterForm";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
 export default function AuthModal() {
-  const { isOpen, view, closeModal } = useAuthModal()
+  const router = useRouter();
+  const { isOpen, view, closeModal } = useAuthModal();
 
-  // Handle escape key to close modal
+  const handleClose = useCallback(() => {
+    closeModal();
+    router.push("/");
+  }, [closeModal, router]);
+
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeModal()
-      }
-    }
+    if (!isOpen) return;
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'hidden'
-    }
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen, closeModal])
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [handleClose, isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const renderForm = () => {
     switch (view) {
-      case 'login':
-        return <LoginForm />
-      case 'register':
-        return <RegisterForm />
-      case 'forgot-password':
-        return <ForgotPasswordForm />
-      case 'reset-password':
-        return <ResetPasswordForm />
+      case "login":
+        return <LoginForm />;
+      case "register":
+        return <RegisterForm />;
+      case "forgot-password":
+        return <ForgotPasswordForm />;
+      case "reset-password":
+        return <ResetPasswordForm />;
       default:
-        return <LoginForm />
+        return <LoginForm />;
     }
-  }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop with blur */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={closeModal}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={handleClose}
       />
 
       {/* Modal */}
-      <div className="relative w-[546px] h-[588px] rounded-3xl bg-[#F5F5F5] shadow-xl p-[40px_48px] flex flex-col justify-center items-stretch">
-        {/* Close Button */}
+      <div className="relative w-full max-w-[388px] h-[550px] mt-[-28px] bg-[#F5F5F5] rounded-[25px] shadow-2xl px-10 py-10 flex flex-col">
+        {/* Close */}
         <button
-          onClick={closeModal}
-          className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center border-2 border-black rounded-full hover:bg-neutral-200 transition"
-          type="button"
+          onClick={handleClose}
+          className="absolute top-[21px] right-[-125px] w-80 h-8 flex items-center justify-center"
         >
-          <X className="h-5 w-5 text-black" strokeWidth={2.5} />
+          <X className="w-8 h-8 text-black" strokeWidth={2} />
         </button>
+
+        {/* Content */}
         <div className="flex-1 flex flex-col justify-center">
           {renderForm()}
         </div>

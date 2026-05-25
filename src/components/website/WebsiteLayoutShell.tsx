@@ -19,7 +19,7 @@ export default function WebsiteLayoutShell({ children }: WebsiteLayoutShellProps
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans">
       <Header />
-      <main className="pt-[92px]">{children}</main>
+      <main>{children}</main>
       <Footer />
     </div>
   );

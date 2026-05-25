@@ -1,151 +1,130 @@
-'use client';
-
-interface PricingItem {
-  quantity: string;
-  price: string;
-  isPopular?: boolean;
-}
-
-interface BundleItem {
-  quantity: string;
-  price: string;
-}
+"use client";
 
 export default function PriceMagnetFrameSection() {
-  const magnetsPricing: PricingItem[] = [
-    { quantity: '4 pieces', price: 'Rs. 1,500' },
-    { quantity: '6 pieces', price: 'Rs. 1,990', isPopular: true },
-    { quantity: '9 pieces', price: 'Rs. 2,590' },
-    { quantity: '12 pieces', price: 'Rs. 2,990' },
-    { quantity: '18 pieces', price: 'Rs. 3,990' },
+  const magnetsPricing = [
+    { quantity: "4 pieces", price: "Rs. 1,500" },
+    { quantity: "6 pieces", price: "Rs. 1,990", isPopular: true },
+    { quantity: "9 pieces", price: "Rs. 2,590" },
+    { quantity: "12 pieces", price: "Rs. 2,990" },
+    { quantity: "18 pieces", price: "Rs. 3,990" },
   ];
 
-  const bundlePricing: BundleItem[] = [
-    { quantity: '4 pieces + Frame', price: 'Rs. 2,500' },
-    { quantity: '6 pieces + Frame', price: 'Rs. 2,990' },
-    { quantity: '9 pieces + Frame', price: 'Rs. 3,590' },
-    { quantity: '12 pieces + Frame', price: 'Rs. 3,990' },
+  const bundlePricing = [
+    { quantity: "4 pieces + Frame", price: "Rs. 2,500" },
+    { quantity: "6 pieces + Frame", price: "Rs. 2,990" },
+    { quantity: "9 pieces + Frame", price: "Rs. 3,590" },
+    { quantity: "12 pieces + Frame", price: "Rs. 3,990" },
   ];
 
   return (
-    <section className="bg-white py-16 md:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Page Heading */}
-        <div className="mb-16 flex flex-col items-center pt-4 md:mb-20">
-          <div className="flex w-full max-w-[1200px] flex-col items-center gap-4">
-            <div className="flex w-full flex-col items-start gap-4">
-              <h1 className="font-manrope w-full text-center text-[44px] font-extrabold uppercase leading-[1] tracking-[-1.8px] text-[#0F172A] md:whitespace-nowrap md:text-[72px] md:leading-[72px]">
-                MAGNIFY CREATIONS
-              </h1>
-              <div className="flex w-full justify-center">
-                <h2 className="text-center text-[14px] font-black uppercase leading-7 tracking-[4px] text-[#002B73] md:text-[18px] md:tracking-[7.2px]">
-                  FRIDGE MAGNET FRAMES
-                </h2>
-              </div>
-            </div>
+    <section className="bg-white py-8 md:py-10">
+      <div className="mx-auto max-w-[1285px] px-4 sm:px-6 lg:px-8">
+        {/* HEADER */}
+        <div className="mb-10 flex flex-col items-center text-center">
+          <h1 className="font-manrope text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-tight text-[#0F172A]">
+            MAGNIFY CREATIONS
+          </h1>
 
-            <div className="flex w-full max-w-[672px] flex-col items-center pt-3 md:pt-4">
-              <p className="w-full text-center text-[20px] font-medium leading-8 text-[#475569] md:text-[24px]">
-                Send your photos - we print, magnetize & deliver!
-              </p>
-            </div>
-          </div>
+          <h2 className="mt-2 text-xs sm:text-sm md:text-base font-bold uppercase tracking-[3px] text-[#002B73]">
+            FRIDGE MAGNET FRAMES
+          </h2>
+
+          <p className="mt-3 max-w-[700px] text-sm sm:text-base md:text-lg font-medium text-[#475569]">
+            Send your photos - we print, magnetize & deliver!
+          </p>
         </div>
 
-        {/* Pricing Grid */}
-        <div className="grid gap-8 md:grid-cols-2 md:gap-8">
-          {/* Left Card - Magnets Only */}
-          <div className="overflow-hidden rounded-[40px] border border-[#E2E8F0] border-t-[6px] border-t-[#E41A0F] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
-            <div className="p-6 pb-10 md:p-12 md:pb-[104px]">
-              {/* Card Title */}
-              <div className="mb-10 flex items-center gap-4">
-                <span className="text-[30px] leading-9 text-[#0F172A]">📍</span>
-                <h3 className="font-manrope text-[30px] font-black uppercase leading-9 tracking-[1.5px] text-[#0F172A]">
+        {/* GRID */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* LEFT CARD */}
+          <div className="rounded-[32px] border border-[#E2E8F0] border-t-[6px] border-t-[#E41A0F] bg-white shadow-sm">
+            <div className="p-5 sm:p-7 md:p-10">
+              <div className="mb-6 flex items-center gap-2">
+                <span className="text-xl">📍</span>
+                <h3 className="text-lg sm:text-xl font-bold uppercase text-[#0F172A]">
                   Magnets Only
                 </h3>
               </div>
 
-              {/* Pricing Items */}
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {magnetsPricing.map((item, index) => {
-                  const isFullWidth = item.quantity === '18 pieces';
-                  const isTallCard = item.quantity === '4 pieces' || item.quantity === '6 pieces';
+              {/* MAGNETS GRID (2 + 2 + 1) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {magnetsPricing.slice(0, 4).map((item, index) => (
+                  <div
+                    key={index}
+                    className={`relative rounded-[20px] border px-5 py-6 flex flex-col justify-center min-h-[120px]
+      ${
+        item.isPopular
+          ? "border-[#93C5FD] bg-[#EFF6FF]"
+          : "border-[#E2E8F0] bg-[#F8FAFC]"
+      }`}
+                  >
+                    {/* POPULAR BADGE */}
+                    {item.isPopular && (
+                      <span className="absolute top-3 right-3 rounded-full bg-[#002B73] px-3 py-1 text-[10px] font-bold uppercase text-white">
+                        Popular
+                      </span>
+                    )}
 
-                  return (
-                    <div
-                      key={index}
-                      className={`rounded-3xl border px-8 ${
-                        isFullWidth
-                          ? 'col-span-1 flex h-[106px] items-center justify-between py-8 sm:col-span-2'
-                          : isTallCard
-                            ? 'relative flex h-[172px] flex-col gap-3 py-8'
-                            : 'relative flex h-[142px] flex-col gap-3 py-8'
-                      } ${
-                        item.isPopular
-                          ? 'border-2 border-[rgba(0,43,115,0.3)] bg-[#EFF6FF]'
-                          : 'border-[#E2E8F0] bg-[#F8FAFC]'
-                      }`}
-                    >
-                      {isFullWidth ? (
-                        <>
-                          <span className="text-[20px] font-bold uppercase leading-7 tracking-[0.5px] text-[#475569]">
-                            {item.quantity}
-                          </span>
-                          <span className="text-[36px] font-black leading-10 text-[#0F172A]">{item.price}</span>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex w-full items-start">
-                            <span className="whitespace-nowrap text-[18px] font-bold uppercase leading-7 tracking-[0.45px] text-[#64748B]">
-                              {item.quantity}
-                            </span>
-                            {item.isPopular && (
-                              <span className="absolute right-3 top-3 whitespace-nowrap rounded-full bg-[#002B73] px-3 py-1 text-xs font-black uppercase leading-4 text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                                Popular
-                              </span>
-                            )}
-                          </div>
-                          <span
-                            className={`mt-auto text-[30px] font-black leading-9 ${
-                              item.isPopular ? 'text-[#002B73]' : 'text-[#0F172A]'
-                            }`}
-                          >
-                            {item.price}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
+                    {/* QUANTITY */}
+                    <span className="text-xs sm:text-sm font-bold uppercase tracking-wide text-[#64748B]">
+                      {item.quantity}
+                    </span>
+
+                    {/* PRICE */}
+                    <span className="mt-2 text-2xl sm:text-3xl font-black text-[#0F172A]">
+                      {item.price}
+                    </span>
+                  </div>
+                ))}
+
+                {/* LAST ITEM FULL WIDTH */}
+                {magnetsPricing.slice(4, 5).map((item, index) => (
+                  <div
+                    key={index}
+                    className="sm:col-span-2 relative rounded-[20px] border border-[#E2E8F0] bg-[#F8FAFC] px-5 py-6 flex flex-col justify-center min-h-[120px]"
+                  >
+                    <span className="text-xs sm:text-sm font-bold uppercase tracking-wide text-[#64748B]">
+                      {item.quantity}
+                    </span>
+
+                    <span className="mt-2 text-2xl sm:text-3xl font-black text-[#0F172A]">
+                      {item.price}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right Card - Magnets + Frame Bundle */}
-          <div className="overflow-hidden rounded-[40px] border border-[#E2E8F0] border-t-[6px] border-t-[#002B73] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
-            <div className="p-6 md:p-12">
-              {/* Card Title and Subtitle */}
-              <div className="mb-10">
-                <div className="mb-3 flex items-center gap-4">
-                  <span className="text-[30px] leading-9 text-[#0F172A]">🖼️</span>
-                  <h3 className="font-manrope text-[30px] font-black uppercase leading-9 tracking-[1.5px] text-[#0F172A]">
+          {/* RIGHT CARD */}
+          <div className="rounded-[32px] border border-[#E2E8F0] border-t-[6px] border-t-[#002B73] bg-white shadow-sm">
+            <div className="p-5 sm:p-7 md:p-10">
+              <div className="mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🖼️</span>
+                  <h3 className="text-lg sm:text-xl font-bold uppercase text-[#0F172A]">
                     Magnets + Frame Bundle
                   </h3>
                 </div>
-                <p className="text-[18px] font-medium leading-7 text-[#64748B]">
+
+                <p className="mt-2 text-sm sm:text-base text-[#64748B]">
                   Black or white 4-in-1 frame included
                 </p>
               </div>
 
-              {/* Bundle Items */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {bundlePricing.map((item, index) => (
                   <div
                     key={index}
-                    className="flex min-h-[94px] items-center justify-between rounded-3xl border border-[rgba(0,43,115,0.1)] bg-[#EFF6FF] px-8 py-7"
+                    className="flex items-center justify-between rounded-[24px] border border-[#E2E8F0] bg-[#EFF6FF] px-5 py-4"
                   >
-                    <span className="text-[20px] font-bold leading-7 text-[#1E293B]">{item.quantity}</span>
-                    <span className="text-[30px] font-black leading-9 text-[#002B73]">{item.price}</span>
+                    <span className="text-sm sm:text-base font-bold text-[#1E293B]">
+                      {item.quantity}
+                    </span>
+
+                    <span className="text-xl sm:text-2xl font-black text-[#002B73]">
+                      {item.price}
+                    </span>
                   </div>
                 ))}
               </div>
