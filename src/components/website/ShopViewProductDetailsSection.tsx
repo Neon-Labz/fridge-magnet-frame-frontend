@@ -39,7 +39,7 @@ export default function ShopViewProductDetailsSection({
   const { isAuthenticated } = useWebsiteAuthSession();
 
   const [quantity, setQuantity] = useState(4);
-  
+
   const handlePersonalizationChange = useCallback(
     (_state: PersonalizationState) => {
       // Store personalization state if needed for future use
@@ -57,22 +57,22 @@ export default function ShopViewProductDetailsSection({
     );
   }
 
-  const product = products[0] && typeof products[0] === "object" ? products[0] : {};
+  const product = products[0];
 
-  const title = product.productName ?? "";
-  const price = Number(product.price ?? 0);
-  const description = product.description ?? "";
-  const inStock = product.status === "In Stock";
-  const mainImage = product.primaryImage?.secure_url ?? "";
+  const title = product?.productName ?? "";
+  const price = Number(product?.price ?? 0);
+  const description = product?.description ?? "";
+  const inStock = product?.status === "In Stock";
+  const mainImage = product?.primaryImage?.secure_url ?? "";
 
   const personalizationOptions =
-    toStringArray(product.personalizationInstructions).length > 0
-      ? toStringArray(product.personalizationInstructions)
-      : toStringArray(product.personalization);
+    toStringArray(product?.personalizationInstructions).length > 0
+      ? toStringArray(product?.personalizationInstructions)
+      : toStringArray(product?.personalization);
 
   const handleAddToCart = () => {
     addToCart({
-      id: product._id ?? `shop-${Date.now()}`,
+      id: product?._id ?? `shop-${Date.now()}`,
       title,
       price,
       frameType: selectedFrame,
@@ -81,7 +81,7 @@ export default function ShopViewProductDetailsSection({
     });
 
     addToast("Product added to cart successfully!", "success");
-    router.push('/cart');
+    router.push("/cart");
   };
 
   const handleDecreaseQuantity = () => {
@@ -99,25 +99,25 @@ export default function ShopViewProductDetailsSection({
 
   const handleBuyNow = () => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
-    router.push('/checkout');
+    router.push("/checkout");
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-20">
+    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
 
         {/* IMAGE */}
         <div className="flex flex-col gap-6">
-          <div className="relative flex aspect-[3/4] md:aspect-[4/5] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
+          <div className="relative flex aspect-[4/5] w-full max-h-[575px] max-w-[480px] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
             {mainImage ? (
               <img
-                  src={mainImage}
-                  alt={title}
-                  className="h-full w-full object-cover"
+                src={mainImage}
+                alt={title}
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="text-center">
@@ -144,14 +144,14 @@ export default function ShopViewProductDetailsSection({
           </div>
 
           <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
-            Rs {Number(price).toFixed(2)}
+            Rs {price.toFixed(2)}
           </div>
 
           <p className="mb-8 text-sm md:text-base leading-relaxed text-slate-600">
             {description}
           </p>
 
-          <hr className="mb-8 border-slate-200" />
+          <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
 
           {personalizationOptions.length > 0 && (
             <div className="mb-8">
@@ -206,7 +206,9 @@ export default function ShopViewProductDetailsSection({
               onClick={handleBuyNow}
               disabled={!isAuthenticated}
               className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
-                isAuthenticated ? 'bg-[#E62A24]' : 'cursor-not-allowed bg-[#E62A24]/60'
+                isAuthenticated
+                  ? "bg-[#E62A24]"
+                  : "cursor-not-allowed bg-[#E62A24]/60"
               }`}
             >
               Buy Now
