@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
-import FramePreview from "@/components/website/FramePreview";
 import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
 import Link from "next/link";
 import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
@@ -89,10 +89,10 @@ export default function OrderConfirmationScreen() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F9F9FE] to-white">
-      <div className="mx-auto w-full max-w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-20">
+      <div className="mx-auto w-full max-w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-25">
 
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-16">
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#0040A1]">
             <CheckCircle className="h-10 w-10 text-white" />
           </div>
@@ -126,8 +126,11 @@ export default function OrderConfirmationScreen() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex gap-4 px-6 py-4">
                     <div className="w-24 h-24 border rounded-lg overflow-hidden flex items-center justify-center">
-                      <FramePreview
-                        variant={resolvePreview(item)}
+                      <Image
+                        src={item.image || "/home-product-1.png"}
+                        alt={item.name}
+                        width={96}
+                        height={96}
                         className="h-full w-full object-cover"
                       />
                     </div>

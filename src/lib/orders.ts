@@ -36,7 +36,6 @@ const statusFromApi = (status: string): OrderStatus => {
 export const statusToApi = (status: OrderStatus) => status.toUpperCase();
 
 export const mapApiOrder = (order: ApiOrder): Order => ({
-  _id: order._id,
   id: order._id || order.id || order.orderId,
   orderId: order.orderId,
   customerName: order.customerName,
@@ -55,7 +54,7 @@ export const mapApiOrder = (order: ApiOrder): Order => ({
   adminNote: order.adminNote,
 });
 
-export const fetchOrders = async () => {
+export const fetchOrders = async (): Promise<Order[]> => {
   try {
     const response = await fetch("/api/v1/orders", { cache: "no-store" });
 
@@ -63,25 +62,28 @@ export const fetchOrders = async () => {
       const backendOrders = (await response.json()) as ApiOrder[];
       return backendOrders.map(mapApiOrder);
     }
-  } catch (error) {
+  } catch {
     console.log("Backend not available, using mock orders");
   }
 
   return ORDERS;
 };
 
-export const fetchOrder = async (id: string) => {
+export const fetchOrder = async (id: string): Promise<Order> => {
   try {
-    const response = await fetch(`/api/v1/orders/${id}`, { cache: "no-store" });
+    const response = await fetch(`/api/v1/orders/${id}`, {
+      cache: "no-store",
+    });
 
     if (response.ok) {
       return mapApiOrder((await response.json()) as ApiOrder);
     }
-  } catch (error) {
+  } catch {
     console.log("Backend not available, checking mock orders");
   }
 
   const mockOrder = ORDERS.find((o) => o.id === id);
+
   if (mockOrder) return mockOrder;
 
   throw new Error(`Order not found: ${id}`);
