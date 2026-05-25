@@ -10,11 +10,11 @@ import HowItWorksSection from "@/components/website/HowItWorksSection";
 
 export default function Home() {
   return (
-    <main>
+    <main className="overflow-x-hidden">
       <Header />
       <Hero />
       <VideoSection />
-      <ProductSection />
+      <ProductSection products={[]} />
       <HowItWorksSection />
       <PricingSection />
       <CounterSection />

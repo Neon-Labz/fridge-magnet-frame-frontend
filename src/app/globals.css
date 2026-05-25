@@ -58,3 +58,42 @@ button,
 input {
   font: inherit;
 }
+
+/* Mobile-specific: improve touch targets and form spacing */
+@media (max-width: 640px) {
+  /* Make native buttons and common button-like elements easier to tap */
+  button,
+  input[type="button"],
+  input[type="submit"],
+  .btn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Inputs, textareas and selects should be finger-friendly and full-width */
+  input,
+  textarea,
+  select {
+    padding: 10px 12px;
+    font-size: 15px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Stack form controls with comfortable spacing */
+  form > * + * {
+    margin-top: 12px;
+  }
+
+  /* Reduce large page paddings on narrow screens */
+  .px-4,
+  .px-6,
+  .px-8 {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}

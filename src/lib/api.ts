@@ -1,6 +1,8 @@
 const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'
-).replace(/\/$/, '')
+  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:3000/api/v1'
+).replace(/\/$/, '');
 
 interface ApiResponse<T> {
   success: boolean
@@ -121,6 +123,12 @@ class ApiClient {
 
   async getProfile(): Promise<ApiResponse<unknown>> {
     return this.request('/auth/profile', {
+      method: 'GET',
+    })
+  }
+
+  async getProducts(): Promise<ApiResponse<any>> {
+    return this.request('/products', {
       method: 'GET',
     })
   }
