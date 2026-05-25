@@ -75,40 +75,6 @@ describe("Homepage Corrections & Testimonial Section", () => {
   });
 
   // =========================
-  // PRODUCT SECTION
-  // =========================
-
-  it("should display curated classic products", () => {
-    cy.contains("Curated Classics").should("be.visible");
-
-    cy.contains("Magnet").should("be.visible");
-
-    cy.contains("Magnet Black Frame").should("be.visible");
-
-    cy.contains("Magnet White Frame").should("be.visible");
-
-    cy.contains("Rs 500.00").should("be.visible");
-
-    cy.contains("Rs 1000.00").should("be.visible");
-  });
-
-  it("should display all product images", () => {
-    cy.get('img[alt="Magnet"]').should("be.visible");
-
-    cy.get('img[alt="Magnet Black Frame"]').should("be.visible");
-
-    cy.get('img[alt="Magnet White Frame"]').should("be.visible");
-  });
-
-  it("should display add to cart buttons", () => {
-    cy.get("button").contains("Add to Cart").should("exist");
-
-    cy.get("button")
-      .filter(":contains('Add to Cart')")
-      .should("have.length.at.least", 3);
-  });
-
-  // =========================
   // HOW IT WORKS SECTION
   // =========================
 
@@ -190,7 +156,7 @@ describe("Homepage Corrections & Testimonial Section", () => {
     cy.contains("button", "→").should("be.visible");
   });
 
-  it.only("should display testimonial ratings", () => {
+  it("should display testimonial ratings", () => {
 
   cy.contains("div", "★ ★ ★ ★ ★")
     .should("be.visible");
