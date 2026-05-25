@@ -7,15 +7,18 @@ import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm'
+import { useRouter } from 'next/navigation'
 
 export default function AuthModal() {
   const { isOpen, view, closeModal } = useAuthModal()
+const router = useRouter()
 
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         closeModal()
+        router.push('/')
       }
     }
 
@@ -52,14 +55,20 @@ export default function AuthModal() {
       {/* Backdrop with blur */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={closeModal}
+        onClick={() => {
+          closeModal()
+          router.push('/')
+    }}
       />
 
       {/* Modal */}
       <div className="relative w-[546px] h-[588px] rounded-3xl bg-[#F5F5F5] shadow-xl p-[40px_48px] flex flex-col justify-center items-stretch">
         {/* Close Button */}
         <button
-          onClick={closeModal}
+          onClick={() => {
+          closeModal()
+          router.push('/')
+        }}
           className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center border-2 border-black rounded-full hover:bg-neutral-200 transition"
           type="button"
         >
