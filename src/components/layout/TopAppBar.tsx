@@ -34,6 +34,25 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
           line-height: 15px;
           color: #64748B;
         }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 640px) {
+          .topappbar {
+            height: 72px;
+            padding-left: 12px;
+            padding-right: 12px;
+          }
+
+          /* hide text portion of profile button on small screens while keeping avatar */
+          .profile-button > .flex.flex-col {
+            display: none;
+          }
+
+          .profile-avatar {
+            width: 36px;
+            height: 36px;
+          }
+        }
       `}</style>
       <header
         className="topappbar fixed top-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 left-0 lg:left-[252px]"
