@@ -4,7 +4,7 @@ describe("Products List Page", () => {
   });
 
   it("should display Add Product button", () => {
-    cy.contains("Add Product").should("be.visible");
+    cy.contains("button", "Add Product").should("be.visible");
   });
 
   it("should display product table", () => {
@@ -21,9 +21,16 @@ describe("Products List Page", () => {
   });
 
   it("should open Add Product modal", () => {
-    cy.contains("Add Product").click();
+    cy.contains("button", "Add Product")
+      .should("be.visible")
+      .and("not.be.disabled");
 
-    cy.contains("Add New Product")
-      .should("be.visible");
+    cy.wait(500);
+
+    cy.contains("button", "Add Product").click({ force: true });
+
+    cy.contains("h2", "Add New Product", { timeout: 10000 }).should(
+      "be.visible",
+    );
   });
 });

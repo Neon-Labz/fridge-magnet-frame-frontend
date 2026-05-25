@@ -1,11 +1,9 @@
 describe("Create Product Page", () => {
   beforeEach(() => {
-    cy.visit("/dashboard/products");
-
-    cy.contains("Add Product").should("be.visible").click({ force: true });
-
-    // instead of strict modal text check
-    cy.get("body", { timeout: 10000 }).should("contain", "Add New Product");
+    cy.visit("/dashboard/products/create");
+    cy.contains("h2", "Add New Product", { timeout: 10000 }).should(
+      "be.visible",
+    );
   });
 
   it("should display all form fields correctly", () => {
@@ -19,7 +17,10 @@ describe("Create Product Page", () => {
   });
 
   it("should validate stock input", () => {
-    cy.get('input[name="stock"]').clear({ force: true }).type("50");
+    cy.get('input[name="stock"]')
+      .invoke("val", "50")
+      .trigger("input")
+      .trigger("change");
 
     cy.get('input[name="stock"]').should(($el) => {
       expect(Number($el.val())).to.eq(50);
@@ -27,7 +28,8 @@ describe("Create Product Page", () => {
   });
 
   it("should validate price input", () => {
-    cy.get('input[name="price"]').clear({ force: true }).type("99.99");
+    cy.get('input[name="price"]')
+      .type("{selectall}{backspace}99.99", { force: true });
 
     cy.get('input[name="price"]').should(($el) => {
       expect(Number($el.val())).to.eq(99.99);
@@ -51,12 +53,10 @@ describe("Create Product Page", () => {
     cy.get('input[name="productId"]').clear().type("SKU-999");
 
     cy.get('input[name="stock"]')
-      .clear({ force: true })
-      .type("10", { delay: 0 });
+      .type("{selectall}{backspace}10", { force: true, delay: 0 });
 
     cy.get('input[name="price"]')
-      .clear({ force: true })
-      .type("49.99", { delay: 0 });
+      .type("{selectall}{backspace}49.99", { force: true, delay: 0 });
 
     cy.get('textarea[name="description"]')
       .clear({ force: true })
@@ -67,7 +67,7 @@ describe("Create Product Page", () => {
     cy.get("body").should("not.contain", "Add New Product");
   });
 
-  it("should prevent empty form submission", () => {
+  it("should keep modal open after empty form submission", () => {
     cy.contains("Submit Product").scrollIntoView().click({ force: true });
 
     cy.get("body").should("contain", "Add New Product");

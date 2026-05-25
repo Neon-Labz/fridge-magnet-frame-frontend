@@ -1,17 +1,22 @@
 describe("Products Image Upload", () => {
   beforeEach(() => {
-    cy.visit("/dashboard/products");
-    cy.contains("Add Product").click();
+    cy.visit("/dashboard/products/create");
+    cy.contains("h2", "Add New Product", { timeout: 10000 }).should(
+      "be.visible",
+    );
   });
 
-  it("should upload primary image", () => {
-    cy.get('input[type="file"]')
-      .first()
-      .selectFile("cypress/fixtures/test-image.png", {
-        force: true,
-      });
+  const getAddProductModal = () =>
+    cy.contains("h2", "Add New Product").parents(".relative").first();
 
-    cy.get('input[type="file"]')
+  it("should upload primary image", () => {
+    getAddProductModal()
+      .find('input[type="file"]')
+      .first()
+      .selectFile("cypress/fixtures/test-image.png", { force: true });
+
+    getAddProductModal()
+      .find('input[type="file"]')
       .first()
       .should(($input) => {
         const input = $input[0] as HTMLInputElement;
@@ -21,14 +26,17 @@ describe("Products Image Upload", () => {
   });
 
   it("should upload gallery images", () => {
-    cy.get('input[type="file"]')
+    getAddProductModal()
+      .find('input[type="file"]')
+      .should("have.length", 2)
       .last()
       .selectFile(
         ["cypress/fixtures/test-image.png", "cypress/fixtures/test-image.png"],
         { force: true },
       );
 
-    cy.get('input[type="file"]')
+    getAddProductModal()
+      .find('input[type="file"]')
       .last()
       .should(($input) => {
         const input = $input[0] as HTMLInputElement;
