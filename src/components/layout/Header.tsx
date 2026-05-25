@@ -88,6 +88,37 @@ const Header = () => {
           height: 16px;
         }
       `}</style>
+
+      <style jsx>{`
+        /* Mobile adjustments (reduces spacing and hides subtitle on small screens) */
+        @media (max-width: 640px) {
+          .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            padding-bottom: 12px;
+          }
+
+          .title {
+            font-size: 20px;
+          }
+
+          .subtitle {
+            display: none;
+          }
+
+          .actions {
+            width: 100%;
+            justify-content: flex-start;
+            gap: 12px;
+          }
+
+          .addButton {
+            padding: 8px 12px;
+            font-size: 13px;
+          }
+        }
+      `}</style>
     </>
   );
 };
