@@ -21,11 +21,15 @@ type OrderStatusProps = {
 export default function OrderStatus({ order }: OrderStatusProps) {
   const router = useRouter();
   const [currentOrder, setCurrentOrder] = useState(order);
-  const [status, setStatus] = useState<OrderStatusValue>(order.status || "processing");
+  const [status, setStatus] = useState<OrderStatusValue>(
+    order.status || "processing"
+  );
   const [adminNote, setAdminNote] = useState(order.adminNote || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const mongoOrderId = currentOrder._id || currentOrder.id;
 
   const statuses = [
     { label: "PENDING", value: "pending", icon: CircleEllipsis },
@@ -36,12 +40,17 @@ export default function OrderStatus({ order }: OrderStatusProps) {
   ];
 
   const handleUpdate = async () => {
+    if (!mongoOrderId) {
+      setError("Order ID missing. Cannot update status.");
+      return;
+    }
+
     setSaving(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const response = await fetch(`/api/v1/orders/${currentOrder.id}/status`, {
+      const response = await fetch(`/api/v1/orders/${mongoOrderId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,7 +71,9 @@ export default function OrderStatus({ order }: OrderStatusProps) {
       setSuccess("Order status updated");
     } catch (error) {
       console.error(error);
-      setError(error instanceof Error ? error.message : "Failed to update order status");
+      setError(
+        error instanceof Error ? error.message : "Failed to update order status"
+      );
     } finally {
       setSaving(false);
     }
@@ -99,9 +110,11 @@ export default function OrderStatus({ order }: OrderStatusProps) {
           </div>
 
           <div className="border-t border-[#EEF1F5] px-12 py-10">
-            <h2 className="text-lg font-bold text-[22px] text-[#1A1C1F]">Change Status</h2>
+            <h2 className="text-lg font-bold text-[22px] text-[#1A1C1F]">
+              Change Status
+            </h2>
 
-           <div className="mt-8 flex flex-wrap gap-10">
+            <div className="mt-8 flex flex-wrap gap-10">
               {statuses.map(({ label, value, icon: Icon }) => (
                 <button
                   key={label}
@@ -149,7 +162,11 @@ export default function OrderStatus({ order }: OrderStatusProps) {
             </div>
 
             {(error || success) && (
-              <p className={`mt-6 text-sm font-bold ${error ? "text-red-700" : "text-green-700"}`}>
+              <p
+                className={`mt-6 text-sm font-bold ${
+                  error ? "text-red-700" : "text-green-700"
+                }`}
+              >
                 {error || success}
               </p>
             )}
@@ -183,7 +200,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
             <button
               onClick={handleUpdate}
               disabled={saving}
-              className="h-[58px] w-[240px] rounded-[14px] bg-[#BC0000] font-bold text-l text-white shadow hover:bg-[#9f0000]"
+              className="h-[58px] w-[240px] rounded-[14px] bg-[#BC0000] font-bold text-l text-white shadow hover:bg-[#9f0000] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? "Updating..." : "Update Order Status"}
             </button>
@@ -191,8 +208,8 @@ export default function OrderStatus({ order }: OrderStatusProps) {
         </section>
 
         <aside className="space-y-8">
-        <div className="w-[450px]  rounded-[22px] border border-[#E1E5EE] bg-white px-8 py-9">    
-                <h3 className="mb-8 text-m font-extrabold tracking-[4px] text-[#002B73]">
+          <div className="w-[450px] rounded-[22px] border border-[#E1E5EE] bg-white px-8 py-9">
+            <h3 className="mb-8 text-m font-extrabold tracking-[4px] text-[#002B73]">
               • ORDER DETAILS
             </h3>
 
@@ -202,7 +219,10 @@ export default function OrderStatus({ order }: OrderStatusProps) {
               subValue={`ID: ${currentOrder.customerId || "#CUST-9921"}`}
             />
 
-            <Detail label="Email Address" value={currentOrder.email || "eleanor.h@example.com"} />
+            <Detail
+              label="Email Address"
+              value={currentOrder.email || "eleanor.h@example.com"}
+            />
 
             <Detail label="Ordered On" value="Oct 24, 2023 · 14:32" />
 
@@ -246,67 +266,57 @@ export default function OrderStatus({ order }: OrderStatusProps) {
             </h3>
 
             <div className="relative mt-8 rounded-[22px] border border-[#EEF1F5] bg-white p-6 shadow-sm">
-  
-                <div className="absolute left-0 top-0 h-full w-2 rounded-l-[22px] bg-[#BC0000]" />
-                <div className="flex items-start gap-5 pl-4">
-                  <div className="h-30 w-30 overflow-hidden rounded-[20px] bg-slate-100">
-                    <img
-                      src="/product-2.png"
-                      alt="frame"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+              <div className="absolute left-0 top-0 h-full w-2 rounded-l-[22px] bg-[#BC0000]" />
+              <div className="flex items-start gap-5 pl-4">
+                <div className="h-30 w-30 overflow-hidden rounded-[20px] bg-slate-100">
+                  <img
+                    src="/product-2.png"
+                    alt="frame"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
 
-                  {/* RIGHT SIDE */}
-                  <div className="flex flex-1 flex-col">
+                <div className="flex flex-1 flex-col">
+                  <h4 className="text-[22px] font-extrabold leading-8 text-[#1A1C1F]">
+                    Modern Oak
+                    <br />
+                    Frame
+                  </h4>
 
-                    {/* TITLE */}
-                    <h4 className="text-[22px] font-extrabold leading-8 text-[#1A1C1F]">
-                      Modern Oak
+                  <p className="mt-3 text-[16px] leading-8 text-[#434652]">
+                    Size: 11&quot; x 14&quot;
+                    <br />
+                    Finish: Natural
+                    <br />
+                    Matte
+                  </p>
+
+                  <div className="mt-5 flex items-center justify-between">
+                    <div className="rounded-[14px] border border-[#DDE2EC] bg-[#F7F7FA] px-4 py-2 text-[18px] font-extrabold text-[#002B73]">
+                      Qty:
                       <br />
-                      Frame
-                    </h4>
+                      {currentOrder.qty ?? 0}
+                    </div>
 
-                    {/* DETAILS */}
-                    <p className="mt-3 text-[16px] leading-8 text-[#434652]">
-                      Size: 11&quot; x 14&quot;
-                      <br />
-                      Finish: Natural
-                      <br />
-                      Matte
-                    </p>
+                    <div className="text-right">
+                      <p className="text-[22px] font-extrabold text-[#1A1C1F]">
+                        $
+                        {currentOrder.totalValue
+                          ? (
+                              currentOrder.totalValue /
+                              Math.max(currentOrder.qty ?? 1, 1)
+                            ).toFixed(2)
+                          : "0.00"}
+                      </p>
 
-                    {/* BOTTOM */}
-                    <div className="mt-5 flex items-center justify-between">
-
-                      {/* QTY */}
-                      <div className="rounded-[14px] border border-[#DDE2EC] bg-[#F7F7FA] px-4 py-2 text-[18px] font-extrabold text-[#002B73]">
-                        Qty:
-                        <br />
-                        {currentOrder.qty ?? 0}
-                      </div>
-
-                      {/* PRICE */}
-                      <div className="text-right">
-                        <p className="text-[22px] font-extrabold text-[#1A1C1F]">
-                          $
-                          {currentOrder.totalValue
-                            ? (
-                                currentOrder.totalValue /
-                                Math.max(currentOrder.qty, 1)
-                              ).toFixed(2)
-                            : "0.00"}
-                        </p>
-
-                        <p className="text-[18px] font-extrabold text-[#1A1C1F]">
-                          ea
-                        </p>
-                      </div>
-
+                      <p className="text-[18px] font-extrabold text-[#1A1C1F]">
+                        ea
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
             <button className="mt-6 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50">
               View Full Order History
