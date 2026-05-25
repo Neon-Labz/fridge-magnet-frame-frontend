@@ -77,7 +77,7 @@ export default function Navbar() {
         </nav>
 
         {/* RIGHT SIDE - CART + LOGIN */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-6">
 
           {/* CART */}
           <button

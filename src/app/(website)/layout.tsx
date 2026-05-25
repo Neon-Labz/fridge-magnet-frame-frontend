@@ -5,7 +5,7 @@ import WebsiteLayoutShell from "@/components/website/WebsiteLayoutShell";
 export default function WebsiteLayout({ children }: { children: ReactNode }) {
   return (
     <WebsiteLayoutShell>
-      <main className="pt-[75px]">{children}</main>
+      <main>{children}</main>
     </WebsiteLayoutShell>
   );
 }
