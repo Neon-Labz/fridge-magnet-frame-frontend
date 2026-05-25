@@ -1,39 +1,42 @@
-'use client';
+"use client";
 
 export default function VideoSection() {
   return (
-    <section className="w-full bg-[#f9f9fe] py-16 lg:py-[100px]">
-      <div className="mx-auto max-w-[1800px] px-4 md:px-24">
-        <div className="flex flex-col items-start justify-between gap-10 lg:flex-row">
-          
-          {/* Left Content */}
-          <div className="w-full pt-2 lg:w-1/2">
-            <h2 className="font-manrope text-[30px] font-bold leading-[44px] tracking-[-0.35px] text-[#002B73] lg:text-[40px] lg:leading-[50px]">
+    <section className="w-full bg-[#f9f9fe] py-16 lg:py-[60px]">
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-[100px]">
+
+        <div className="flex flex-col lg:flex-row md:flex-row items-stretch gap-10 lg:gap-[60px]">
+
+          {/* LEFT TEXT BOX */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center text-center lg:text-left">
+
+            <h2 className="font-manrope text-[30px] sm:text-[34px] lg:text-[40px] font-bold leading-[44px] lg:leading-[50px] text-[#002B73]">
               What is a Magnet Frame?
             </h2>
 
-            <div className="mt-[16px] h-[3px] w-[90px] bg-[#BC0000]" />
+            <div className="mt-[14px] mx-auto lg:mx-0 h-[3px] w-[90px] bg-[#BC0000]" />
 
-            <p className="mt-6 max-w-[550px] font-inter text-[18px] md:text-[23px] font-normal leading-relaxed tracking-[0.5px] text-[#4B5563]">
-              Your memories - printed,
-              
-              magnetised & displayed on
-              premium tiles that stick straight
-              to your fridge.
+            <p className="mt-[24px] sm:mt-[30px] lg:mt-[40px] font-inter text-[16px] sm:text-[18px] lg:text-[23px] leading-[28px] sm:leading-[32px] lg:leading-[37px] text-[#4B5563] max-w-[600px] mx-auto lg:mx-0">
+              Your memories - printed, magnetised & displayed on premium tiles
+              that stick straight to your fridge. Turn every moment into a
+              lasting fridge-worthy memory.
             </p>
+
           </div>
 
-          {/* Right Video Content */}
-          <div className="flex w-full justify-end lg:w-1/2">
-            <div className="rounded-[24px] bg-[#f6f6fa] p-6 md:p-[40px]">
-              <div className="relative aspect-[3/2] w-full md:w-[500px] max-w-full overflow-hidden rounded-[16px]">
-                <img
-                  src="/homepage-video.gif"
-                  alt="Magnet Frame Demo"
-                  className="h-full w-full object-cover"
-                />
-              </div>
+          {/* RIGHT VIDEO BOX */}
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+
+            <div className="w-full max-w-[500px] aspect-[3/2] flex items-center justify-center">
+
+              <img
+                src="/homepage-video.gif"
+                alt="Magnet Frame Demo"
+                className="h-full w-full object-cover rounded-[16px]"
+              />
+
             </div>
+
           </div>
 
         </div>

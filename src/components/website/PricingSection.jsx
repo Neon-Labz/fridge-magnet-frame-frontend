@@ -15,15 +15,15 @@ function PriceCard({ variant = 'default', label, title, price, description }) {
   return (
     <div className={`${styles.priceCard} ${styles[variant]}`}>
       {variant === 'popular' && <div className={styles.ribbon}>POPULAR</div>}
-      
+
       <div className={styles.cardLabel}>{label}</div>
       <h3 className={styles.cardTitle}>{title}</h3>
-      
+
       <div className={styles.priceSection}>
         <span className={styles.pricePrefix}>from</span>
         <span className={styles.priceAmount}>{price}</span>
       </div>
-      
+
       <p className={styles.cardDescription}>{description}</p>
     </div>
   );
