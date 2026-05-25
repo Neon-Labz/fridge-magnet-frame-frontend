@@ -9,6 +9,8 @@ export type OrderItem = {
   price: number;
   quantity: number;
   image?: string;
+  frameType?: string;
+  colorOption?: string;
 };
 
 interface OrderDetailsProps {

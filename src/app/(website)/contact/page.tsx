@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="bg-white text-slate-900">
       <Header />
 
       <div className={styles.contactWrapper}>
