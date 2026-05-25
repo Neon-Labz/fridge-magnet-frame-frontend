@@ -8,7 +8,7 @@ import type { ProductFormData } from '@/types/product';
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: ProductFormData) => void;
+  onSubmit?: (data: ProductFormData) => void | Promise<void>;
 }
 
 const CATEGORIES = ['Wooden Frames', 'Metal Frames', 'Shadow Boxes', 'Gallery Frames', 'Heritage Frames'];
@@ -27,6 +27,7 @@ const EMPTY: ProductFormData = {
 
 export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalProps) {
   const [form, setForm] = useState<ProductFormData>(EMPTY);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -45,11 +46,18 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    onSubmit?.(form);
-    setForm(EMPTY);
-    onClose();
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit?.(form);
+      setForm(EMPTY);
+    } catch {
+      // Parent submit handler owns the user-facing error message.
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -194,9 +202,10 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
             Cancel
           </button>
           <button type="submit" onClick={handleSubmit}
+            disabled={isSubmitting}
             className="flex items-center justify-center font-bold text-base text-white transition hover:opacity-90"
             style={{ height: 48, padding: '0 32px', background: '#BC0000', borderRadius: 12, boxShadow: '0px 10px 15px -3px rgba(188,0,0,0.25)' }}>
-            Submit Product
+            {isSubmitting ? 'Submitting...' : 'Submit Product'}
           </button>
         </div>
       </div>
