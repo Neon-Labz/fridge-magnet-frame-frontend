@@ -14,10 +14,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
     const token = localStorage.getItem('adminToken')
 
-    if (!token) {
-      router.replace('/dashboard/login')
-      return
-    }
+    // if (!token) {
+    //   router.replace('/dashboard/login')
+    //   return
+    // }
 
     const hasCookie = document.cookie
       .split('; ')
