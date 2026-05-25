@@ -4,18 +4,22 @@ import VideoSection from "@/components/website/VideoSection";
 import ProductSection from "@/components/website/ProductSection";
 import PricingSection from "@/components/website/PricingSection";
 import CounterSection from "@/components/website/CounterSection";
-import Footer from "@/components/website/Footer";
+import Testimonial from "@/components/website/Testimonial";
+import FooterH from "@/components/website/FooterH";
+import HowItWorksSection from "@/components/website/HowItWorksSection";
 
 export default function Home() {
   return (
-    <main>
+    <main className="overflow-x-hidden">
       <Header />
       <Hero />
       <VideoSection />
-      <ProductSection />
+      <ProductSection products={[]} />
+      <HowItWorksSection />
       <PricingSection />
       <CounterSection />
-      <Footer />
+      <Testimonial />
+      <FooterH />
     </main>
   );
 }

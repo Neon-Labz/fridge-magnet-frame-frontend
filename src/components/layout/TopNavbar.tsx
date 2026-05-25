@@ -90,6 +90,26 @@ const TopNavbar = () => {
           font-size: 12px;
           color: var(--text-light);
         }
+        
+        /* Mobile tweaks */
+        @media (max-width: 640px) {
+          .navbar {
+            padding: 12px 16px;
+          }
+
+          .avatar {
+            width: 32px;
+            height: 32px;
+          }
+
+          .userDetails {
+            display: none;
+          }
+
+          .actions {
+            gap: 12px;
+          }
+        }
       `}</style>
     </div>
   );
