@@ -5,12 +5,20 @@ describe('FMS-82 - Counter Section', () => {
     visitHome();
   });
 
+  const getCounterSection = () =>
+    cy.contains('LIMITED RELEASE').closest('section');
+
   it('should display counter section', () => {
-    cy.get('section[class*="flex"][class*="justify-center"]').should('be.visible');
+    getCounterSection().should('be.visible');
   });
 
   it('should display counter container with gradient background', () => {
-    cy.get('div[class*="rounded-\\[24px\\]"][class*="flex"][class*="flex-row"]').should('be.visible');
+    cy.contains('LIMITED RELEASE')
+      .parents('div[class*="rounded-\\[24px\\]"]')
+      .first()
+      .should('be.visible')
+      .and('have.attr', 'style')
+      .and('include', 'linear-gradient');
   });
 
   it('should display Limited Release badge', () => {
@@ -18,7 +26,10 @@ describe('FMS-82 - Counter Section', () => {
   });
 
   it('should display offer heading', () => {
-    cy.get('h2').contains('Limited Time Gallery Opening Offer').should('be.visible');
+    getCounterSection().within(() => {
+      cy.get('h2').should('contain.text', 'Limited Time Gallery');
+      cy.get('h2').should('contain.text', 'Opening Offer');
+    });
   });
 
   it('should display offer description', () => {
@@ -33,8 +44,10 @@ describe('FMS-82 - Counter Section', () => {
   });
 
   it('should display timer numbers', () => {
-    // Verify timer displays numeric values
-    cy.get('span[class*="text-4xl"][class*="md:text-5xl"]').should('have.length.at.least', 3);
+    getCounterSection().within(() => {
+      cy.contains('div', /^\d{2}$/).should('be.visible');
+      cy.get('div[class*="text-\\[38px\\]"]').should('have.length.at.least', 3);
+    });
   });
 
   it('should display Claim Offer button', () => {
@@ -43,11 +56,11 @@ describe('FMS-82 - Counter Section', () => {
 
   it('should validate counter remains visible on scroll', () => {
     cy.scrollTo('center');
-    cy.get('section[class*="flex"][class*="justify-center"]').should('be.visible');
+    getCounterSection().should('be.visible');
   });
 
   it('should validate responsive layout', () => {
     checkResponsive();
-    cy.get('div[class*="rounded-\\[24px\\]"][class*="flex"][class*="flex-row"]').should('be.visible');
+    getCounterSection().should('be.visible');
   });
 });

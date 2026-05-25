@@ -6,7 +6,11 @@ describe('FMS-80 - Home Hero Section', () => {
   });
 
   it('should display hero section correctly', () => {
-    cy.get('section[class*="relative"][class*="mt-[90px]"]').should('be.visible');
+    cy.get('h1')
+      .first()
+      .closest('section')
+      .should('have.class', 'relative')
+      .and('be.visible');
     cy.get('h1').first().should('contain.text', 'Your Memories');
     cy.get('h1').first().should('contain.text', 'Magnified');
     cy.get('h1').first().should('contain.text', 'Precision');
@@ -26,6 +30,6 @@ describe('FMS-80 - Home Hero Section', () => {
 
   it('should validate responsive layout', () => {
     checkResponsive();
-    cy.get('section[class*="relative"][class*="mt-[90px]"]').should('be.visible');
+    cy.get('h1').first().closest('section').should('be.visible');
   });
 });

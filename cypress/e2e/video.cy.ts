@@ -5,8 +5,11 @@ describe('FMS-83 - Play Video Section', () => {
     visitHome();
   });
 
+  const getVideoSection = () =>
+    cy.contains('h2', 'What is a Magnet Frame?').closest('section');
+
   it('should display video section', () => {
-    cy.get('section[class*="bg-white"][class*="py-"]').should('be.visible');
+    getVideoSection().should('be.visible');
   });
 
   it('should display section heading', () => {
@@ -32,11 +35,13 @@ describe('FMS-83 - Play Video Section', () => {
   });
 
   it('should display video in container', () => {
-    cy.get('div[class*="rounded-\\[24px\\]"][class*="bg-\\[#F9F9FE\\]"]').should('be.visible');
+    cy.get('img[alt="Magnet Frame Demo"]')
+      .closest('div[class*="aspect-\\[3\\/2\\]"]')
+      .should('be.visible');
   });
 
   it('should validate responsive layout', () => {
     checkResponsive();
-    cy.get('section[class*="bg-white"][class*="py-"]').should('be.visible');
+    getVideoSection().should('be.visible');
   });
 });

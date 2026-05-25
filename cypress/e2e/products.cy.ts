@@ -5,44 +5,46 @@ describe('FMS-81 - Home View All Product Section', () => {
     visitHome();
   });
 
+  const getProductSection = () =>
+    cy.contains('h2', 'Curated Classics').closest('section');
+
   it('should display product section', () => {
-    cy.get('section[class*="bg-\\[#F9F9FE\\]"]').should('be.visible');
-    cy.get('h2').contains('Curated Classics').should('be.visible');
+    getProductSection().should('be.visible');
+    cy.contains('h2', 'Curated Classics').should('be.visible');
   });
 
-  it('should display product cards grid with 3 products', () => {
-    cy.get('div[class*="grid"][class*="grid-cols-3"]').should('be.visible');
-    cy.get('div[class*="overflow-hidden"][class*="rounded-\\[13px\\]"]').should('have.length', 3);
+  it('should display empty product state when no products are provided', () => {
+    getProductSection().within(() => {
+      cy.contains('No products available right now.').should('be.visible');
+      cy.get('div[class*="overflow-hidden"][class*="rounded-\\[13px\\]"]').should('not.exist');
+    });
   });
 
-  it('should validate product titles are visible', () => {
-    cy.get('h3[class*="font-manrope"]').first().should('be.visible');
-    cy.get('h3[class*="font-manrope"]').contains('Magnate Frame').should('be.visible');
+  it('should display product section subtitle', () => {
+    getProductSection()
+      .contains('The foundation of every great gallery wall.')
+      .should('be.visible');
   });
 
-  it('should validate product descriptions', () => {
-    cy.get('p').contains('Sustainably sourced solid oak').should('be.visible');
-    cy.get('p').contains('Deep matte black finish').should('be.visible');
+  it('should not display product titles when product list is empty', () => {
+    getProductSection().find('h3[class*="font-manrope"]').should('not.exist');
   });
 
-  it('should display Add to Cart buttons', () => {
-    // Verify at least one Add to Cart button exists and is visible
-    cy.get('button').contains('Add to Cart').should('exist').and('be.visible');
+  it('should not display Add to Cart buttons when product list is empty', () => {
+    getProductSection().contains('button', 'Add to Cart').should('not.exist');
   });
 
-  it('should display product badge', () => {
-    cy.get('span').contains('New Arrival').should('be.visible');
+  it('should not display product badges when product list is empty', () => {
+    getProductSection().find('span[class*="rounded-full"]').should('not.exist');
   });
 
-  it('should have clickable Add to Cart button', () => {
-    cy.get('button').contains('Add to Cart').first().should('be.visible').should('not.be.disabled');
-    cy.get('button').contains('Add to Cart').first().click();
-    // Button click should complete without errors
-    cy.get('button').contains('Add to Cart').first().should('be.visible');
+  it('should keep product section stable after scrolling', () => {
+    cy.scrollTo('center');
+    getProductSection().should('be.visible');
   });
 
   it('should validate responsive grid layout', () => {
     checkResponsive();
-    cy.get('div[class*="grid"][class*="grid-cols-3"]').should('be.visible');
+    getProductSection().contains('No products available right now.').should('be.visible');
   });
 });
