@@ -91,19 +91,26 @@ export default function LoginForm({
         const isAdmin = role === "admin";
 
         if (token) {
-          localStorage.setItem(tokenKey, token);
-          document.cookie = `${tokenKey}=${encodeURIComponent(
-            token
-          )}; path=/; samesite=lax`;
+  localStorage.setItem(tokenKey, token);
 
-          if (isAdmin) {
-            localStorage.setItem("adminToken", token);
-            document.cookie = `adminToken=${encodeURIComponent(
-              token
-            )}; path=/; samesite=lax`;
-          }
+  localStorage.setItem(
+    "user",
+    JSON.stringify(payload?.user)
+  );
 
-          dispatchWebsiteAuthChanged();
+  document.cookie = `${tokenKey}=${encodeURIComponent(
+    token
+  )}; path=/; samesite=lax`;
+
+  if (isAdmin) {
+    localStorage.setItem("adminToken", token);
+
+    document.cookie = `adminToken=${encodeURIComponent(
+      token
+    )}; path=/; samesite=lax`;
+  }
+
+  dispatchWebsiteAuthChanged();
 
           const finalRedirect =
             redirectTo ||

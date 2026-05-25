@@ -107,8 +107,7 @@ export default function OrderConfirmationScreen() {
         </div>
 
         {/* Main Content */}
-        <div className="grid gap-8 grid-cols-1 lg:grid-cols-[7fr_3fr]">
-
+<div className="grid gap-6 px-6 sm:px-10 lg:px-[75px] lg:grid-cols-[1.5fr_1fr]">
           {/* Left */}
           <div className="space-y-6">
 

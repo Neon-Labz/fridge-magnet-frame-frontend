@@ -17,9 +17,8 @@ export default function PriceMagnetFrameSection() {
   ];
 
   return (
-    <section className="bg-white py-8 md:py-10">
-      <div className="mx-auto max-w-[1285px] px-4 sm:px-6 lg:px-8">
-        {/* HEADER */}
+<section className="bg-white pt-20 pb-8 md:pt-24 md:pb-10">
+      <div className="mx-auto max-w-[1328px] px-3 py-6 sm:px-6 lg:px-7">
         <div className="mb-10 flex flex-col items-center text-center">
           <h1 className="font-manrope text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-tight text-[#0F172A]">
             MAGNIFY CREATIONS

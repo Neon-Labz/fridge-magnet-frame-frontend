@@ -45,8 +45,8 @@ export default function OrderDetails({
   const total = subtotal + shipping;
 
   return (
-    <Card className="overflow-hidden rounded-[20px] border border-[#C3C6D4] bg-white shadow-sm">
-      <CardContent className="space-y-6 p-8">
+<Card className="overflow-hidden rounded-[20px] border border-[#C3C6D4] bg-white shadow-sm">
+          <CardContent className="space-y-6 p-8">
         <div className="flex flex-col gap-4 border-b border-[#E2E2E7] pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[24px] font-manrope font-semibold text-[#002B73]">
