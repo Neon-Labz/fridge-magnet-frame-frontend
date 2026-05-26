@@ -107,7 +107,7 @@ export default function ShopViewProductDetailsSection({
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-25 sm:px-4 lg:px-8">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
 
         {/* IMAGE */}
@@ -205,10 +205,10 @@ export default function ShopViewProductDetailsSection({
               type="button"
               onClick={handleBuyNow}
               disabled={!isAuthenticated}
-              className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
+              className={`flex-1 rounded-[4px] px-6 py-3  font-medium text-white ${
                 isAuthenticated
                   ? "bg-[#E62A24]"
-                  : "cursor-not-allowed bg-[#E62A24]/60"
+                  : " bg-[#E62A24]/60"
               }`}
             >
               Buy Now

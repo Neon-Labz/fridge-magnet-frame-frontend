@@ -20,7 +20,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[#002B73]/20" />
 
       {/* CONTENT WRAPPER */}
-      <div className="relative z-10 flex items-start md:items-stretch px-4 sm:px-6 lg:px-[100px] py-10 md:py-15">
+      <div className="relative z-10 flex items-start md:items-stretch px-4 sm:px-6 lg:px-[120px] py-10 md:py-15">
 
         {/* GLASS BOX */}
         <div className="

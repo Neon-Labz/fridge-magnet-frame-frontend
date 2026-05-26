@@ -26,8 +26,8 @@ export default function ProductTable({ products, onDelete, onView }: ProductTabl
           </tr>
         </thead>
         <tbody>
-          {products.map(product => (
-            <tr key={product.id} className="transition hover:bg-slate-50/50" style={{ borderTop: '1px solid #F8FAFC' }}>
+          {products.map((product,index) => (
+            <tr key={`${product.id}-${index}`} className="transition hover:bg-slate-50/50" style={{ borderTop: '1px solid #F8FAFC' }}>
               <td className="pl-8 font-mono text-sm" style={{ height: 115, color: '#94A3B8', whiteSpace: 'nowrap' }}>
                 {product.id}
               </td>

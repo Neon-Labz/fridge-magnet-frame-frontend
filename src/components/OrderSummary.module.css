@@ -1,32 +1,33 @@
 .orderSummary {
   width: 100%;
-  max-width: 360px;
+  max-width: 430px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 22px;
   height: fit-content;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 }
 
 .heading {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 34px;
+  font-weight: 700;
   color: #002b73;
 }
 
 .rows {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 17px;
   color: #64748b;
 }
 
@@ -38,35 +39,35 @@
 .totalRow {
   display: flex;
   justify-content: space-between;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 22px;
 }
 
 .total {
   color: #bc0000;
 }
 
-.button {
+.checkoutBtn {
   width: 100%;
-  padding: 10px;
+  padding: 14px;
   background: #E61D11;
   color: white;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
   cursor: pointer;
 }
 
-.button:hover {
-  background: #001f52;
+.checkoutBtn:hover {
+  background: #f3643d;
 }
 
 .secure {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 8px;
+  font-size: 13px;
   color: #64748b;
   text-align: center;
   width: 100%;

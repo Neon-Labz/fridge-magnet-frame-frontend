@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { getStorage, setStorage, removeStorage } from '../utils/localStorage';
+import { getStorage, setStorage, removeStorage } from "../utils/localStorage";
 
-const CART_KEY = 'cart';
-const ORDER_KEY = 'latest-order';
-const SAVED_ORDERS_KEY = 'saved-orders';
+const CART_KEY = "cart";
+const ORDER_KEY = "latest-order";
+const SAVED_ORDERS_KEY = "saved-orders";
 
 export interface Product {
   id: string | number;
@@ -22,12 +22,25 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface CustomerDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  notes?: string;
+}
+
 export interface OrderRecord {
   items: CartItem[];
   subtotal: number;
   shipping: number;
   orderNumber: string;
   createdAt: string;
+  customerDetails?: CustomerDetails;
 }
 
 const normalizeCartItem = (product: Product): CartItem => ({
@@ -40,7 +53,7 @@ const normalizeCartItem = (product: Product): CartItem => ({
 
 const saveCartItems = (items: CartItem[]): void => {
   setStorage(CART_KEY, items);
-  window.dispatchEvent(new Event('cart-updated'));
+  window.dispatchEvent(new Event("cart-updated"));
 };
 
 export const getCartItems = (): CartItem[] => {
@@ -75,7 +88,10 @@ export const removeFromCart = (productId: string | number): CartItem[] => {
   return cartItems;
 };
 
-export const updateQuantity = (productId: string | number, quantity: number): CartItem[] => {
+export const updateQuantity = (
+  productId: string | number,
+  quantity: number
+): CartItem[] => {
   const parsedQty = Number(quantity);
 
   if (parsedQty <= 0) {
@@ -92,45 +108,54 @@ export const updateQuantity = (productId: string | number, quantity: number): Ca
 
 export const clearCart = (): CartItem[] => {
   removeStorage(CART_KEY);
-  window.dispatchEvent(new Event('cart-updated'));
+  window.dispatchEvent(new Event("cart-updated"));
   return [];
 };
 
 export const saveOrder = (order: OrderRecord): OrderRecord => {
-  // Save the latest order
   setStorage(ORDER_KEY, order);
-  
-  // Also save to orders collection
-  const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const totalQuantity = order.items.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
   const savedOrders = getStorage(SAVED_ORDERS_KEY);
   const ordersList = Array.isArray(savedOrders) ? savedOrders : [];
-  
-  // Generate unique ID using timestamp (starts at 1000+) to avoid conflicts with mock data
+
   const newOrderId = String(1000 + ordersList.length);
-  
+
+  const customer = order.customerDetails;
+
   const newOrder = {
     id: newOrderId,
     orderId: order.orderNumber,
-    customerName: `${(order as any).customerDetails?.firstName || ''} ${(order as any).customerDetails?.lastName || ''}`.trim(),
-    customerInitials: `${((order as any).customerDetails?.firstName || '')[0]}${((order as any).customerDetails?.lastName || '')[0]}`.toUpperCase(),
+    customerName: customer
+      ? `${customer.firstName} ${customer.lastName}`.trim()
+      : "",
+    customerInitials: customer
+      ? `${customer.firstName?.[0] || ""}${customer.lastName?.[0] || ""}`.toUpperCase()
+      : "",
     customerId: `CUST-${Date.now()}`,
     qty: totalQuantity,
-    status: 'pending' as const,
-    email: (order as any).customerDetails?.email,
+    status: "pending" as const,
+    email: customer?.email || "",
     totalValue: order.subtotal + order.shipping,
-    shippingAddress: `${(order as any).customerDetails?.street || ''}, ${(order as any).customerDetails?.city || ''}, ${(order as any).customerDetails?.state || ''} ${(order as any).customerDetails?.zip || ''}`,
-    adminNote: (order as any).customerDetails?.notes || '',
+    shippingAddress: customer
+      ? `${customer.street}, ${customer.city}, ${customer.state} ${customer.zip}`.trim()
+      : "",
+    adminNote: customer?.notes || "",
   };
-  
+
   ordersList.push(newOrder);
   setStorage(SAVED_ORDERS_KEY, ordersList);
-  
+
   return order;
 };
 
 export const getSavedOrder = (): OrderRecord | null => {
   const order = getStorage(ORDER_KEY);
-  return order && typeof order === 'object' ? (order as OrderRecord) : null;
+  return order && typeof order === "object" ? (order as OrderRecord) : null;
 };
 
 export const clearSavedOrder = (): boolean => removeStorage(ORDER_KEY);

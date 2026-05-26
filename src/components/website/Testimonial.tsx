@@ -4,7 +4,7 @@ export default function CustomerSection() {
   return (
     <section className="w-full bg-[#F9F9FE] py-[60px] md:py-[80px] lg:py-[30px] lg:pb-[60px]">
 
-      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[100px]">
+      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[120px]">
 
         {/* TOP */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
