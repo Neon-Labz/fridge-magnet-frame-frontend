@@ -1,0 +1,13 @@
+{
+  "_id": "1",
+  "id": "1",
+  "orderId": "MAG-12345",
+  "customerName": "Eleanor Herbert",
+  "customerId": "CUST-9921",
+  "qty": 2,
+  "status": "processing",
+  "email": "eleanor.h@example.com",
+  "totalValue": 284.5,
+  "shippingAddress": "4820 Memory Lane\nSuite 102\nSan Francisco, CA\n94105",
+  "adminNote": ""
+}
