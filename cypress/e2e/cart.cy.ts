@@ -32,17 +32,17 @@ describe('Cart Page', () => {
   it('should increase quantity', () => {
     cy.get('button').contains('+').first().click();
 
-    cy.get('input[type="text"]')
-      .first()
-      .should('not.have.value', '0');
+    cy.get('input[type="number"]')
+    .first()
+    .should('have.value', '3');
   });
 
   it('should decrease quantity', () => {
     cy.get('button').contains('-').first().click();
 
-    cy.get('input[type="text"]')
-      .first()
-      .should('exist');
+    cy.get('input[type="number"]')
+    .first()
+    .should('have.value', '4');
   });
 
   it('should update subtotal when quantity changes', () => {
