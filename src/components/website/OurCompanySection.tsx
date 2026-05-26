@@ -79,8 +79,10 @@ function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
 
 export default function OurCompanySection() {
   return (
-    <div className="w-full md:pl-4 lg:pl-6" aria-labelledby="our-company-title">
-      <header className="flex flex-col gap-2">
+<div
+  className="w-full px-0 sm:px-2 md:pl-4 lg:pl-6"
+  aria-labelledby="our-company-title"
+>      <header className="flex flex-col gap-2">
         <h1
           id="our-company-title"
           className="font-manrope text-[30px] font-bold leading-[1.2] text-[#002B73]"

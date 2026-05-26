@@ -65,7 +65,8 @@ export default function AuthModal() {
         {/* Close */}
         <button
           onClick={handleClose}
-          className="absolute top-[21px] right-[-125px] w-80 h-8 flex items-center justify-center"
+          className="absolute top-[21px] right-[25px] w-8 h-8 flex items-center justify-center"
+          type="button"
         >
           <X className="w-8 h-8 text-black" strokeWidth={2} />
         </button>
