@@ -49,8 +49,7 @@ function CartItem({
   };
 
   return (
-    <article className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 bg-white border border-[#E2E8F0] rounded-xl w-full max-w-[700px]">
-      {/* DELETE */}
+<article className="relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-9 bg-white border border-[#E2E8F0] rounded-xl w-full max-w-[1220px]">      {/* DELETE */}
       <button
         type="button"
         onClick={() =>
@@ -101,7 +100,7 @@ function CartItem({
                   item.id,
                   item.frameType,
                   item.colorOption,
-                  Math.max(1, item.quantity - 1)
+                  Math.max(4, item.quantity - 1)
                 )
               }
               className="px-3 py-1 hover:bg-gray-100"
@@ -113,7 +112,7 @@ function CartItem({
               value={item.quantity}
               onChange={(e) => handleInput(e.target.value)}
               className="w-10 text-center outline-none text-sm"
-              type="text"
+              type="number"
               inputMode="numeric"
             />
 
@@ -176,7 +175,7 @@ export default function CartPage() {
 
   return (
     <div className="bg-[#F9F9FE]">
-      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-10 lg:py-14">
+      <main className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-[120px] py-10 lg:py-25">
         {/* HEADER */}
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">

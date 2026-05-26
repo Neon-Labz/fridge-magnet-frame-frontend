@@ -7,6 +7,44 @@ import { Customer, CustomerStats, CustomerApiResponse } from '@/types/customer';
 // This avoids port mismatches during `next dev` where Next may switch ports.
 const API_BASE = '/api/v1';
 
+type RawCustomer = {
+  _id?: string;
+  id?: string;
+  customerId?: string;
+  customerName?: string;
+  name?: string;
+  emailAddress?: string;
+  email?: string;
+  phoneNumber?: string;
+  phone?: string;
+  customerAddress?: string;
+  address?: string;
+  createdAt?: string;
+};
+
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
+const mapCustomer = (customer: RawCustomer): Customer => {
+  const name = customer.customerName || customer.name || 'Website Customer';
+  const id = customer.customerId || customer.id || customer._id || '';
+
+  return {
+    ...customer,
+    id: String(id).replace(/^#/, ''),
+    name,
+    initials: getInitials(name),
+    email: customer.emailAddress || customer.email || '',
+    phone: customer.phoneNumber || customer.phone || 'Not provided',
+    address: customer.customerAddress || customer.address || 'Not provided',
+  };
+};
+
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stats, setStats] = useState<CustomerStats>({
@@ -33,20 +71,20 @@ export const useCustomers = () => {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const json: CustomerApiResponse = await res.json();
 
-      // Derive initials if not provided by backend
-      const enriched = (json.data || []).map((c) => ({
-        ...c,
-        id: String(c.id),
-        initials: c.initials ?? (typeof c.name === 'string' ? c.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2) : '?'),
-      }));
+      const enriched = (json.data || []).map(mapCustomer);
+      const today = new Date().toDateString();
+      const newToday = (json.data || []).filter((customer) => {
+        if (!customer.createdAt) return false;
+        return new Date(customer.createdAt).toDateString() === today;
+      }).length;
 
       setCustomers(enriched);
       setTotal(json.total);
       setTotalPages(json.totalPages);
       setStats({
-        totalActiveCustomers: 0,
-        satisfactionRate: 0,
-        newToday: 0,
+        totalActiveCustomers: json.total,
+        satisfactionRate: json.total > 0 ? 100 : 0,
+        newToday,
       });
     } catch {
       setCustomers([]);

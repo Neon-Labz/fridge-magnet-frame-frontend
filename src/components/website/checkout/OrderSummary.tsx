@@ -3,6 +3,7 @@
 import { CreditCard, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FramePreview from "../FramePreview";
+import Image from "next/image";
 
 export type SummaryItem = {
   id: string | number;
@@ -59,10 +60,13 @@ export default function OrderSummary({
           items.map((item) => (
             <div key={item.id} className="flex gap-3 sm:gap-4">
               <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded border border-[#C3C6D4] bg-white overflow-hidden flex items-center justify-center">
-                <FramePreview
-                  variant={resolvePreview(item)}
-                  className="h-full w-full object-cover"
-                />
+              <Image
+                src={item.image || "/home-product-1.png"}
+                alt={item.name}
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+              />
               </div>
 
               <div className="flex-1 min-w-0">

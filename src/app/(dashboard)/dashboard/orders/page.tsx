@@ -11,6 +11,7 @@ import OrderPagination from '@/components/dashboard/orders/OrderPagination';
 import OrderStats from '@/components/dashboard/orders/OrderStats';
 import OrderTable from '@/components/dashboard/orders/OrderTable';
 import { fetchOrders } from '@/lib/orders';
+import { apiV1Url } from '@/lib/backendUrl';
 import type { Order } from '@/types/order';
 
 const PAGE_SIZE = 5;
@@ -86,7 +87,7 @@ export default function OrdersPage() {
     if (!deleteTarget) return;
 
     try {
-      const response = await fetch(`/api/v1/orders/${deleteTarget.id}`, {
+      const response = await fetch(apiV1Url(`/orders/${deleteTarget.id}`), {
         method: 'DELETE',
       });
 
@@ -121,9 +122,9 @@ export default function OrdersPage() {
         onConfirm={confirmDelete}
       />
 
-      <div className="ml-[100px] flex h-full w-[calc(100%-100px)] flex-col px-4 pt-6 pb-0 sm:px-8 sm:pt-8">
-        <OrderHeader />
-        <OrderStats />
+<div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
+          <OrderHeader />
+        <OrderStats orders={orders} />
 
         <div
           className="flex flex-1 flex-col overflow-hidden"

@@ -1,7 +1,7 @@
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_BACKEND_API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:3000/api/v1'
+  'http://localhost:5000/api/v1'
 ).replace(/\/$/, '');
 
 interface ApiResponse<T> {
@@ -93,11 +93,9 @@ class ApiClient {
   }
 
   async register(userData: RegisterData): Promise<ApiResponse<unknown>> {
-    const { email, password } = userData
-
     return this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(userData),
     })
   }
 

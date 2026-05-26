@@ -19,7 +19,7 @@ export default function Footer() {
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F9F9FE]">
 
       {/* MAIN FOOTER */}
-      <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1350px] px-5 py-6 sm:px-6 lg:px-7">
 
         {/* ✅ RESPONSIVE GRID (Mobile → Tablet → Desktop) */}
         <div className="grid grid-cols-2 gap-15 sm:grid-cols-4 xl:grid-cols-4">
