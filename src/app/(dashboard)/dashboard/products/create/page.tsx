@@ -4,6 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ProductFormData } from '@/types/product';
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
+import { apiV1Url } from '@/lib/backendUrl';
+
+const getProductStatus = (stock: number) => {
+  if (stock > 10) return 'In Stock';
+  if (stock > 0) return 'Low Stock';
+  return 'Out of Stock';
+};
 
 export default function CreateProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -13,12 +20,13 @@ export default function CreateProductPage() {
   try {
     const data = new FormData();
 
-    data.append("name", formData.name);
+    data.append("productName", formData.name);
     data.append("productId", formData.productId);
     data.append("category", formData.category);
     data.append("price", String(formData.price));
     data.append("stock", String(formData.stock));
     data.append("description", formData.description);
+    data.append("status", getProductStatus(formData.stock));
 
     // primary image
     if (formData.primaryImage) {
@@ -31,7 +39,7 @@ export default function CreateProductPage() {
     });
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+      apiV1Url('/api/products'),
       {
         method: "POST",
         body: data,
@@ -42,20 +50,18 @@ export default function CreateProductPage() {
       throw new Error("Failed to create product");
     }
 
-    alert("Product Added Successfully");
-
     setIsModalOpen(false);
-    router.push('/admin/products');
+    router.push('/dashboard/products');
 
   } catch (error) {
     console.error('Error creating product:', error);
-    alert("Error adding product");
+    return false;
   }
 };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    router.push('/admin/products');
+    router.push('/dashboard/products');
   };
 
   return (

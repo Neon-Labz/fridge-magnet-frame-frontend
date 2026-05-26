@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DeleteProductModal from '@/components/dashboard/products/DeleteProductModal';
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
 import ViewProductModal from '@/components/dashboard/products/ViewProductModal';
@@ -11,13 +11,9 @@ import ProductTable from '@/components/dashboard/products/ProductTable';
 import Pagination from '@/components/dashboard/shared/Pagination';
 import { useProducts } from '@/hooks/useProducts';
 import type { Product, ProductFormData } from '@/types/product';
+import { apiV1Url } from '@/lib/backendUrl';
 
 const PAGE_SIZE = 4;
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:5000'
-).replace(/\/$/, '');
 
 const getProductStatus = (stock: number) => {
   if (stock > 10) return 'In Stock';
@@ -40,6 +36,19 @@ export default function ProductsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewTarget, setViewTarget] = useState<Product | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [productMessage, setProductMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!productMessage) return;
+
+    const timer = window.setTimeout(() => {
+      setProductMessage(null);
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [productMessage]);
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [sortBy, setSortBy] = useState<SortBy>('default');
@@ -104,7 +113,7 @@ export default function ProductsPage() {
     });
 
     const res = await fetch(
-      `${API_BASE_URL}/api/v1/api/products`,
+      apiV1Url('/api/products'),
       {
         method: 'POST',
         body: data,
@@ -118,25 +127,69 @@ export default function ProductsPage() {
       throw new Error(getErrorMessage(result));
     }
 
-    alert('Product added successfully');
+    setProductMessage('Product added successfully');
 
     await refreshProducts();
     setAddOpen(false);
+    return true;
 
   } catch (error) {
-    console.error(error);
-    alert(error instanceof Error ? error.message : 'Something went wrong');
-    throw error;
+    setProductMessage(error instanceof Error ? error.message : 'Something went wrong');
+    return false;
   }
 };
 
-  const handleUpdateProduct = () => {
-    alert('Update API later connect pannalam');
+  const handleUpdateProduct = async (product: Product, newStatus: string) => {
+    try {
+      const res = await fetch(apiV1Url(`/api/products/${product.id}`), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const result = await res.text();
+
+      if (!res.ok) {
+        throw new Error(getErrorMessage(result));
+      }
+
+      setProductMessage('Product updated successfully');
+      await refreshProducts();
+      setViewTarget(null);
+      return true;
+    } catch (error) {
+      setProductMessage(error instanceof Error ? error.message : 'Failed to update product');
+      return false;
+    }
   };
 
-  const confirmDelete = () => {
-    alert('Delete API later connect pannalam');
-    setDeleteTarget(null);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setDeleteError(null);
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(apiV1Url(`/api/products/${deleteTarget.id}`), {
+        method: 'DELETE',
+      });
+
+      const result = await res.text();
+
+      if (!res.ok) {
+        throw new Error(getErrorMessage(result));
+      }
+
+      setProductMessage('Product deleted successfully');
+      await refreshProducts();
+      setDeleteTarget(null);
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete product');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (!isLoaded) {
@@ -145,10 +198,9 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="ml-[100px] flex h-full flex-col px-4 pb-0 pt-6 sm:px-8 sm:pt-8">
-        <ProductHeader onAddClick={() => setAddOpen(true)} />
+<div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
+            <ProductHeader onAddClick={() => setAddOpen(true)} />
 
-        <ProductStats products={safeProducts} />
 
         <section
           className="mb-0 flex flex-1 flex-col overflow-hidden"
@@ -160,40 +212,34 @@ export default function ProductsPage() {
               '0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)',
           }}
         >
-          {(filterOpen || sortOpen) && (
+
+          {productMessage && (
             <div
-              className="fixed inset-0 z-10"
-              onClick={() => {
-                setFilterOpen(false);
-                setSortOpen(false);
-              }}
-            />
+              className="mx-8 mt-5 rounded-lg px-4 py-3 text-sm font-semibold"
+              style={{ background: '#F1F7FF', color: '#002B73', border: '1px solid rgba(0, 43, 115, 0.14)' }}
+            >
+              {productMessage}
+            </div>
           )}
 
-          <ProductFilters
-            filterStatus={filterStatus}
-            sortBy={sortBy}
-            filterOpen={filterOpen}
-            sortOpen={sortOpen}
-            onFilterToggle={() => {
-              setFilterOpen((current) => !current);
-              setSortOpen(false);
+          <ProductTable
+            products={paged}
+            onDelete={(product) => {
+              setDeleteError(null);
+              setDeleteTarget(product);
             }}
-            onSortToggle={() => {
-              setSortOpen((current) => !current);
-              setFilterOpen(false);
-            }}
-            onFilterSelect={handleFilterSelect}
-            onSortSelect={handleSortSelect}
-            startItem={startItem}
-            endItem={endItem}
-            totalItems={sorted.length}
+            onView={setViewTarget}
           />
 
-          <ProductTable products={paged} onDelete={setDeleteTarget} onView={setViewTarget} />
-
-          <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setPage} />
-        </section>
+<Pagination
+  currentPage={safePage}
+  totalPages={totalPages}
+  startItem={startItem}
+  endItem={endItem}
+  totalItems={sorted.length}
+  label="products"
+  onPageChange={setPage}
+/>        </section>
       </div>
 
       <AddProductModal
@@ -212,8 +258,13 @@ export default function ProductsPage() {
       <DeleteProductModal
         isOpen={Boolean(deleteTarget)}
         product={deleteTarget}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => {
+          setDeleteError(null);
+          setDeleteTarget(null);
+        }}
         onConfirm={confirmDelete}
+        error={deleteError}
+        isDeleting={isDeleting}
       />
     </>
   );

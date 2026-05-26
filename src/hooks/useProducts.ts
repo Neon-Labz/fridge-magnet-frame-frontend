@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Product } from '@/types/product';
+import { apiV1Url } from '@/lib/backendUrl';
 
 type ApiImage = {
   secure_url?: string;
@@ -21,12 +22,6 @@ type ApiProduct = {
   description?: string;
   updatedAt?: string;
 };
-
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:5000'
-).replace(/\/$/, '');
 
 const toStockStatus = (status?: string, stock = 0): Product['stockStatus'] => {
   if (status === 'Out of Stock' || stock <= 0) return 'out-of-stock';
@@ -68,7 +63,7 @@ export const useProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/api/products`);
+      const res = await fetch(apiV1Url('/api/products'));
 
       const data = await res.json();
 

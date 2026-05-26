@@ -28,8 +28,10 @@ function PriceCard({
 
   return (
     <div
-      className={`relative flex min-h-[250px] flex-col justify-between overflow-hidden rounded-2xl border-2  bg-white p-7 shadow-sm xl:min-h-[280px] xl:p-10 ${
-        isPopular ? 'border-blue-200 bg-blue-50' : 'border-yellow-100'
+      className={`relative flex h-[300px] flex-col justify-between overflow-hidden rounded-2xl border-2  p-10 shadow-sm transition ${
+        isPopular
+          ? 'border-blue-200 bg-blue-50'
+          : 'border-yellow-200 bg-yellow-50'
       }`}
     >
       {isPopular && (
@@ -38,31 +40,46 @@ function PriceCard({
         </div>
       )}
 
-      <div className="text-[11px] font-bold uppercase text-gray-500">
+      <div className="text-[12px] font-bold uppercase tracking-wide text-gray-500">
         {label}
       </div>
 
-      <h3 className="mt-2 text-[21px] font-bold leading-[30px] text-gray-800">
+      <h3 className="mt-2 text-[22px] font-bold leading-[32px] text-gray-800">
         {title}
       </h3>
 
       <div className="my-4 flex items-baseline gap-2">
-        <span className="text-sm text-gray-500">from</span>
-        <span className="text-[25px] font-black leading-none text-red-600">
+        <span className="text-base text-gray-500">
+          from
+        </span>
+
+        <span className="text-[26px] font-black leading-none text-red-600">
           {price}
         </span>
       </div>
 
-      <p className="text-sm leading-6 text-gray-500">{description}</p>
+      <p className="text-[16px] leading-8 text-gray-500">
+        {description}
+      </p>
     </div>
   );
 }
 
-function OccasionCard({ emoji, label }: { emoji: string; label: string }) {
+function OccasionCard({
+  emoji,
+  label,
+}: {
+  emoji: string;
+  label: string;
+}) {
   return (
-    <div className="flex min-h-[130px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[10px] border border-gray-100 bg-white px-4 py-6 transition hover:border-gray-200 hover:shadow-md">
-      <div className="text-[32px] leading-none">{emoji}</div>
-      <p className="text-center text-sm font-semibold text-gray-800">
+    <div className="flex h-[138px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[14px] border border-gray-100 bg-white px-4 py-6 shadow-sm transition hover:border-gray-200 hover:shadow-md">
+      
+      <div className="text-[34px] leading-none">
+        {emoji}
+      </div>
+
+      <p className="text-center text-[16px] font-semibold text-gray-800">
         {label}
       </p>
     </div>
@@ -71,18 +88,23 @@ function OccasionCard({ emoji, label }: { emoji: string; label: string }) {
 
 export default function PricingSection() {
   return (
-    <section className="mx-auto flex flex-col gap-[50px] bg-[#F9F9FE] px-6 py-[50px] md:gap-[60px] md:px-[120px] md:py-10 xl:flex-row xl:items-stretch xl:gap-[60px] xl:px-[120px] xl:py-[60px]">
-      <div className="flex-1">
-        <header className="mb-7">
-          <h2 className="text-2xl font-extrabold leading-[34px] text-[#002B73] md:text-[30px] md:leading-10 xl:text-[32px] xl:leading-[44px]">
+    <section className="mx-auto flex flex-col gap-[60px] bg-[#F9F9FE] px-6 py-[70px] md:px-[80px] xl:flex-row xl:items-start xl:justify-between xl:gap-[80px] xl:px-[120px]">
+
+      {/* LEFT SIDE */}
+      <div className="flex w-full flex-1 flex-col">
+
+        <header className="mb-10 min-h-[120px]">
+          <h2 className="text-[32px] font-extrabold leading-[44px] text-[#002B73]">
             Simple, honest pricing.
           </h2>
-          <p className="mt-2.5 max-w-[440px] text-sm leading-6 text-slate-500 md:text-[15px] md:leading-[25px] xl:text-sm xl:leading-[26px]">
+
+          <p className="mt-3 max-w-[500px] text-[18px] leading-8 text-slate-500">
             No hidden costs. Cash on delivery available across the island.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+
           <PriceCard
             label="MAGNETS ONLY"
             title="Photo Magnets"
@@ -97,20 +119,25 @@ export default function PricingSection() {
             price="Rs. 2,500"
             description="Black or white frame • holds 4 tiles"
           />
+
         </div>
       </div>
 
-      <div className="flex-1">
-        <header className="mb-7">
-          <h2 className="text-2xl font-extrabold leading-[34px] text-[#002B73] md:text-[30px] md:leading-10 xl:text-[32px] xl:leading-[44px]">
+      {/* RIGHT SIDE */}
+      <div className="flex w-full flex-1 flex-col">
+
+        <header className="mb-10 min-h-[120px]">
+          <h2 className="text-[32px] font-extrabold leading-[44px] text-[#002B73]">
             Perfect for every occasion.
           </h2>
-          <p className="mt-2.5 max-w-[440px] text-sm leading-6 text-slate-500 md:text-[15px] md:leading-[25px] xl:text-sm xl:leading-[26px]">
+
+          <p className="mt-3 max-w-[500px] text-[18px] leading-8 text-slate-500">
             Turn life's best moments into a daily reminder.
           </p>
         </header>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+
           {occasionItems.map((item) => (
             <OccasionCard
               key={item.id}
@@ -118,6 +145,7 @@ export default function PricingSection() {
               label={item.label}
             />
           ))}
+
         </div>
       </div>
     </section>

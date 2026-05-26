@@ -1,5 +1,6 @@
 import type { Order, OrderStatus } from "@/types/order";
 import { ORDERS } from "@/data/orders";
+import { apiV1Url } from "@/lib/backendUrl";
 
 type ApiOrder = {
   _id?: string;
@@ -10,9 +11,20 @@ type ApiOrder = {
   qty: number;
   status: string;
   email?: string;
+  phone?: string;
   totalValue?: number;
   shippingAddress?: string;
   adminNote?: string;
+  createdAt?: string;
+  items?: {
+    productId?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    image?: string;
+    frameType?: string;
+    colorOption?: string;
+  }[];
 };
 
 const statusFromApi = (status: string): OrderStatus => {
@@ -37,6 +49,7 @@ export const statusToApi = (status: OrderStatus) => status.toUpperCase();
 
 export const mapApiOrder = (order: ApiOrder): Order => ({
   id: order._id || order.id || order.orderId,
+  _id: order._id,
   orderId: order.orderId,
   customerName: order.customerName,
   customerInitials: order.customerName
@@ -49,14 +62,25 @@ export const mapApiOrder = (order: ApiOrder): Order => ({
   qty: order.qty,
   status: statusFromApi(order.status),
   email: order.email,
+  phone: order.phone,
   totalValue: order.totalValue,
   shippingAddress: order.shippingAddress,
   adminNote: order.adminNote,
+  createdAt: order.createdAt,
+  items: order.items?.map((item) => ({
+    productId: item.productId,
+    name: item.name || "Product",
+    price: Number(item.price ?? 0),
+    quantity: Number(item.quantity ?? 1),
+    image: item.image,
+    frameType: item.frameType,
+    colorOption: item.colorOption,
+  })),
 });
 
 export const fetchOrders = async (): Promise<Order[]> => {
   try {
-    const response = await fetch("/api/v1/orders", { cache: "no-store" });
+    const response = await fetch(apiV1Url("/orders"), { cache: "no-store" });
 
     if (response.ok) {
       const backendOrders = (await response.json()) as ApiOrder[];
@@ -71,7 +95,7 @@ export const fetchOrders = async (): Promise<Order[]> => {
 
 export const fetchOrder = async (id: string): Promise<Order> => {
   try {
-    const response = await fetch(`/api/v1/orders/${id}`, {
+    const response = await fetch(apiV1Url(`/orders/${id}`), {
       cache: "no-store",
     });
 

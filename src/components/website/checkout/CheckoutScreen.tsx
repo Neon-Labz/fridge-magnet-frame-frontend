@@ -11,6 +11,7 @@ import { useCart } from "@/context/CartContext";
 import { useFrameStore } from "@/store/frameStore";
 import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
 import { Truck, UserRound } from "lucide-react";
+import { apiV1Url } from "@/lib/backendUrl";
 
 const generateOrderNumber = () =>
   `MAG-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -105,6 +106,8 @@ export default function CheckoutScreen() {
   const [touched, setTouched] = useState<
     Partial<Record<keyof FormState, boolean>>
   >({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const setField = (k: keyof FormState, v: string) =>
     setForm((s) => ({ ...s, [k]: v }));
@@ -153,7 +156,7 @@ export default function CheckoutScreen() {
     );
   }, [form]);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -172,18 +175,63 @@ export default function CheckoutScreen() {
 
     if (!isFormValid || items.length === 0) return;
 
-    saveOrder({
+    const orderNumber = generateOrderNumber();
+    const shipping = 200;
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    const shippingAddress = `${form.street}, ${form.city}, ${form.state} ${form.zip}`.trim();
+    const customerName = `${form.firstName} ${form.lastName}`.trim();
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(apiV1Url("/orders"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: orderNumber,
+          customerName,
+          customerId: `CUST-${Date.now()}`,
+          email: form.email,
+          phone: form.phone,
+          qty: totalQuantity,
+          totalValue: subtotal + shipping,
+          shippingAddress,
+          adminNote: form.notes?.trim() || undefined,
+          items: items.map((item) => ({
+            productId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+            frameType: item.frameType,
+            colorOption: item.colorOption,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || `Order failed: ${response.status}`);
+      }
+
+      saveOrder({
       items,
       subtotal,
-      shipping: 200,
-      orderNumber: generateOrderNumber(),
+      shipping,
+      orderNumber,
       createdAt: new Date().toISOString(),
       customerDetails: form,
-    });
+      });
 
-    clearCart();
-    setSelectedFrame("black-frame");
-    router.push("/order-confirmation");
+      clearCart();
+      setSelectedFrame("black-frame");
+      router.push("/order-confirmation");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Failed to place order");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -241,8 +289,13 @@ export default function CheckoutScreen() {
             items={items}
             subtotal={subtotal}
             onPlaceOrder={handlePlaceOrder}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
           />
+          {submitError && (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+              {submitError}
+            </p>
+          )}
         </div>
       </div>
     </div>

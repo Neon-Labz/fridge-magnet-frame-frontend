@@ -1,27 +1,27 @@
-import { ORDER_STATS } from '@/data/orders';
+import type { Order } from '@/types/order';
 
 function StatCard({
   label, value, change, changeColor,
 }: { label: string; value: string; change: string; changeColor: string }) {
   return (
     <div
-      className="flex flex-col justify-between p-6"
+      className="flex flex-col justify-between px-5 py-4"
       style={{
-        flex: 1, minWidth: 0,
+        minWidth: 0,
         background: '#fff',
         border: '1px solid #C3C6D4',
-        borderRadius: 12,
+        borderRadius: 10,
         boxShadow: '0px 1px 2px rgba(0,0,0,0.05)',
       }}
     >
       <p
-        className="font-semibold text-sm uppercase"
+        className="font-semibold text-xs uppercase"
         style={{ color: '#434652', letterSpacing: '0.7px' }}
       >
         {label}
       </p>
-      <div className="flex items-baseline gap-2 mt-2">
-        <span className="font-bold text-[30px] leading-9" style={{ color: '#002B73' }}>
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="text-[26px] font-bold leading-8" style={{ color: '#002B73' }}>
           {value}
         </span>
         <span className="font-bold text-xs" style={{ color: changeColor }}>
@@ -32,26 +32,23 @@ function StatCard({
   );
 }
 
-export default function OrderStats() {
+export default function OrderStats({ orders }: { orders: Order[] }) {
+  const totalOrders = orders.length;
+  const pendingOrders = orders.filter((order) => order.status === 'pending').length;
+
   return (
-    <div className="flex-shrink-0 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-5 ">
+    <div className="mb-4 grid max-w-[400px] flex-shrink-0 grid-cols-1 gap-4 sm:grid-cols-2">
       <StatCard
         label="Total Orders"
-        value={ORDER_STATS.totalOrders.value}
-        change={ORDER_STATS.totalOrders.change}
-        changeColor={ORDER_STATS.totalOrders.changeColor}
+        value={totalOrders.toLocaleString()}
+        change="Current"
+        changeColor="#16A34A"
       />
       <StatCard
         label="Pending"
-        value={ORDER_STATS.pending.value}
-        change={ORDER_STATS.pending.change}
-        changeColor={ORDER_STATS.pending.changeColor}
-      />
-      <StatCard
-        label="Revenue (MoM)"
-        value={ORDER_STATS.revenue.value}
-        change={ORDER_STATS.revenue.change}
-        changeColor={ORDER_STATS.revenue.changeColor}
+        value={pendingOrders.toLocaleString()}
+        change={pendingOrders > 0 ? 'Action Needed' : 'Clear'}
+        changeColor={pendingOrders > 0 ? '#BC0000' : '#16A34A'}
       />
     </div>
   );

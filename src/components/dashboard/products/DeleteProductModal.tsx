@@ -8,9 +8,18 @@ interface DeleteProductModalProps {
   product: Product | null;
   onCancel: () => void;
   onConfirm: () => void;
+  error?: string | null;
+  isDeleting?: boolean;
 }
 
-export default function DeleteProductModal({ isOpen, product, onCancel, onConfirm }: DeleteProductModalProps) {
+export default function DeleteProductModal({
+  isOpen,
+  product,
+  onCancel,
+  onConfirm,
+  error,
+  isDeleting = false,
+}: DeleteProductModalProps) {
   if (!isOpen || !product) return null;
 
   return (
@@ -88,12 +97,22 @@ export default function DeleteProductModal({ isOpen, product, onCancel, onConfir
               </div>
             </div>
           </div>
+
+          {error && (
+            <p
+              className="w-full rounded-lg px-4 py-3 text-center text-sm font-semibold"
+              style={{ background: '#FFF1F1', color: '#BA1A1A', border: '1px solid rgba(186, 26, 26, 0.18)' }}
+            >
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-center gap-4 w-full px-12 pb-10">
           <button
             onClick={onCancel}
+            disabled={isDeleting}
             className="flex items-center justify-center font-bold text-base transition hover:opacity-80"
             style={{ flex: 1, height: 56, background: '#E8E8ED', borderRadius: 12, color: '#434652' }}
           >
@@ -101,6 +120,7 @@ export default function DeleteProductModal({ isOpen, product, onCancel, onConfir
           </button>
           <button
             onClick={onConfirm}
+            disabled={isDeleting}
             className="flex items-center justify-center font-extrabold text-base text-white transition hover:opacity-90"
             style={{
               flex: 1.15,
@@ -110,7 +130,7 @@ export default function DeleteProductModal({ isOpen, product, onCancel, onConfir
               boxShadow: '0px 10px 15px -3px rgba(188, 0, 0, 0.3), 0px 4px 6px -4px rgba(188, 0, 0, 0.3)',
             }}
           >
-            Delete Product
+            {isDeleting ? 'Deleting...' : 'Delete Product'}
           </button>
         </div>
 

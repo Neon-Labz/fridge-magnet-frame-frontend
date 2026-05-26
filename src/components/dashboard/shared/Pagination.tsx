@@ -1,10 +1,30 @@
 import type { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-function PageBtn({ children, active = false, onClick }: { children: ReactNode; active?: boolean; onClick?: () => void }) {
+function PageBtn({
+  children,
+  active = false,
+  disabled = false,
+  onClick,
+}: {
+  children: ReactNode;
+  active?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+}) {
   return (
-    <button onClick={onClick} className="flex items-center justify-center rounded-lg text-sm font-bold transition"
-      style={{ width: 36, height: 36, background: active ? '#002B73' : 'transparent', color: active ? '#fff' : '#475569' }}>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex items-center justify-center rounded-[10px] text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40"
+      style={{
+        width: 42,
+        height: 42,
+        background: active ? '#002B73' : 'transparent',
+        color: active ? '#fff' : '#475569',
+      }}
+    >
       {children}
     </button>
   );
@@ -13,33 +33,75 @@ function PageBtn({ children, active = false, onClick }: { children: ReactNode; a
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
+  startItem: number;
+  endItem: number;
+  totalItems: number;
+  label: string;
   onPageChange: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+ startItem,
+  endItem,
+  totalItems,
+  label = 'items',
+  onPageChange,
+}: PaginationProps) {
   return (
-    <div className="flex-shrink-0 flex items-center justify-between px-8" style={{ height: 72, borderTop: '1px solid #F1F5F9' }}>
-      <button
-        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-        className="flex items-center gap-2 text-sm font-bold transition hover:opacity-70 disabled:opacity-30"
-        style={{ color: '#002B73' }}
+    <div
+      className="flex-shrink-0 flex items-center justify-between px-8"
+      style={{
+        height: 70,
+        borderTop: '1px solid #E2E8F0',
+        background: '#FFFFFF',
+      }}
+    >
+      {/* Left Text */}
+      <p
+        className="text-[15px] font-medium"
+        style={{ color: '#434652' }}
       >
-        <ChevronLeft size={16} /> Previous
-      </button>
+Showing {startItem}–{endItem} of {totalItems} {label}    
+  </p>
+
+      {/* Right Pagination */}
       <div className="flex items-center gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-          <PageBtn key={n} active={n === currentPage} onClick={() => onPageChange(n)}>{n}</PageBtn>
+        
+        <PageBtn
+          disabled={currentPage === 1}
+          onClick={() =>
+            onPageChange(Math.max(1, currentPage - 1))
+          }
+        >
+          <ChevronLeft size={16} />
+        </PageBtn>
+
+        {Array.from(
+          { length: totalPages },
+          (_, i) => i + 1
+        ).map((n) => (
+          <PageBtn
+            key={n}
+            active={n === currentPage}
+            onClick={() => onPageChange(n)}
+          >
+            {n}
+          </PageBtn>
         ))}
+
+        <PageBtn
+          disabled={currentPage === totalPages}
+          onClick={() =>
+            onPageChange(
+              Math.min(totalPages, currentPage + 1)
+            )
+          }
+        >
+          <ChevronRight size={16} />
+        </PageBtn>
       </div>
-      <button
-        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-        className="flex items-center gap-2 text-sm font-bold transition hover:opacity-70 disabled:opacity-30"
-        style={{ color: '#002B73' }}
-      >
-        Next <ChevronRight size={16} />
-      </button>
     </div>
   );
 }
