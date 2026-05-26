@@ -6,15 +6,13 @@ interface ProductHeaderProps {
 
 export default function ProductHeader({ onAddClick }: ProductHeaderProps) {
   return (
-    <section className="flex-shrink-0 flex items-end justify-between gap-6 mb-5">
+    <section className="flex-shrink-0 flex items-end justify-between gap-2 mb-5 ">
       <div className="flex flex-col gap-1">
         <h1 className="font-bold text-[26px] sm:text-[36px] lg:text-[40px] leading-tight"
           style={{ fontFamily: 'var(--font-manrope, Manrope, sans-serif)', color: '#002B73', letterSpacing: '-1.2px' }}>
           Product Management
         </h1>
-        <p className="text-lg leading-[29px]" style={{ color: '#434652' }}>
-          Manage your premium curated photo frames and track stock availability across the gallery with precision.
-        </p>
+        
       </div>
       <button onClick={onAddClick}
         className="flex items-center gap-2 font-bold text-base text-white flex-shrink-0 transition hover:opacity-90"

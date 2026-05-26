@@ -8,21 +8,23 @@ interface ViewProductModalProps {
   isOpen: boolean;
   product: Product | null;
   onClose: () => void;
-  onUpdate?: (product: Product, newStatus: string) => void;
+  onUpdate?: (product: Product, newStatus: string) => boolean | void | Promise<boolean | void>;
 }
 
 const STOCK_OPTIONS = ['In Stock', 'Low Stock', 'Out of Stock'] as const;
 
 export default function ViewProductModal({ isOpen, product, onClose, onUpdate }: ViewProductModalProps) {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string>('In Stock');
+  const [selectedStatus, setSelectedStatus] = useState<{ productId: string; value: string } | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const currentLabel =
+    product?.stockStatus === 'in-stock' ? 'In Stock' :
+    product?.stockStatus === 'low-stock' ? 'Low Stock' : 'Out of Stock';
 
   if (!isOpen || !product) return null;
 
-  const currentLabel =
-    product.stockStatus === 'in-stock' ? 'In Stock' :
-    product.stockStatus === 'low-stock' ? 'Low Stock' : 'Out of Stock';
-
+  const selected = selectedStatus?.productId === product.id ? selectedStatus.value : currentLabel;
   const cardRadius = 16;
 
   return (
@@ -53,7 +55,7 @@ export default function ViewProductModal({ isOpen, product, onClose, onUpdate }:
             >
               <div
                 className="flex-shrink-0 flex items-center justify-center bg-[#F8F8FB] rounded-2xl p-4"
-                style={{ width: 220, height: 220, border: '1px solid #EDEDF2' }}
+                style={{ width: 200, height: 200, border: '1px solid #EDEDF2' }}
               >
                 {product.primaryImageUrl ? (
                   <img
@@ -133,7 +135,7 @@ export default function ViewProductModal({ isOpen, product, onClose, onUpdate }:
                       {STOCK_OPTIONS.map(opt => (
                         <button
                           key={opt}
-                          onClick={() => { setSelected(opt); setOpen(false); }}
+                          onClick={() => { setSelectedStatus({ productId: product.id, value: opt }); setOpen(false); }}
                           className="flex items-center w-full px-6 py-4 text-white font-bold text-base text-left transition hover:bg-[#003585]"
                         >
                           {opt}
@@ -190,16 +192,22 @@ export default function ViewProductModal({ isOpen, product, onClose, onUpdate }:
             Cancel
           </button>
           <button
-            onClick={() => {
-              if (onUpdate) {
-                onUpdate(product, selected);
+            onClick={async () => {
+              setIsUpdating(true);
+              try {
+                const shouldStayOpen = await onUpdate?.(product, selected);
+                if (shouldStayOpen !== false) {
+                  onClose();
+                }
+              } finally {
+                setIsUpdating(false);
               }
-              onClose();
             }}
+            disabled={isUpdating}
             className="flex items-center justify-center font-bold text-lg text-white transition hover:opacity-90"
             style={{ width: 280, height: 60, background: '#BC0000', borderRadius: 12, boxShadow: '0px 4px 12px rgba(188, 0, 0, 0.2)' }}
           >
-            Confirm Status Update
+            {isUpdating ? 'Updating...' : 'Confirm Status Update'}
           </button>
         </div>
       </div>

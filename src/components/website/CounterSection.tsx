@@ -104,7 +104,7 @@ export default function GalleryOfferSection({
                 </div>
               </div>
 
-              <div className="text-[26px] sm:text-[34px] font-bold text-[#D90000]">:</div>
+              <div className="text-[26px] sm:text-[34px] mt-[-25px] font-bold text-[#D90000]">:</div>
 
               <div className="text-center">
                 <div className="text-[38px] sm:text-[48px] font-bold">
@@ -115,7 +115,7 @@ export default function GalleryOfferSection({
                 </div>
               </div>
 
-              <div className="text-[26px] sm:text-[34px] font-bold text-[#D90000]">:</div>
+              <div className="text-[26px] sm:text-[34px]  mt-[-25px] font-bold text-[#D90000]">:</div>
 
               <div className="text-center">
                 <div className="text-[38px] sm:text-[48px] font-bold">
@@ -128,8 +128,10 @@ export default function GalleryOfferSection({
             </div>
 
             {/* BUTTON */}
-            <button className="z-10 flex items-center justify-center h-[54px] sm:h-[62px] w-full max-w-[220px] rounded-[10px] bg-white text-[#07357E] font-bold text-[14px] sm:text-[15px] transition hover:scale-[1.02]">
-              Claim Offer
+<button
+  className="z-10 flex items-center justify-center h-[54px] sm:h-[62px] w-full max-w-[150px] rounded-[10px] bg-white text-[#07357E] text-[15px] sm:text-[16px] tracking-wide"
+  style={{ fontWeight: 700 }}
+>              Claim Offer
             </button>
 
           </div>

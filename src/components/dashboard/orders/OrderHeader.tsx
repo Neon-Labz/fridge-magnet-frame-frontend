@@ -1,6 +1,6 @@
 export default function OrderHeader() {
   return (
-    <div className="flex-shrink-0 flex flex-col gap-1 mb-5">
+    <div className="flex-shrink-0 mb-4">
       <h1
         className="font-bold text-[26px] sm:text-[36px] lg:text-[40px] leading-tight"
         style={{
@@ -10,9 +10,6 @@ export default function OrderHeader() {
       >
         Order Management
       </h1>
-      <p className="text-base" style={{ color: '#434652' }}>
-        Review and manage customer photo frame orders.
-      </p>
     </div>
   );
 }

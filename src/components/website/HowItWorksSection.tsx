@@ -33,7 +33,7 @@ export default function HowItWorksSection() {
 
           {/* ARROW */}
           <span className="hidden text-[28px] text-white lg:block">
-            ---›
+              →
           </span>
 
           {/* STEP 2 */}
@@ -57,7 +57,7 @@ export default function HowItWorksSection() {
 
           {/* ARROW */}
           <span className="hidden text-[28px] text-white lg:block">
-            ---›
+            →
           </span>
 
           {/* STEP 3 */}

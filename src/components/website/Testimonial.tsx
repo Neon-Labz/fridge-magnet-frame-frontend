@@ -27,11 +27,11 @@ export default function CustomerSection() {
           <div className="flex items-center gap-[12px] md:justify-end">
 
             <button className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-[2px] border-[#002B73] text-[22px] font-bold text-[#002B73] transition hover:bg-[#002B73] hover:text-white">
-              ←
+              🡠
             </button>
 
             <button className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-[2px] border-[#002B73] text-[22px] font-bold text-[#002B73] transition hover:bg-[#002B73] hover:text-white">
-              →
+              🡢
             </button>
 
           </div>

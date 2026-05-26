@@ -46,5 +46,5 @@ export default function OrderStatusPage() {
   );
 }
 
-return <OrderStatus currentOrder={order} />;
+return <OrderStatus order={order} />;
 }
