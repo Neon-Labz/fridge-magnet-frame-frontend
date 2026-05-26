@@ -3,7 +3,7 @@
 export default function VideoSection() {
   return (
     <section className="w-full bg-[#f9f9fe] py-16 lg:py-[60px]">
-      <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-[100px]">
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-[120px]">
 
         <div className="flex flex-col lg:flex-row md:flex-row items-stretch gap-10 lg:gap-[60px]">
 

@@ -37,8 +37,8 @@ export default function ContactSection() {
 
   return (
     <div className="w-full">
-      <div className="relative w-full rounded-[12px] ">
-        <div className="relative z-10">
+<div className="relative w-full max-w-[760px] rounded-[12px] px-3 sm:px-5 lg:px-[-5px]">
+              <div className="relative z-10">
           <h2 className="text-[30px] font-bold leading-[36px] text-[#1A1C1F]">
             Send a Message
           </h2>

@@ -36,7 +36,7 @@ export const productCatalog: CatalogProduct[] = [
   {
     id: 'magnet-3',
     title: 'Magnet White Frame',
-    desc: 'Clean white frame for a soft premium aesthetic.',
+    desc: 'Modern white magnetic frame for displaying your favorite memories in style.',
     price: 1000,
     priceLabel: 'Rs 1000.00',
     img: '/product-3.png',
