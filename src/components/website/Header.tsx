@@ -1,100 +1,85 @@
 "use client";
 
-import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, ShoppingCart } from "lucide-react";
+
 import { useCart } from "@/context/CartContext";
 import {
   clearWebsiteAuthSession,
   useWebsiteAuthSession,
 } from "@/hooks/useWebsiteAuthSession";
 
-export default function Header() {
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
 
   const { totalQuantity } = useCart();
   const { isAuthenticated } = useWebsiteAuthSession();
 
-  const isActive = (href: string) => {
-    if (href === "/" && pathname === "/") return true;
-    if (href === "/shop" && pathname === "/shop") return true;
-    if (href === "/contact" && pathname === "/contact") return true;
-    if (href === "/price" && pathname === "/price") return true;
-    return false;
-  };
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Shop", href: "/shop" },
+    { name: "Contact", href: "/contact" },
+    { name: "Price", href: "/price" },
+  ];
+
+  const isActive = (href: string) => pathname === href;
+  const closeMenu = () => setIsOpen(false);
 
   return (
-    <header className="fixed left-0 top-0 z-50 h-[82px] w-full border-b border-[#E5E5EA]/80 bg-white/95 shadow-[0_6px_18px_rgba(15,23,42,0.05)] backdrop-blur-sm">
-      <nav className="flex h-full w-full max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-10">
-        
-        {/* LOGO */}
-        <Link href="/" className="shrink-0">
-          <Image
-            src="/logo.png"
-            alt="Magnify Logo"
-            width={177}
-            height={55}
-            priority
-            className="h-auto w-[118px] object-contain sm:w-[138px] lg:w-[162px]"
-          />
-        </Link>
-
-        {/* NAV LINKS */}
-        <div className="flex items-center gap-3 font-inter text-[13px] font-medium sm:gap-6 sm:text-[15px] lg:gap-8 lg:text-[16px]">
-          
-          <Link
-            href="/"
-            className={
-              isActive("/")
-                ? "border-b-[2px] border-[#BC0000] pb-[4px] font-semibold text-[#BC0000]"
-                : "text-[#64748B] transition-colors hover:text-[#002B73]"
-            }
+    <header className="fixed left-0 top-0 z-50 h-[85px] w-full border-b border-[#E5E5EA]/80 bg-white/95 shadow-sm backdrop-blur-md">
+<div className="mx-auto flex h-full max-w-[1350px] items-center justify-between px-6 sm:px-8 lg:px-7">
+          <div className="flex items-center gap-3">
+          <button
+            className="text-[#475569] md:hidden"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Menu"
           >
-            Home
-          </Link>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
 
-          <Link
-            href="/shop"
-            className={
-              isActive("/shop")
-                ? "border-b-[2px] border-[#BC0000] pb-[4px] font-semibold text-[#BC0000]"
-                : "text-[#64748B] transition-colors hover:text-[#002B73]"
-            }
-          >
-            Shop
-          </Link>
-
-          <Link
-            href="/contact"
-            className={
-              isActive("/contact")
-                ? "border-b-[2px] border-[#BC0000] pb-[4px] font-semibold text-[#BC0000]"
-                : "text-[#64748B] transition-colors hover:text-[#002B73]"
-            }
-          >
-            Contact
-          </Link>
-
-          <Link
-            href="/price"
-            className={
-              isActive("/price")
-                ? "border-b-[2px] border-[#BC0000] pb-[4px] font-semibold text-[#BC0000]"
-                : "text-[#64748B] transition-colors hover:text-[#002B73]"
-            }
-          >
-            Price
+          <Link href="/" onClick={closeMenu}>
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={140}
+              height={50}
+              className="h-auto w-[110px] object-contain sm:w-[130px]"
+            />
           </Link>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-          
-          <button className="relative cursor-pointer text-[24px] text-[#475569] transition-colors hover:text-[#002B73]">
-            🛒
+        <nav className="hidden items-center gap-8 text-[15px] font-medium md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={
+                isActive(link.href)
+                  ? "border-b-2 border-[#BC0000] pb-1 font-semibold text-[#BC0000]"
+                  : "text-[#475569] hover:text-[#002B73]"
+              }
+            >
+              {link.name}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => router.push("/cart")}
+            className="relative flex h-[46px] w-[46px] items-center justify-center text-[#475569] hover:text-[#BC0000]"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={22} strokeWidth={2.2} />
+
             {totalQuantity > 0 && (
-              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#BC0000] text-[12px] font-bold text-white">
+              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#BC0000] text-[10px] font-semibold text-white">
                 {totalQuantity}
               </span>
             )}
@@ -102,24 +87,44 @@ export default function Header() {
 
           {isAuthenticated ? (
             <button
-              type="button"
               onClick={() => {
                 clearWebsiteAuthSession();
                 router.push("/");
               }}
-              className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]"
+              className="flex h-[46px] items-center justify-center rounded-[8px] bg-[#BC0000] px-6 text-sm font-semibold text-white hover:bg-[#a10000]"
             >
               Logout
             </button>
           ) : (
             <Link href="/login">
-              <button className="h-[46px] rounded-[10px] bg-[#BC0000] px-6 font-inter text-[15px] font-semibold text-white shadow-[0_4px_10px_rgba(188,0,0,0.15)] transition-all hover:bg-[#a10000] sm:h-[50px] sm:px-7 sm:text-[16px] lg:text-[17px]">
+              <button className="flex h-[46px] items-center justify-center rounded-[8px] bg-[#BC0000] px-6 text-sm font-semibold text-white hover:bg-[#a10000]">
                 Login
               </button>
             </Link>
           )}
         </div>
-      </nav>
+      </div>
+
+      {isOpen && (
+        <div className="border-t border-[#E5E5EA] bg-white px-6 py-4 md:hidden">
+          <div className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={closeMenu}
+                className={
+                  isActive(link.href)
+                    ? "font-semibold text-[#BC0000]"
+                    : "text-[#475569]"
+                }
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

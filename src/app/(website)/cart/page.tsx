@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Trash2 } from "lucide-react";
-import OrderSummary from '../../../components/OrderSummary';
-import { useCart } from '@/context/CartContext';
+import OrderSummary from "@/components/OrderSummary";
+import { useCart } from "@/context/CartContext";
 
 type CartItemData = {
   id: string;
@@ -23,97 +23,118 @@ function CartItem({
   onDelete,
 }: {
   item: CartItemData;
-  onQuantityChange: (id: string, frameType: string | undefined, colorOption: string | undefined, quantity: number) => void;
-  onDelete: (id: string, frameType: string | undefined, colorOption: string | undefined) => void;
+  onQuantityChange: (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined,
+    quantity: number
+  ) => void;
+  onDelete: (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined
+  ) => void;
 }) {
   const handleInput = (value: string) => {
     const qty = Number(value);
+
     if (!Number.isNaN(qty)) {
-      onQuantityChange(item.id, item.frameType, item.colorOption, Math.max(1, qty));
+      onQuantityChange(
+        item.id,
+        item.frameType,
+        item.colorOption,
+        Math.max(1, qty)
+      );
     }
   };
 
   return (
-    <article style={{ position: 'relative', boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', padding: '32px', gap: '32px', width: '100%', minHeight: '220px', background: '#FFFFFF', border: '1px solid #C3C6D4', boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)', borderRadius: '14px' }} className="rounded-[14px]">
+<article className="relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-9 bg-white border border-[#E2E8F0] rounded-xl w-full max-w-[1220px]">      {/* DELETE */}
       <button
         type="button"
-        onClick={() => onDelete(item.id, item.frameType, item.colorOption)}
-        style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 0, width: '16px', height: '18px', background: 'none', border: 'none', cursor: 'pointer', zIndex: 2 }}
+        onClick={() =>
+          onDelete(item.id, item.frameType, item.colorOption)
+        }
+        className="absolute top-3 right-3 z-10 text-gray-500 hover:text-red-500"
         aria-label="Delete item"
       >
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: 0, width: '16px', height: '18px' }}>
-          <Trash2 style={{ width: '16px', height: '18px', color: '#747784' }} strokeWidth={2} />
-        </div>
+        <Trash2 size={16} />
       </button>
 
-      {/* Product Image - Left */}
-      <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 0, width: '180px', height: '180px', minWidth: '180px', background: '#F3F3F8', border: '1px solid #EDEDF2', borderRadius: '10px', flex: 'none', order: 0, flexGrow: 0, overflow: 'hidden' }}>
+      {/* IMAGE */}
+      <div className="w-[90px] h-[90px] bg-[#F3F3F8] rounded-lg flex items-center justify-center overflow-hidden shrink-0">
         <Image
-          src={item.image || 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22178%22 height=%22178%22><rect width=%22178%22 height=%22178%22 fill=%22%23e5e7eb%22 /></svg>'}
-          alt={item.title || 'Product image'}
-          width={178}
-          height={178}
-          style={{ width: '178px', height: '178px', objectFit: 'cover' }}
-          className="rounded-[10px]"
+          src={
+            item.image ||
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="178" height="178"><rect width="178" height="178" fill="#e5e7eb" /></svg>'
+          }
+          alt={item.title || "Product image"}
+          width={90}
+          height={90}
+          className="object-cover rounded-lg w-full h-full"
         />
       </div>
 
-      {/* Content Wrapper - Middle & Right */}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', padding: 0, gap: '24px', width: '100%', flex: 1, alignSelf: 'stretch', flexGrow: 1, position: 'relative' }}>
-        
-        {/* Title Row */}
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', padding: 0, width: '100%', flexGrow: 0 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '6px', flexGrow: 1 }}>
-            <h3 style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', letterSpacing: '0px', verticalAlign: 'middle', color: '#002B73', margin: 0, flex: 'none' }}>
-              {item.title}
-            </h3>
-            <p style={{ fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 400, fontSize: '14px', lineHeight: '20px', color: '#747784', margin: 0, flex: 'none' }}>
-              {item.subtitle}
-            </p>
-          </div>
+      {/* CONTENT */}
+      <div className="flex-1 flex flex-col justify-between gap-[18px]">
+        {/* TITLE */}
+        <div>
+          <h3 className="text-[16px] sm:text-[18px] font-semibold text-[#002B73]">
+            {item.title}
+          </h3>
+
+          {/* SUBTITLE */}
+          <p className="text-[14px] sm:text-[15px] text-gray-600">
+            {item.subtitle}
+          </p>
         </div>
 
-        {/* Bottom Row: Quantity + Price */}
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: '24px', width: '100%', flexGrow: 0 }}>
-          
-          {/* Quantity Selector */}
-          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'stretch', padding: 0, height: '40px', border: '1px solid #C3C6D4', borderRadius: '8px', background: '#FFFFFF', overflow: 'hidden', flex: 'none' }}>
+        {/* BOTTOM ROW */}
+        <div className="flex items-center justify-between">
+          {/* QUANTITY */}
+          <div className="flex items-center border border-gray-300 w-[130px] sm:w-28 rounded-md overflow-hidden">
             <button
               type="button"
-              onClick={() => onQuantityChange(item.id, item.frameType, item.colorOption, Math.max(1, item.quantity - 1))}
-              style={{ boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 12px', border: 'none', borderRight: '1px solid #C3C6D4', background: '#FFFFFF', cursor: 'pointer', transition: 'background-color 0.2s ease', flex: 'none' }}
-              className="hover:bg-[#F9F9FE]"
+              onClick={() =>
+                onQuantityChange(
+                  item.id,
+                  item.frameType,
+                  item.colorOption,
+                  Math.max(4, item.quantity - 1)
+                )
+              }
+              className="px-3 py-1 hover:bg-gray-100"
             >
-              <span style={{ fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 700, fontSize: '16px', lineHeight: '24px', color: '#002B73' }}>−</span>
+              -
             </button>
-            
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 16px', flex: 'none', minWidth: '50px' }}>
-              <input
-                value={String(item.quantity)}
-                onChange={(e) => handleInput(e.target.value)}
-                style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 500, fontSize: '16px', lineHeight: '24px', textAlign: 'center', color: '#1A1C1F', border: 'none', outline: 'none', background: 'transparent', padding: 0, width: '30px', appearance: 'textfield' }}
-                type="text"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                aria-label="Quantity"
-              />
-            </div>
-            
+
+            <input
+              value={item.quantity}
+              onChange={(e) => handleInput(e.target.value)}
+              className="w-10 text-center outline-none text-sm"
+              type="number"
+              inputMode="numeric"
+            />
+
             <button
               type="button"
-              onClick={() => onQuantityChange(item.id, item.frameType, item.colorOption, item.quantity + 1)}
-              style={{ boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 12px', border: 'none', borderLeft: '1px solid #C3C6D4', background: '#FFFFFF', cursor: 'pointer', transition: 'background-color 0.2s ease', flex: 'none' }}
-              className="hover:bg-[#F9F9FE]"
+              onClick={() =>
+                onQuantityChange(
+                  item.id,
+                  item.frameType,
+                  item.colorOption,
+                  item.quantity + 1
+                )
+              }
+              className="px-3 py-1 hover:bg-gray-100"
             >
-              <span style={{ fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 700, fontSize: '16px', lineHeight: '24px', color: '#002B73' }}>+</span>
+              +
             </button>
           </div>
 
-          {/* Price - Far Right */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', padding: 0, flex: 'none', marginLeft: 'auto', height: '40px' }}>
-            <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '30px', lineHeight: '40px', color: '#1D2128', textAlign: 'right' }}>
-              Rs{(item.price * item.quantity).toFixed(2)}
-            </div>
+          {/* PRICE */}
+          <div className="font-semibold text-[#1A1C1F]">
+            Rs {(item.price * item.quantity).toFixed(2)}
           </div>
         </div>
       </div>
@@ -121,76 +142,93 @@ function CartItem({
   );
 }
 
-
-
 export default function CartPage() {
-  const { items, subtotal, totalQuantity, updateQuantity, removeFromCart } = useCart();
+  const {
+    items,
+    subtotal,
+    totalQuantity,
+    updateQuantity,
+    removeFromCart,
+  } = useCart();
 
-  const handleQuantityChange = (id: string, frameType: string | undefined, colorOption: string | undefined, quantity: number) => {
-    updateQuantity(id, frameType, colorOption, Math.max(1, quantity));
+  const handleQuantityChange = (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined,
+    quantity: number
+  ) => {
+    updateQuantity(
+      id,
+      frameType,
+      colorOption,
+      Math.max(1, quantity)
+    );
   };
 
-  const handleDelete = (id: string, frameType: string | undefined, colorOption: string | undefined) => {
+  const handleDelete = (
+    id: string,
+    frameType: string | undefined,
+    colorOption: string | undefined
+  ) => {
     removeFromCart(id, frameType, colorOption);
   };
 
   return (
-    <div className="relative w-full bg-[#F9F9FE]">
-      <main className="mx-auto w-full max-w-[1600px] px-6 lg:px-8 pb-[100px] pt-[140px]">
-        <div className="w-full">
-          <header className="mb-16 max-w-4xl">
-            <h1 className="font-manrope font-bold text-[56px] lg:text-[64px] leading-[64px] lg:leading-[72px] tracking-[-1.12px] text-[#1A1C1F] mb-4">
-              Your Gallery Bag
-            </h1>
-            <p className="font-inter text-[18px] lg:text-[20px] font-normal leading-[28px] lg:leading-[32px] text-[#747784]">
-              Review your curated selections before we frame them for eternity.
-            </p>
-          </header>
+    <div className="bg-[#F9F9FE]">
+      <main className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-[120px] py-10 lg:py-25">
+        {/* HEADER */}
+        <header className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">
+            Your Gallery Bag
+          </h1>
 
-          <div className="grid gap-8 lg:gap-12 grid-cols-1 lg:grid-cols-[1fr_420px]">
-            <section className="space-y-8 lg:space-y-6">
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '32px', width: '100%' }}>
-                {items.map((it) => {
-                  const item: CartItemData = {
-                    id: it.id,
-                    title: it.title,
-                    subtitle: it.colorOption ? `Frame: ${it.frameType} • Color: ${it.colorOption}` : `Frame: ${it.frameType}`,
-                    price: it.price,
-                    quantity: it.quantity,
-                    image: it.image,
-                    frameType: it.frameType,
-                    colorOption: it.colorOption,
-                  };
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Review your items before checkout
+          </p>
+        </header>
 
-                  return (
-                  <CartItem
-                    key={`${item.id}-${item.frameType}`}
-                    item={item}
-                    onQuantityChange={handleQuantityChange}
-                    onDelete={handleDelete}
-                  />
-                  );
-                })}
-              </div>
+        {/* GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8 items-start">
+          {/* LEFT */}
+          <section className="space-y-5 w-full">
+            {items.map((it) => {
+              const item: CartItemData = {
+                id: it.id,
+                title: it.title,
+                subtitle: it.colorOption
+                  ? `Frame: ${it.frameType} • Color: ${it.colorOption}`
+                  : `Frame: ${it.frameType}`,
+                price: it.price,
+                quantity: it.quantity,
+                image: it.image,
+                frameType: it.frameType,
+                colorOption: it.colorOption,
+              };
 
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '32px 0px 0px', width: '100%', flex: 'none', order: 2, alignSelf: 'stretch', flexGrow: 0 }}>
-                <Link
-                  href="/shop"
-                  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 0, gap: '12px', flex: 'none', order: 0, flexGrow: 0, textDecoration: 'none' }}
-                  className="hover:underline"
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 0, width: '20px', height: '20px', flex: 'none', order: 0, flexGrow: 0 }}>
-                    <ArrowLeft style={{ width: '20px', height: '20px', color: '#002B73' }} />
-                  </div>
-                  <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: '18px', lineHeight: '28px', display: 'flex', alignItems: 'center', textAlign: 'center', color: '#002B73', flex: 'none', order: 1, flexGrow: 0 }} className="font-manrope">
-                    Continue Shopping
-                  </span>
-                </Link>
-              </div>
-            </section>
+              return (
+                <CartItem
+                  key={`${item.id}-${item.frameType}-${item.colorOption ?? "no-color"}`}
+                  item={item}
+                  onQuantityChange={handleQuantityChange}
+                  onDelete={handleDelete}
+                />
+              );
+            })}
 
-            <OrderSummary subtotal={subtotal} quantity={totalQuantity} />
-          </div>
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 text-[#002B73] font-medium hover:underline"
+            >
+              <ArrowLeft size={18} />
+              Continue Shopping
+            </Link>
+          </section>
+
+          {/* RIGHT */}
+          <OrderSummary
+            subtotal={subtotal}
+            quantity={totalQuantity}
+          />
         </div>
       </main>
     </div>

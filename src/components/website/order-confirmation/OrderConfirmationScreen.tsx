@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
-import FramePreview from "@/components/website/FramePreview";
 import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
 import Link from "next/link";
 import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
@@ -58,24 +58,22 @@ export default function OrderConfirmationScreen() {
       setOrder(savedOrder as Order);
     }
 
-    // Cleanup: Clear saved order after 5 minutes to free up memory
+    // Cleanup: Clear saved order after 5 minutes
     const cleanupTimer = setTimeout(() => {
       clearSavedOrder();
     }, 5 * 60 * 1000);
 
-    // Also clear on page unload
     const handleBeforeUnload = () => {
       clearSavedOrder();
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       clearTimeout(cleanupTimer);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
-
 
   if (!order) {
     return (
@@ -91,9 +89,10 @@ export default function OrderConfirmationScreen() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F9F9FE] to-white">
-      <div className="mx-auto w-full max-w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-20">
-        {/* Header - Success Message */}
-        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+      <div className="mx-auto w-full max-w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-25">
+
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-16">
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#0040A1]">
             <CheckCircle className="h-10 w-10 text-white" />
           </div>
@@ -103,129 +102,112 @@ export default function OrderConfirmationScreen() {
           </h1>
 
           <p className="max-w-[672px] text-base sm:text-lg text-[#434652] leading-relaxed">
-            Your memories are in safe hands. We've received your order and are preparing to craft your custom frames with the precision they deserve.
+            Your memories are in safe hands. We've received your order and are preparing to craft your custom frames.
           </p>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid gap-8 grid-cols-1 lg:grid-cols-[7fr_3fr]">
-          {/* Left Column: Order Details */}
+        {/* Main Content */}
+<div className="grid gap-6 px-6 sm:px-10 lg:px-[75px] lg:grid-cols-[1.5fr_1fr]">
+          {/* Left */}
           <div className="space-y-6">
-            {/* Order Summary Section */}
-            <div className="rounded-xl border border-[#C3C6D4] bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] overflow-hidden">
-              {/* Header */}
-              <div className="border-b border-[#C3C6D4] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <h2 className="font-manrope text-2xl sm:text-[28px] font-semibold text-[#002B73]">
+
+            {/* Order Summary */}
+            <div className="rounded-xl border border-[#C3C6D4] bg-white overflow-hidden">
+              <div className="border-b px-6 py-6 flex justify-between items-center">
+                <h2 className="text-2xl font-semibold text-[#002B73]">
                   Order Details
                 </h2>
-                <div className="bg-[#E8E8ED] rounded-full px-4 py-2 self-start sm:self-auto">
-                  <span className="text-xs sm:text-sm font-medium text-[#1A1C1F]">
-                    Order #{order.orderNumber}
-                  </span>
-                </div>
+                <span className="bg-[#E8E8ED] rounded-full px-4 py-2 text-sm">
+                  Order #{order.orderNumber}
+                </span>
               </div>
 
-              {/* Items List */}
-              <div className="divide-y divide-[#E2E2E7]">
+              <div className="divide-y">
                 {order.items.map((item) => (
-                  <div key={item.id} className="flex gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-4">
-                    {/* Product Image */}
-                    <div className="flex-shrink-0 w-20 sm:w-24 h-20 sm:h-24 rounded-lg border border-[#C3C6D4] bg-white overflow-hidden flex items-center justify-center">
-                      <FramePreview
-                        variant={resolvePreview(item)}
+                  <div key={item.id} className="flex gap-4 px-6 py-4">
+                    <div className="w-24 h-24 border rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src={item.image || "/home-product-1.png"}
+                        alt={item.name}
+                        width={96}
+                        height={96}
                         className="h-full w-full object-cover"
                       />
                     </div>
 
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <h3 className="font-semibold text-base sm:text-lg text-[#1A1C1F] line-clamp-2 mb-1">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">
                         {item.name}
                       </h3>
-                      <p className="text-xs sm:text-sm text-[#434652]">
-                        Quantity: {item.quantity} • Frame: White
+                      <p className="text-sm text-gray-500">
+                        Quantity: {item.quantity}
                       </p>
                     </div>
 
-                    {/* Price */}
-                    <div className="text-right font-bold text-base sm:text-lg text-[#1A1C1F] whitespace-nowrap">
-                      Rs{(item.price * item.quantity).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    <div className="font-bold">
+                      Rs{(item.price * item.quantity).toLocaleString()}
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Order Summary Totals */}
-              <div className="border-t border-[#C3C6D4] bg-[#F9F9FE] px-4 sm:px-6 lg:px-8 py-6 space-y-4">
-                <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+              <div className="border-t bg-[#F9F9FE] px-6 py-6 space-y-2">
+                <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>Rs{order.subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  <span>Rs{order.subtotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+                <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>Rs{order.shipping.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  <span>Rs{order.shipping.toLocaleString()}</span>
                 </div>
-                <div className="border-t border-[#C3C6D4] pt-4 flex justify-between text-base sm:text-xl font-bold text-[#002B73]">
+                <div className="flex justify-between font-bold text-lg border-t pt-2">
                   <span>Total</span>
-                  <span>Rs{total.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  <span>Rs{total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
-            {/* Delivery Information Section */}
-            <div className="rounded-xl border border-[#C3C6D4] bg-[#F3F3F8] p-4 sm:p-6 lg:p-8">
-              <h2 className="font-manrope text-2xl sm:text-[28px] font-semibold text-[#002B73] mb-6">
+            {/* Delivery Info */}
+            <div className="border rounded-xl p-6 bg-[#F3F3F8]">
+              <h2 className="text-xl font-semibold mb-4">
                 Delivery Information
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                {/* Shipping Address */}
-                <div className="space-y-3">
-                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#747784]">
-                    Shipping Address
-                  </p>
-                  <div className="text-xs sm:text-sm text-[#1A1C1F] space-y-1 leading-relaxed">
-                    <p className="font-medium">
-                      {order.customerDetails.firstName} {order.customerDetails.lastName}
-                    </p>
-                    <p>{order.customerDetails.street}</p>
-                    <p>
-                      {order.customerDetails.city}, {order.customerDetails.state}{" "}
-                      {order.customerDetails.zip}
-                    </p>
-                  </div>
+              <div className="grid md:grid-cols-2 gap-6">
+
+                <div>
+                  <p className="font-semibold text-sm">Shipping Address</p>
+                  <p>{order.customerDetails.firstName} {order.customerDetails.lastName}</p>
+                  <p>{order.customerDetails.street}</p>
+                  <p>{order.customerDetails.city}, {order.customerDetails.state} {order.customerDetails.zip}</p>
                 </div>
 
-                {/* Contact Details */}
-                <div className="space-y-3">
-                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#747784]">
-                    Contact Details
-                  </p>
-                  <div className="text-xs sm:text-sm text-[#1A1C1F] space-y-1">
-                    <p>{order.customerDetails.email}</p>
-                    <p>{order.customerDetails.phone}</p>
-                  </div>
+                <div>
+                  <p className="font-semibold text-sm">Contact</p>
+                  <p>{order.customerDetails.email}</p>
+                  <p>{order.customerDetails.phone}</p>
                 </div>
+
               </div>
             </div>
+
           </div>
 
-          {/* Right Column: Feedback Section */}
+          {/* Right */}
           <FeedbackCard />
         </div>
 
-        {/* Continue Shopping */}
         <div className="mt-12 text-center">
           <Link
             href="/shop"
-            className="inline-block bg-[#FF3B30] hover:bg-[#E61D11] text-white font-semibold px-6 sm:px-8 py-3 rounded-lg transition-colors text-sm sm:text-base"
+            className="bg-[#FF3B30] text-white px-6 py-3 rounded-lg"
           >
             Continue Shopping
           </Link>
         </div>
+
       </div>
 
-      {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );

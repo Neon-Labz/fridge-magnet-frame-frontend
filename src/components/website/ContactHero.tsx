@@ -8,11 +8,11 @@ export default function ContactHero() {
       }}
     >
       <div className="max-w-3xl text-center text-white">
-        <h1 className="text-[60px] font-bold leading-[60px] tracking-[-0.025em] text-white">
+        <h1 className="text-[50px] font-bold leading-[60px] tracking-[-0.025em] text-white">
           Get in Touch
         </h1>
 
-        <p className="mx-auto mt-2 max-w-[646px] text-[20px] leading-[28px] text-white/80">
+        <p className="mx-auto mt-2 max-w-[646px] text-[18px] leading-[28px] text-white/80">
           We&apos;re here to help you preserve your most cherished memories and answer any questions you may have.
         </p>
       </div>

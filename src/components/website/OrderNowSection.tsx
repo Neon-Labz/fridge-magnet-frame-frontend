@@ -1,60 +1,55 @@
-'use client';
-
 const features = [
-  {
-    icon: '🚚',
-    label: 'Island Wide Delivery',
-  },
-  {
-    icon: '💵',
-    label: 'Cash on Delivery',
-  },
-  {
-    icon: '⚡',
-    label: 'Same Day Jaffna',
-  },
-  {
-    icon: '✨',
-    label: 'Premium Quality',
-  },
+  { icon: "🚚", label: "Island Wide Delivery" },
+  { icon: "💵", label: "Cash on Delivery" },
+  { icon: "⚡", label: "Same Day Jaffna" },
+  { icon: "✨", label: "Premium Quality" },
 ];
 
 export default function OrderNowSection() {
   return (
-    <section className="border-y border-[#F1F5F9] bg-white">
-      <div className="mx-auto max-w-[1274px] px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-4">
+    <section className="px-3 pb-8 sm:px-6">
+
+      {/* FEATURES */}
+      <div className="mx-auto mt-6 max-w-[1270px] rounded-[20px] border border-[#E2E8F0] bg-white px-3 py-5 shadow-sm sm:px-6 sm:py-8">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
           {features.map((feature) => (
             <div
               key={feature.label}
-              className="flex flex-col items-center justify-center gap-4 rounded-[24px] border border-[#E2E8F0] bg-white px-6 py-6 text-center shadow-none"
+              className="flex flex-col items-center gap-2 rounded-[18px] bg-[#F8FAFC] px-3 py-4 text-center"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F8FAFC] text-[32px]">
+              <div className="text-[24px] sm:text-3xl">
                 {feature.icon}
               </div>
-              <p className="max-w-[128px] text-[13px] font-black uppercase tracking-[2.8px] text-[#334155] sm:text-[14px]">
+
+              <p className="text-[11px] font-bold uppercase leading-4 tracking-wide text-[#334155] sm:text-sm">
                 {feature.label}
               </p>
             </div>
           ))}
+
         </div>
       </div>
 
-      <div className="bg-[#F8FAFC] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[1267px] rounded-[48px] border border-[#E2E8F0] bg-[#F8FAFC] px-8 py-14 shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] sm:px-12">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-[16px] font-bold uppercase tracking-[3.6px] text-[#64748B] sm:text-[18px]">
-              Ready to customize? Order now via WhatsApp
-            </p>
-            <p className="text-[58px] font-black leading-[66px] text-[#002B73] sm:text-[72px]">
-              +94 753 912 534
-            </p>
-            <p className="text-[16px] font-medium leading-[24px] text-[#64748B]">
-              magnifyofficials@gmail.com
-            </p>
-          </div>
+      {/* CONTACT */}
+      <div className="pt-6">
+        <div className="mx-auto max-w-[1280px] rounded-[24px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-8 text-center sm:rounded-[36px] sm:p-12">
+
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#64748B] sm:text-sm">
+            Ready to customize? Order now via WhatsApp
+          </p>
+
+          <p className="mt-3 text-[28px] font-black leading-tight text-[#002B73] sm:text-4xl md:text-5xl">
+            +94 75 391 2534
+          </p>
+
+          <p className="mt-2 break-all text-sm text-[#475569] sm:text-base md:text-lg">
+            magnifyofficials@gmail.com
+          </p>
+
         </div>
       </div>
+
     </section>
   );
 }

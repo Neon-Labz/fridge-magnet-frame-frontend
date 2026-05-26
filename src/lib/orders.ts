@@ -1,5 +1,5 @@
-import type { Order, OrderStatus } from '@/types/order';
-import { ORDERS } from '@/data/orders';
+import type { Order, OrderStatus } from "@/types/order";
+import { ORDERS } from "@/data/orders";
 
 type ApiOrder = {
   _id?: string;
@@ -17,18 +17,20 @@ type ApiOrder = {
 
 const statusFromApi = (status: string): OrderStatus => {
   const normalized = status.toLowerCase();
-  if (normalized === 'cancelled') return 'canceled';
+
+  if (normalized === "cancelled") return "canceled";
+
   if (
-    normalized === 'shipped' ||
-    normalized === 'pending' ||
-    normalized === 'processing' ||
-    normalized === 'delivered' ||
-    normalized === 'canceled'
+    normalized === "shipped" ||
+    normalized === "pending" ||
+    normalized === "processing" ||
+    normalized === "delivered" ||
+    normalized === "canceled"
   ) {
     return normalized;
   }
 
-  return 'pending';
+  return "pending";
 };
 
 export const statusToApi = (status: OrderStatus) => status.toUpperCase();
@@ -38,9 +40,9 @@ export const mapApiOrder = (order: ApiOrder): Order => ({
   orderId: order.orderId,
   customerName: order.customerName,
   customerInitials: order.customerName
-    .split(' ')
+    .split(" ")
     .map((part) => part[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2),
   customerId: order.customerId,
@@ -52,70 +54,37 @@ export const mapApiOrder = (order: ApiOrder): Order => ({
   adminNote: order.adminNote,
 });
 
-export const fetchOrders = async () => {
-  let allOrders: Order[] = [];
-
-  // Always include mock orders as base
-  allOrders = [...ORDERS];
-
-  // Try to fetch from backend first
+export const fetchOrders = async (): Promise<Order[]> => {
   try {
-    const response = await fetch('/api/v1/orders', { cache: 'no-store' });
+    const response = await fetch("/api/v1/orders", { cache: "no-store" });
 
     if (response.ok) {
       const backendOrders = (await response.json()) as ApiOrder[];
-      const mappedOrders = backendOrders.map(mapApiOrder);
-      return [...allOrders, ...mappedOrders];
+      return backendOrders.map(mapApiOrder);
     }
-  } catch (error) {
-    console.log('Backend not available, using localStorage');
+  } catch {
+    console.log("Backend not available, using mock orders");
   }
 
-  // Fall back to localStorage if backend is unavailable
-  try {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('saved-orders');
-      if (stored) {
-        const savedOrders = JSON.parse(stored) as Order[];
-        allOrders = [...allOrders, ...savedOrders];
-      }
-    }
-  } catch (error) {
-    console.error('Error reading from localStorage:', error);
-  }
-
-  return allOrders;
+  return ORDERS;
 };
 
-export const fetchOrder = async (id: string) => {
-  // Check mock orders first
-  const mockOrder = ORDERS.find((o) => o.id === id);
-  if (mockOrder) return mockOrder;
-
-  // Try backend
+export const fetchOrder = async (id: string): Promise<Order> => {
   try {
-    const response = await fetch(`/api/v1/orders/${id}`, { cache: 'no-store' });
+    const response = await fetch(`/api/v1/orders/${id}`, {
+      cache: "no-store",
+    });
 
     if (response.ok) {
       return mapApiOrder((await response.json()) as ApiOrder);
     }
-  } catch (error) {
-    console.log('Backend not available, checking localStorage');
+  } catch {
+    console.log("Backend not available, checking mock orders");
   }
 
-  // Check localStorage
-  try {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('saved-orders');
-      if (stored) {
-        const orders = JSON.parse(stored) as Order[];
-        const found = orders.find((o) => o.id === id);
-        if (found) return found;
-      }
-    }
-  } catch (error) {
-    console.error('Error reading from localStorage:', error);
-  }
+  const mockOrder = ORDERS.find((o) => o.id === id);
+
+  if (mockOrder) return mockOrder;
 
   throw new Error(`Order not found: ${id}`);
 };
