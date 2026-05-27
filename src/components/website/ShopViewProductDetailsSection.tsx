@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import PersonalizationSection, { PersonalizationState } from "./PersonalizationSection";
-import { useFrameStore } from "@/store/frameStore";
+import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useToastStore } from "@/store/toastStore";
 import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
@@ -13,39 +11,17 @@ interface ShopViewProductDetailsSectionProps {
   products: ShopProduct[];
 }
 
-function toStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => (typeof item === "string" ? item.trim() : ""))
-      .filter(Boolean);
-  }
-
-  if (typeof value === "string") {
-    const normalized = value.trim();
-    return normalized ? [normalized] : [];
-  }
-
-  return [];
-}
-
 export default function ShopViewProductDetailsSection({
   products,
 }: ShopViewProductDetailsSectionProps) {
   const router = useRouter();
-  const selectedFrame = useFrameStore((s) => s.selectedFrame);
-
   const { addToCart } = useCart();
   const { addToast } = useToastStore();
   const { isAuthenticated } = useWebsiteAuthSession();
 
   const [quantity, setQuantity] = useState(4);
-
-  const handlePersonalizationChange = useCallback(
-    (_state: PersonalizationState) => {
-      // Store personalization state if needed for future use
-    },
-    []
-  );
+  const [selectedOption, setSelectedOption] = useState("Without Frame");
+  const [selectedColor, setSelectedColor] = useState("");
 
   if (!products || products.length === 0) {
     return (
@@ -57,25 +33,49 @@ export default function ShopViewProductDetailsSection({
     );
   }
 
-  const product = products[0];
+  const findProductByName = (name: string) =>
+    products.find((p) =>
+      p.productName?.toLowerCase().includes(name.toLowerCase())
+    );
 
-  const title = product?.productName ?? "";
-  const price = Number(product?.price ?? 0);
-  const description = product?.description ?? "";
-  const inStock = product?.status === "In Stock";
-  const mainImage = product?.primaryImage?.secure_url ?? "";
+  const selectedProduct =
+    selectedOption === "Without Frame"
+      ? findProductByName("Without Frame") ||
+        findProductByName("Magnet Frame") ||
+        products[0]
+      : selectedColor === "Black"
+      ? findProductByName("Black Frame") ||
+        findProductByName("Magnet With Black Frame") ||
+        products[0]
+      : selectedColor === "White"
+      ? findProductByName("White Frame") ||
+        findProductByName("Magnet With White Frame") ||
+        products[0]
+      : products[0];
 
-  const personalizationOptions =
-    toStringArray(product?.personalizationInstructions).length > 0
-      ? toStringArray(product?.personalizationInstructions)
-      : toStringArray(product?.personalization);
+  const title = selectedProduct?.productName ?? "";
+  const price = Number(selectedProduct?.price ?? 0);
+  const description = selectedProduct?.description ?? "";
+  const status = selectedProduct?.status ?? "Out of Stock";
+  const mainImage = selectedProduct?.primaryImage?.secure_url ?? "";
 
   const handleAddToCart = () => {
+    if (status === "Out of Stock") {
+      addToast("This product is out of stock!", "error");
+      return;
+    }
+
+    if (selectedOption === "With Frame" && !selectedColor) {
+      addToast("Please select frame color.", "error");
+      return;
+    }
+
     addToCart({
-      id: product?._id ?? `shop-${Date.now()}`,
+      id: selectedProduct?._id ?? `shop-${Date.now()}`,
       title,
       price,
-      frameType: selectedFrame,
+      frameType: selectedOption,
+      colorOption: selectedOption === "With Frame" ? selectedColor : "",
       quantity,
       image: mainImage,
     });
@@ -103,14 +103,17 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
+    if (selectedOption === "With Frame" && !selectedColor) {
+      addToast("Please select frame color.", "error");
+      return;
+    }
+
     router.push("/checkout");
   };
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-25 sm:px-4 lg:px-8">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
-
-        {/* IMAGE */}
         <div className="flex flex-col gap-6">
           <div className="relative flex aspect-[4/5] w-full max-h-[575px] max-w-[480px] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]">
             {mainImage ? (
@@ -120,16 +123,13 @@ export default function ShopViewProductDetailsSection({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="text-center">
-                <p className="text-sm font-medium text-slate-400">
-                  No image available
-                </p>
-              </div>
+              <p className="text-sm font-medium text-slate-400">
+                No image available
+              </p>
             )}
           </div>
         </div>
 
-        {/* DETAILS */}
         <div className="flex flex-col pt-3">
           <h1 className="mb-3 text-[22px] font-medium text-slate-800">
             {title}
@@ -138,9 +138,21 @@ export default function ShopViewProductDetailsSection({
           <div className="mb-6 flex items-center gap-4">
             <div className="text-[#FFB800]">★★★★★</div>
             <div className="mx-1 h-4 w-px bg-slate-300" />
-            <span className="text-sm font-bold text-[#E62A24]">
-              {inStock ? "IN STOCK" : "OUT OF STOCK"}
+
+            <span
+              className={`text-sm font-bold uppercase ${
+                status === "Out of Stock"
+                  ? "text-red-700"
+                  : status === "Low Stock"
+                  ? "text-red-500"
+                  : "text-green-600"
+              }`}
+            >
+              {status}
             </span>
+            <span className="text-sm text-slate-500">
+({Number((selectedProduct as any)?.stock ?? 0)} Available)
+  </span>
           </div>
 
           <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
@@ -153,17 +165,64 @@ export default function ShopViewProductDetailsSection({
 
           <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
 
-          {personalizationOptions.length > 0 && (
+          <div className="mb-8">
+            <label className="mb-3 block text-[15px] text-slate-800">
+              Personalization
+            </label>
+
+            <select
+              value={selectedOption}
+              onChange={(e) => {
+                setSelectedOption(e.target.value);
+                setSelectedColor("");
+              }}
+              className="h-11 w-full max-w-[260px] rounded-full border-2 border-[#002B73] px-4 text-sm outline-none"
+            >
+              <option value="Without Frame">Without Frame</option>
+              <option value="With Frame">With Frame</option>
+            </select>
+          </div>
+
+          {selectedOption === "With Frame" && (
             <div className="mb-8">
-              <PersonalizationSection
-                availableOptions={personalizationOptions}
-                availableColors={[]}
-                onChange={handlePersonalizationChange}
-              />
+              <label className="mb-3 block text-[15px] text-slate-800">
+                Select Color
+              </label>
+
+              <div className="flex gap-5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedColor("Black")}
+                  className="flex flex-col items-center gap-1 text-xs"
+                >
+                  <span
+                    className={`h-8 w-8 rounded-full border bg-black ${
+                      selectedColor === "Black"
+                        ? "ring-2 ring-[#002B73] ring-offset-2"
+                        : ""
+                    }`}
+                  />
+                  Black
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedColor("White")}
+                  className="flex flex-col items-center gap-1 text-xs"
+                >
+                  <span
+                    className={`h-8 w-8 rounded-full border bg-white ${
+                      selectedColor === "White"
+                        ? "ring-2 ring-[#002B73] ring-offset-2"
+                        : ""
+                    }`}
+                  />
+                  White
+                </button>
+              </div>
             </div>
           )}
 
-          {/* QUANTITY */}
           <div className="mb-10">
             <label className="mb-3 block text-[15px] text-slate-800">
               Quantity
@@ -192,11 +251,11 @@ export default function ShopViewProductDetailsSection({
             </div>
           </div>
 
-          {/* ACTIONS */}
           <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
             <button
               onClick={handleAddToCart}
-              className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E]"
+              disabled={status === "Out of Stock"}
+              className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
             >
               🛒 Add to Cart
             </button>
@@ -204,11 +263,11 @@ export default function ShopViewProductDetailsSection({
             <button
               type="button"
               onClick={handleBuyNow}
-              disabled={!isAuthenticated}
-              className={`flex-1 rounded-[4px] px-6 py-3  font-medium text-white ${
-                isAuthenticated
+              disabled={!isAuthenticated || status === "Out of Stock"}
+              className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
+                isAuthenticated && status !== "Out of Stock"
                   ? "bg-[#E62A24]"
-                  : " bg-[#E62A24]/60"
+                  : "bg-[#E62A24]/60"
               }`}
             >
               Buy Now

@@ -146,7 +146,7 @@ export default function LoginForm({
       className="w-full max-w-[288px] mx-auto flex flex-col sm:gap-8 lg:gap-6  text-gray-950"
     >
       <h2 className="text-center text-[30px] font-bold leading-[38px] mb-1">
-        Welcome back
+        Login
       </h2>
 
       {/* EMAIL */}
@@ -221,7 +221,7 @@ export default function LoginForm({
             <span>Sign in with Google</span>
           </button>
 
-          <p className="text-center text-[16px]">
+          <p className="text-center text-[14px]">
             Don't have an account?{" "}
             <button
               type="button"
