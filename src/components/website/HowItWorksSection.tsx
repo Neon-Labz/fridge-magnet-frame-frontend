@@ -1,6 +1,6 @@
 export default function HowItWorksSection() {
   return (
-<section className="w-full bg-[#F9F9FE] px-4 py-[30px] sm:px-6 lg:px-[100px] lg:py-[55px]">
+<section className="w-full bg-[#F9F9FE] px-4 py-[30px] sm:px-6 lg:px-[120px] lg:py-[55px]">
       <div className="mx-auto w-full max-w-[1800px] rounded-[22px] bg-[#07357E] px-5 py-8 text-white sm:px-8 sm:py-10 lg:px-[30px] lg:py-[42px]">
 
         {/* TITLE */}
@@ -33,7 +33,7 @@ export default function HowItWorksSection() {
 
           {/* ARROW */}
           <span className="hidden text-[28px] text-white lg:block">
-            ---›
+              →
           </span>
 
           {/* STEP 2 */}
@@ -57,7 +57,7 @@ export default function HowItWorksSection() {
 
           {/* ARROW */}
           <span className="hidden text-[28px] text-white lg:block">
-            ---›
+            →
           </span>
 
           {/* STEP 3 */}

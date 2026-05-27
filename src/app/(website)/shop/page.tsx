@@ -5,13 +5,16 @@ import { productCatalog } from '@/lib/productCatalog'
 export const metadata: Metadata = {
   title: 'Shop | Magnify',
   description: 'Browse our artisan-crafted Heritage Oak frames.',
-
 };
 
-export const revalidate = 0; // Always fetch fresh data from DB
+export const revalidate = 0;
+
 type ShopPageProps = {
-  searchParams?: Promise<{ productId?: string | string[]; frameType?: string | string[] }>;
-}
+  searchParams?: Promise<{
+    productId?: string | string[];
+    frameType?: string | string[];
+  }>;
+};
 
 type RawProduct = Record<string, any>;
 
@@ -26,7 +29,10 @@ function toComparableId(value: unknown): string {
 
   const record = value as Record<string, unknown>;
   const oid = record.$oid ?? record.oid ?? record.id ?? record._id;
-  return typeof oid === 'string' || typeof oid === 'number' ? String(oid).trim() : '';
+
+  return typeof oid === 'string' || typeof oid === 'number'
+    ? String(oid).trim()
+    : '';
 }
 
 function resolveProductId(product: any): string {
@@ -61,10 +67,20 @@ function extractProducts(payload: unknown): RawProduct[] {
 
 function normalizeProduct(rawProduct: RawProduct): RawProduct {
   const resolvedId = resolveProductId(rawProduct);
-  const productName = String(rawProduct?.productName ?? rawProduct?.name ?? '').trim();
-  const description = String(rawProduct?.description ?? '').trim();
+
+  const productName = String(
+    rawProduct?.productName ?? rawProduct?.name ?? ''
+  ).trim();
+
+  const description = String(
+    rawProduct?.description ?? ''
+  ).trim();
+
   const imageUrl = String(
-    rawProduct?.primaryImage?.secure_url ?? rawProduct?.primaryImageUrl ?? rawProduct?.image ?? ''
+    rawProduct?.primaryImage?.secure_url ??
+      rawProduct?.primaryImageUrl ??
+      rawProduct?.image ??
+      ''
   ).trim();
 
   return {
@@ -74,9 +90,13 @@ function normalizeProduct(rawProduct: RawProduct): RawProduct {
     productName,
     description,
     price: Number(rawProduct?.price ?? 0),
-    status: String(rawProduct?.status ?? 'In Stock').trim() || 'In Stock',
-    primaryImage: imageUrl ? { secure_url: imageUrl } : rawProduct?.primaryImage ?? null,
-    personalizationInstructions: rawProduct?.personalizationInstructions ?? [],
+    status:
+      String(rawProduct?.status ?? 'In Stock').trim() || 'In Stock',
+    primaryImage: imageUrl
+      ? { secure_url: imageUrl }
+      : rawProduct?.primaryImage ?? null,
+    personalizationInstructions:
+      rawProduct?.personalizationInstructions ?? [],
     personalization: rawProduct?.personalization ?? [],
   };
 }
@@ -90,26 +110,36 @@ async function fetchProductsForShop(): Promise<RawProduct[]> {
   ).replace(/\/$/, '');
 
   try {
-    const response = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
+    const response = await fetch(`${baseUrl}/products`, {
+      cache: 'no-store',
+    });
 
     if (!response.ok) {
       return [];
     }
 
     const payload = await response.json();
+
     return extractProducts(payload).map(normalizeProduct);
   } catch {
     return [];
   }
 }
 
-export default async function ShopPage({ searchParams }: ShopPageProps) {
+export default async function ShopPage({
+  searchParams,
+}: ShopPageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
 
-  const requestedProductId = Array.isArray(resolvedSearchParams.productId)
+  const requestedProductId = Array.isArray(
+    resolvedSearchParams.productId
+  )
     ? resolvedSearchParams.productId[0]
     : resolvedSearchParams.productId;
-  const requestedFrameType = Array.isArray(resolvedSearchParams.frameType)
+
+  const requestedFrameType = Array.isArray(
+    resolvedSearchParams.frameType
+  )
     ? resolvedSearchParams.frameType[0]
     : resolvedSearchParams.frameType;
 
@@ -125,11 +155,15 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       primaryImage: { secure_url: product.img },
       personalizationInstructions: [],
       personalization: [],
-    }))
+    }));
   }
 
   const filteredProducts = requestedProductId
-    ? products.filter((product) => resolveProductId(product) === toComparableId(requestedProductId))
+    ? products.filter(
+        (product) =>
+          resolveProductId(product) ===
+          toComparableId(requestedProductId)
+      )
     : products;
 
   return (
@@ -140,5 +174,5 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         selectedFrameType={requestedFrameType}
       />
     </main>
-  )
+  );
 }
