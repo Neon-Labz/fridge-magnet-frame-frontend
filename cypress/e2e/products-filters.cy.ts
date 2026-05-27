@@ -85,7 +85,7 @@ describe("Products Filter Functionality", () => {
     cy.contains("Previous").should("exist").and("be.visible");
   });
 
-it.only("should display product rows correctly after filter click", () => {
+it("should display product rows correctly after filter click", () => {
 
   cy.contains("button", "Filter")
     .click({ force: true });
