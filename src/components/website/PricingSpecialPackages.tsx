@@ -27,8 +27,8 @@ export default function SpecialPackages() {
   ];
 
   return (
-    <section className="bg-white md:py-10">
-      <div className="mx-auto max-w-[1235px] rounded-[32px] border border-[#E5E7EB] bg-white px-4 py-6 shadow-sm sm:px-6 sm:py-8 md:px-10 md:py-10">
+    <section className="bg-white md:py-10 px-3 sm:px-6 lg:px-7">
+      <div className="mx-auto max-w-[1275px] rounded-[32px] border border-[#E5E7EB] bg-white px-5 pb-10 py-6 shadow-sm sm:px-6 sm:py-8 md:px-10 md:py-10">
         {/* TITLE */}
         <div className="mb-6 flex items-center gap-2">
           <span className="text-xl sm:text-2xl">👑</span>

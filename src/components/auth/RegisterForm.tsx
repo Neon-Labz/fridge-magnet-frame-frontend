@@ -123,7 +123,7 @@ export default function RegisterForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-20 w-[26px] h-[26px]"
+            className="absolute right-0 top-3 w-[26px] h-[26px]"
           >
             {showPassword ? (
               <Eye className="w-5 h-5" />
@@ -159,6 +159,7 @@ export default function RegisterForm() {
       {/* GOOGLE */}
       <button
         type="button"
+        disabled
         className="flex items-center justify-center gap-2 w-full h-[48px] border border-gray-300 rounded-lg"
       >
         <GoogleIcon />

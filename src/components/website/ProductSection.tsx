@@ -46,7 +46,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
 
   return (
     <section className="w-full bg-[#F9F9FE] py-10 md:py-0">
-      <div className="mx-auto w-full max-w-[1800px] px-4 md:px-[100px]">
+      <div className="mx-auto w-full max-w-[1800px] px-4 md:px-[120px]">
         {/* HEADER */}
         <div className="mb-6 md:mb-[52px]">
           <h2 className="font-manrope text-[28px] md:text-[35px] font-bold leading-[1.1] tracking-[-0.35px] text-[#002B73]">

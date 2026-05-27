@@ -8,6 +8,21 @@ export interface Customer {
   [key: string]: unknown; // allow extra fields from backend
 }
 
+export interface CustomerApiItem {
+  _id?: string;
+  id?: string;
+  customerId?: string;
+  customerName?: string;
+  name?: string;
+  emailAddress?: string;
+  email?: string;
+  phoneNumber?: string;
+  phone?: string;
+  customerAddress?: string;
+  address?: string;
+  createdAt?: string;
+}
+
 export interface CustomerStats {
   totalActiveCustomers: number;
   satisfactionRate: number;
@@ -17,7 +32,7 @@ export interface CustomerStats {
 export interface CustomerApiResponse {
   statusCode: number;
   message: string;
-  data: Customer[];
+  data: CustomerApiItem[];
   total: number;
   page: number;
   limit: number;

@@ -4,7 +4,7 @@ export default function CustomerSection() {
   return (
     <section className="w-full bg-[#F9F9FE] py-[60px] md:py-[80px] lg:py-[30px] lg:pb-[60px]">
 
-      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[100px]">
+      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[120px]">
 
         {/* TOP */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -27,11 +27,11 @@ export default function CustomerSection() {
           <div className="flex items-center gap-[12px] md:justify-end">
 
             <button className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-[2px] border-[#002B73] text-[22px] font-bold text-[#002B73] transition hover:bg-[#002B73] hover:text-white">
-              ←
+              🡠
             </button>
 
             <button className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-[2px] border-[#002B73] text-[22px] font-bold text-[#002B73] transition hover:bg-[#002B73] hover:text-white">
-              →
+              🡢
             </button>
 
           </div>

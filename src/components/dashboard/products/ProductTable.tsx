@@ -14,22 +14,27 @@ export default function ProductTable({ products, onDelete, onView }: ProductTabl
     <div className="flex-1 overflow-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr>
+          <tr className="bg-slate-100" style={{ borderBottom: '2px solid #F1F5F9' }}>
             {['Product ID', 'Product Details', 'Price', 'Stock Status', 'Actions'].map((h, i) => (
-              <th key={h} className="py-5 text-xs font-bold uppercase" style={{
+              <th key={h} className="py-5 text-sm text-blue-300 font-semibold uppercase" style={{
                 paddingLeft: 32, paddingRight: i === 4 ? 32 : 0,
                 textAlign: i === 4 ? 'right' : 'left',
-                color: '#64748B', letterSpacing: '0.07em',
-                borderBottom: '1px solid #F1F5F9',
+               color: '#002B73',
+                letterSpacing: '0.07em',
+                borderBottom: '2px solid #F1F5F9',
               }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {products.map(product => (
-            <tr key={product.id} className="transition hover:bg-slate-50/50" style={{ borderTop: '1px solid #F8FAFC' }}>
+          {products.map((product,index) => (
+            <tr
+              key={`${product.id}-${index}`}
+              className="transition hover:bg-slate-50/50"
+              style={{ borderBottom: '1px solid #E8ECF4' }}
+            >
               <td className="pl-8 font-mono text-sm" style={{ height: 115, color: '#94A3B8', whiteSpace: 'nowrap' }}>
-                {product.id}
+                {product.sku || product.id}
               </td>
               <td className="pr-8">
                 <div className="flex items-center gap-5">
@@ -41,7 +46,7 @@ export default function ProductTable({ products, onDelete, onView }: ProductTabl
                 </div>
               </td>
               <td className="pl-8 text-base font-bold" style={{ color: '#1A1C1F', whiteSpace: 'nowrap' }}>
-                ${product.price.toFixed(2)}
+                LKR {product.price.toFixed(2)}
               </td>
               <td className="pl-8">
                 <StockBadge status={product.stockStatus} count={product.stockCount} />
