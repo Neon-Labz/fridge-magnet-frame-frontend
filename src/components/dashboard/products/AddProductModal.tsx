@@ -49,34 +49,35 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      const submitData: ProductFormData & {
-        personalizationEnabled?: boolean;
-        personalization?: string[];
-      } = {
-        ...form,
-        personalizationEnabled: form.personalization,
-        personalization: personalizationText
-          .split(',')
-          .map(item => item.trim())
-          .filter(Boolean),
-      };
+  try {
+    const submitData = {
+      ...form,
 
-      const shouldReset = await onSubmit?.(submitData);
+      personalizationEnabled: form.personalization,
 
-      if (shouldReset !== false) {
-        setForm(EMPTY);
-        setPersonalizationText('');
-      }
-    } catch {
-      // Parent submit handler owns the user-facing error message.
-    } finally {
-      setIsSubmitting(false);
+      personalizationOptions: personalizationText
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean),
+    };
+
+    const shouldReset = await onSubmit?.(
+      submitData as unknown as ProductFormData
+    );
+
+    if (shouldReset !== false) {
+      setForm(EMPTY);
+      setPersonalizationText('');
     }
-  };
+  } catch {
+    // Parent submit handler owns the user-facing error message.
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   if (!isOpen) return null;
 
