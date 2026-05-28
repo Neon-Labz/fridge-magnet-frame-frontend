@@ -9,6 +9,8 @@ export type WebsiteProduct = {
   badge?: string;
   frameType: 'without-frame' | 'black-frame' | 'white-frame';
   colorOption?: string;
+  stock: number;
+  status: string;
 };
 
 const FRAME_SEQUENCE: WebsiteProduct['frameType'][] = [
@@ -20,9 +22,7 @@ const FRAME_SEQUENCE: WebsiteProduct['frameType'][] = [
 function normalizeFrameType(value: unknown): WebsiteProduct['frameType'] | null {
   const normalized = String(value ?? '').trim().toLowerCase();
 
-  if (!normalized) {
-    return null;
-  }
+  if (!normalized) return null;
 
   if (
     normalized === 'without-frame' ||
@@ -62,27 +62,15 @@ function normalizeFrameType(value: unknown): WebsiteProduct['frameType'] | null 
 }
 
 function extractProducts(payload: unknown): any[] {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
+  if (Array.isArray(payload)) return payload;
 
-  if (!payload || typeof payload !== 'object') {
-    return [];
-  }
+  if (!payload || typeof payload !== 'object') return [];
 
   const data = payload as Record<string, any>;
 
-  if (Array.isArray(data.data?.products)) {
-    return data.data.products;
-  }
-
-  if (Array.isArray(data.products)) {
-    return data.products;
-  }
-
-  if (Array.isArray(data.data)) {
-    return data.data;
-  }
+  if (Array.isArray(data.data?.products)) return data.data.products;
+  if (Array.isArray(data.products)) return data.products;
+  if (Array.isArray(data.data)) return data.data;
 
   return [];
 }
@@ -92,9 +80,7 @@ function toProductId(value: unknown): string {
     return String(value).trim();
   }
 
-  if (!value || typeof value !== 'object') {
-    return '';
-  }
+  if (!value || typeof value !== 'object') return '';
 
   const record = value as Record<string, unknown>;
   const oid = record.$oid ?? record.oid ?? record.id ?? record._id;
@@ -106,37 +92,58 @@ function toProductId(value: unknown): string {
   return '';
 }
 
-export function mapBackendProductsToWebsiteProducts(payload: unknown): WebsiteProduct[] {
-  return extractProducts(payload).reduce<WebsiteProduct[]>((mappedProducts, item) => {
-    const id =
-      toProductId(item?._id) ||
-      toProductId(item?.id) ||
-      toProductId(item?.productId);
-    const title = String(item?.productName ?? item?.name ?? '').trim();
+export function mapBackendProductsToWebsiteProducts(
+  payload: unknown,
+): WebsiteProduct[] {
+  return extractProducts(payload).reduce<WebsiteProduct[]>(
+    (mappedProducts, item) => {
+      const id =
+        toProductId(item?._id) ||
+        toProductId(item?.id) ||
+        toProductId(item?.productId);
 
-    if (!id || !title) {
+      const title = String(item?.productName ?? item?.name ?? '').trim();
+
+      if (!id || !title) {
+        return mappedProducts;
+      }
+
+      const desc = String(item?.description ?? '').trim();
+      const price = Number(item?.price ?? 0);
+      const image = String(
+        item?.primaryImage?.secure_url ??
+          item?.primaryImageUrl ??
+          item?.image ??
+          '',
+      ).trim();
+
+      const normalizedFrameType = normalizeFrameType(
+        item?.frameType ?? item?.frame,
+      );
+
+      const fallbackFrameType =
+        FRAME_SEQUENCE[mappedProducts.length % FRAME_SEQUENCE.length];
+
+      const stock = Number(item?.stock ?? 0);
+      const status = String(item?.status ?? 'Out of Stock').trim();
+
+      mappedProducts.push({
+        id,
+        title,
+        desc,
+        price,
+        image,
+        badge: status,
+        frameType: normalizedFrameType ?? fallbackFrameType,
+        colorOption: undefined,
+        stock,
+        status,
+      });
+
       return mappedProducts;
-    }
-
-    const desc = String(item?.description ?? '').trim();
-    const price = Number(item?.price ?? 0);
-    const image = String(item?.primaryImage?.secure_url ?? item?.primaryImageUrl ?? item?.image ?? '').trim();
-    const normalizedFrameType = normalizeFrameType(item?.frameType ?? item?.frame);
-    const fallbackFrameType = FRAME_SEQUENCE[mappedProducts.length % FRAME_SEQUENCE.length];
-
-    mappedProducts.push({
-      id,
-      title,
-      desc,
-      price,
-      image,
-      badge: String(item?.status ?? '').trim(),
-      frameType: normalizedFrameType ?? fallbackFrameType,
-      colorOption: undefined,
-    });
-
-    return mappedProducts;
-  }, []);
+    },
+    [],
+  );
 }
 
 function getCatalogFallbackProducts(): WebsiteProduct[] {
@@ -149,10 +156,14 @@ function getCatalogFallbackProducts(): WebsiteProduct[] {
     badge: product.badge,
     frameType: product.frameOption,
     colorOption: product.colorOption,
+    stock: 10,
+    status: product.badge || 'In Stock',
   }));
 }
 
-export async function fetchWebsiteProductsFromBackend(): Promise<WebsiteProduct[]> {
+export async function fetchWebsiteProductsFromBackend(): Promise<
+  WebsiteProduct[]
+> {
   const baseUrl = (
     process.env.NEXT_PUBLIC_BACKEND_API_URL ||
     process.env.NEXT_BACKEND_URL ||
@@ -161,7 +172,9 @@ export async function fetchWebsiteProductsFromBackend(): Promise<WebsiteProduct[
   ).replace(/\/$/, '');
 
   try {
-    const response = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
+    const response = await fetch(`${baseUrl}/products`, {
+      cache: 'no-store',
+    });
 
     if (!response.ok) {
       return getCatalogFallbackProducts();

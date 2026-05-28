@@ -139,31 +139,58 @@ export default function ProductsPage() {
   }
 };
 
-  const handleUpdateProduct = async (product: Product, newStatus: string) => {
-    try {
-      const res = await fetch(apiV1Url(`/api/products/${product.id}`), {
+  const handleUpdateProduct = async (
+  product: Product,
+  newStock: string,
+) => {
+  try {
+    const updatedStock = Number(newStock);
+
+    let status = 'Out of Stock';
+
+    if (updatedStock > 10) {
+      status = 'In Stock';
+    } else if (updatedStock > 4) {
+      status = 'Low Stock';
+    }
+
+    const res = await fetch(
+      apiV1Url(`/api/products/${product.id}`),
+      {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus }),
-      });
+        body: JSON.stringify({
+          stock: updatedStock,
+          status,
+        }),
+      },
+    );
 
-      const result = await res.text();
+    const result = await res.text();
 
-      if (!res.ok) {
-        throw new Error(getErrorMessage(result));
-      }
-
-      setProductMessage('Product updated successfully');
-      await refreshProducts();
-      setViewTarget(null);
-      return true;
-    } catch (error) {
-      setProductMessage(error instanceof Error ? error.message : 'Failed to update product');
-      return false;
+    if (!res.ok) {
+      throw new Error(getErrorMessage(result));
     }
-  };
+
+    setProductMessage('Stock updated successfully');
+
+    await refreshProducts();
+
+    setViewTarget(null);
+
+    return true;
+  } catch (error) {
+    setProductMessage(
+      error instanceof Error
+        ? error.message
+        : 'Failed to update stock',
+    );
+
+    return false;
+  }
+};
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;

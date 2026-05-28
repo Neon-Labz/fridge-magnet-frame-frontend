@@ -56,7 +56,7 @@ export default function Hero() {
             {/* BUTTON */}
             <button
               onClick={() => router.push("/shop")}
-              className="mt-6 md:mt-[42px] flex h-[48px] md:h-[68px] w-[160px] md:w-[180px] items-center justify-center rounded-[10px] bg-[#BC0000] text-[16px] md:text-[18px] font-semibold text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)] transition-all hover:bg-[#a00000]"
+              className="mt-6 md:mt-[42px] flex h-[48px] md:h-[68px] w-[160px] md:w-[180px] items-center justify-center rounded-[10px] bg-[#BC0000] text-[25px] md:text-[28px] font-semibold text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)] transition-all hover:bg-[#a00000]"
             >
               Shop Now
             </button>
