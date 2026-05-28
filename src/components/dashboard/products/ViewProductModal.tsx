@@ -44,7 +44,7 @@ export default function ViewProductModal({
 
   if (!isOpen || !product) return null;
 
-const currentStock = Number(product.stockCount ?? 0);
+  const currentStock = Number(product.stockCount ?? 0);
   const updatedStock = currentStock + extraStock;
 
   const getStatus = (stock: number) => {
@@ -104,6 +104,7 @@ const currentStock = Number(product.stockCount ?? 0);
             >
               Manage Stock Level
             </h2>
+
             <p className="text-sm mt-1" style={{ color: '#64748B' }}>
               Add extra stock for this product. Status will update automatically.
             </p>
@@ -111,15 +112,16 @@ const currentStock = Number(product.stockCount ?? 0);
 
           <button
             onClick={onClose}
-            className="flex items-center justify-center rounded-full hover:bg-slate-100 flex-shrink-0 ml-4"
+            className="flex items-center justify-center rounded-full hover:bg-slate-100"
             style={{ width: 32, height: 32 }}
           >
             <X size={18} color="#94A3B8" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto px-20 py-6">
+          <div className="grid grid-cols-[650px_350px] gap-[22px]">
+            {/* LEFT PRODUCT BOX */}
             <div
               className="flex flex-col md:flex-row items-center gap-8 p-8 md:p-10"
               style={{
@@ -143,12 +145,7 @@ const currentStock = Number(product.stockCount ?? 0);
                     className="h-full w-full rounded-2xl object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-white border-[12px] border-[#A67C52] shadow-md flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 border-[1px] border-black/10" />
-                    <div className="w-[70%] h-[70%] bg-[#FDFDFD] border border-gray-100 flex items-center justify-center text-[10px] text-gray-400 font-bold text-center p-2 uppercase tracking-wider">
-                      {product.name}
-                    </div>
-                  </div>
+                  <div className="w-full h-full bg-white border-[12px] border-[#A67C52]" />
                 )}
               </div>
 
@@ -163,7 +160,6 @@ const currentStock = Number(product.stockCount ?? 0);
                 <h2
                   className="font-bold leading-tight"
                   style={{
-                    fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
                     fontSize: 32,
                     color: '#002B73',
                   }}
@@ -180,6 +176,7 @@ const currentStock = Number(product.stockCount ?? 0);
               </div>
             </div>
 
+            {/* BLUE BOX */}
             <div
               className="flex flex-col justify-between p-8 md:p-10"
               style={{
@@ -191,7 +188,8 @@ const currentStock = Number(product.stockCount ?? 0);
               <div className="flex flex-col gap-5">
                 <div className="flex items-center gap-3">
                   <Package size={28} color="#DAE2FF" strokeWidth={2.5} />
-                  <span className="text-2xl font-bold text-white tracking-tight">
+
+                  <span className="text-2xl font-bold text-white">
                     Add Extra Stock
                   </span>
                 </div>
@@ -205,7 +203,9 @@ const currentStock = Number(product.stockCount ?? 0);
 
                 <p className="text-lg font-medium" style={{ color: '#98B3FF' }}>
                   Current Stock:{' '}
-                  <span className="font-bold text-white">{currentStock}</span>
+                  <span className="font-bold text-white">
+                    {currentStock}
+                  </span>
                 </p>
               </div>
 
@@ -221,7 +221,9 @@ const currentStock = Number(product.stockCount ?? 0);
                   type="number"
                   min={0}
                   value={extraStock}
-                  onChange={(e) => setExtraStock(Number(e.target.value) || 0)}
+                  onChange={(e) =>
+                    setExtraStock(Number(e.target.value) || 0)
+                  }
                   className="w-full px-6 text-white font-bold text-lg outline-none"
                   style={{
                     height: 60,
@@ -232,7 +234,9 @@ const currentStock = Number(product.stockCount ?? 0);
 
                 <p className="text-lg font-medium mt-3" style={{ color: '#98B3FF' }}>
                   Updated Stock:{' '}
-                  <span className="font-bold text-white">{updatedStock}</span>
+                  <span className="font-bold text-white">
+                    {updatedStock}
+                  </span>
                 </p>
 
                 <p className="text-lg font-medium" style={{ color: '#98B3FF' }}>
@@ -244,162 +248,106 @@ const currentStock = Number(product.stockCount ?? 0);
               </div>
             </div>
 
-            <div
-              className="flex flex-col justify-center gap-4 px-8 py-8"
-              style={{
-                background: '#F8F8FB',
-                border: '1px solid #EDEDF2',
-                borderRadius: cardRadius,
-              }}
-            >
-              <h4 className="text-lg font-bold" style={{ color: '#002B73' }}>
-                Warehouse Location
-              </h4>
-
-              <div className="flex items-center gap-4">
+            {/* BOTTOM BOXES */}
+            <div className="col-span-2 mt-[12px] grid grid-cols-[350px_650px] gap-[25px]">
+              {/* WAREHOUSE */}
+              <div
+                className="flex items-center gap-4"
+                style={{
+                  height: 110,
+                  borderRadius: cardRadius,
+                  background: '#F5F6FB',
+                  border: '1px solid #E5E7EB',
+                  padding: '24px 28px',
+                }}
+              >
                 <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-white rounded-full shadow-sm">
                   <MapPin size={22} color="#0040A1" strokeWidth={2.5} />
                 </div>
 
                 <div>
+                  <h4
+                    className="text-lg font-bold"
+                    style={{ color: '#002B73' }}
+                  >
+                    Warehouse Location
+                  </h4>
+
                   <p
                     className="text-[19px] font-bold leading-tight"
                     style={{ color: '#1A1C1F' }}
                   >
-                    {product.warehouseLocation || 'Main Warehouse'}
+                    {product.warehouseLocation || 'Kokuvil'}
                   </p>
+
                   <p
                     className="text-sm font-medium mt-0.5"
                     style={{ color: '#5C5F6C' }}
                   >
-                    {product.warehouseCenter || 'Distribution Center'}
+                    {product.warehouseCenter || 'west,Jaffna'}
                   </p>
                 </div>
               </div>
-            </div>
 
-            <div
-              className="relative flex items-center justify-between px-8 py-8"
-              style={{
-                background: '#F8F8FB',
-                border: '1px solid #EDEDF2',
-                borderRadius: cardRadius,
-              }}
-            >
-              <div className="flex flex-col gap-1.5">
-                <h4 className="text-lg font-bold" style={{ color: '#002B73' }}>
-                  Last Updated
-                </h4>
+              {/* LAST UPDATED */}
+              <div
+                className="flex items-center justify-between"
+                style={{
+                  height: 110,
+                  borderRadius: cardRadius,
+                  background: '#F5F6FB',
+                  border: '1px solid #E5E7EB',
+                  padding: '24px 28px',
+                }}
+              >
+                <div>
+                  <h4
+                    className="text-lg font-bold"
+                    style={{ color: '#002B73' }}
+                  >
+                    Last Updated
+                  </h4>
 
-                <p className="text-lg font-medium" style={{ color: '#5C5F6C' }}>
-                  Adjusted by{' '}
-                  <span className="font-bold text-[#1A1C1F]">
-                    {product.lastUpdatedBy || 'Admin'}
-                  </span>{' '}
-                  on {product.lastUpdatedDate || new Date().toISOString()}
-                </p>
-              </div>
+                  <p
+                    className="text-lg font-medium"
+                    style={{ color: '#5C5F6C' }}
+                  >
+                    Adjusted by{' '}
+                    <span className="font-bold text-[#1A1C1F]">
+                      {product.lastUpdatedBy || 'Admin'}
+                    </span>{' '}
+                    on {product.lastUpdatedDate || new Date().toISOString()}
+                  </p>
+                </div>
 
-              <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowLog((prev) => !prev)}
-                  className="flex items-center gap-2 text-base font-bold transition hover:text-[#0040A1] flex-shrink-0"
+                  className="flex items-center gap-2 text-base font-bold"
                   style={{ color: '#002B73' }}
                 >
                   View Log
-                  <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm ml-1">
+
+                  <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
                     <History size={16} />
                   </div>
                 </button>
-
-                {showLog && (
-                  <div
-                    className="absolute right-0 mt-3 w-[420px] bg-white shadow-2xl z-50 p-5"
-                    style={{
-                      borderRadius: 16,
-                      border: '1px solid #E2E8F0',
-                    }}
-                  >
-                    <h3
-                      className="text-lg font-bold mb-1"
-                      style={{ color: '#002B73' }}
-                    >
-                      Stock Update Logs
-                    </h3>
-
-                    <p className="mb-4 text-sm text-slate-500">
-                      {product.name}
-                    </p>
-
-                    {selectedProductLogs.length === 0 ? (
-                      <p className="text-sm text-slate-500">
-                        No stock updates yet for this product.
-                      </p>
-                    ) : (
-                      <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto">
-                        {selectedProductLogs.map((log, index) => (
-                          <div
-                            key={index}
-                            className="border rounded-xl p-4"
-                            style={{ borderColor: '#E2E8F0' }}
-                          >
-                            <p className="text-sm font-semibold text-[#002B73]">
-                              {log.date}
-                            </p>
-
-                            <p className="text-sm mt-2">
-                              Product:
-                              <span className="font-bold ml-1">
-                                {log.productName}
-                              </span>
-                            </p>
-
-                            <p className="text-sm">
-                              Previous Stock:
-                              <span className="font-bold ml-1">
-                                {log.previousStock}
-                              </span>
-                            </p>
-
-                            <p className="text-sm">
-                              Added Stock:
-                              <span className="font-bold text-green-600 ml-1">
-                                +{log.addedStock}
-                              </span>
-                            </p>
-
-                            <p className="text-sm">
-                              Updated Stock:
-                              <span className="font-bold ml-1">
-                                {log.updatedStock}
-                              </span>
-                            </p>
-
-                            <p className="text-sm">
-                              Updated By:
-                              <span className="font-bold ml-1">
-                                {log.updatedBy}
-                              </span>
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
+        {/* BUTTONS */}
         <div
           className="flex-shrink-0 flex items-center justify-end gap-4 px-8 py-6"
-          style={{ borderTop: '1px solid #F1F5F9', background: '#FAFAFA' }}
+          style={{
+            borderTop: '1px solid #F1F5F9',
+            background: '#FAFAFA',
+          }}
         >
           <button
             onClick={onClose}
-            className="flex items-center justify-center font-bold text-lg transition hover:bg-gray-50"
+            className="flex items-center justify-center font-bold text-lg"
             style={{
               width: 140,
               height: 60,
@@ -431,13 +379,12 @@ const currentStock = Number(product.stockCount ?? 0);
               }
             }}
             disabled={isUpdating || extraStock <= 0}
-            className="flex items-center justify-center font-bold text-lg text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center justify-center font-bold text-lg text-white"
             style={{
               width: 280,
               height: 60,
               background: '#BC0000',
               borderRadius: 12,
-              boxShadow: '0px 4px 12px rgba(188, 0, 0, 0.2)',
             }}
           >
             {isUpdating ? 'Updating...' : 'Confirm Stock Update'}
