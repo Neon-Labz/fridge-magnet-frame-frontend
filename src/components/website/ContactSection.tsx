@@ -113,41 +113,43 @@ export default function ContactSection() {
               </div>
             </div>
 
-            <div className="relative">
+            <div>
               <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                 Subject
               </label>
-              <select
-                id="subject"
-                required
-                value={formData.subject}
-                onChange={handleChange}
-                className="h-[40px] w-full appearance-none rounded-[8px] border border-[#C3C6D4] bg-white px-4 pr-10 text-[16px] outline-none focus:border-[#0040A1]"
-              >
-                <option value="" disabled>
-                  Select subject
-                </option>
-                {subjectOptions.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
+              <div className="relative">
+                <select
+                  id="subject"
+                  required
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="h-[40px] w-full appearance-none truncate rounded-[8px] border border-[#C3C6D4] bg-white pl-4 pr-12 text-[16px] outline-none focus:border-[#0040A1]"
+                >
+                  <option value="" disabled>
+                    Select subject
                   </option>
-                ))}
-              </select>
+                  {subjectOptions.map((subject) => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
 
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="pointer-events-none absolute right-3 top-[38px] h-4 w-4 text-black"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
             </div>
 
             <div>
