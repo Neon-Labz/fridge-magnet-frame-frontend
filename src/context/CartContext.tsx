@@ -31,11 +31,11 @@ function getSafeItems(items: unknown): CartItem[] {
 }
 
 function clampQuantity(quantity: number, stock?: number): number {
-  const safeQuantity = Math.max(4, Number(quantity) || 4);
-  const safeStock = Number(stock);
-  return Number.isFinite(safeStock) && safeStock >= 0
-    ? Math.min(safeQuantity, safeStock)
-    : safeQuantity;
+  const requested = Math.max(1, Number(quantity) || 1);
+  const available = Number(stock);
+  return Number.isFinite(available) && available >= 0
+    ? Math.min(requested, available)
+    : requested;
 }
 
 function reducer(state: State, action: Action): State {
@@ -153,9 +153,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             try {
               const response = await fetch(apiV1Url(`/api/products/${item.id}`));
               if (!response.ok) return item;
+
               const product = await response.json();
               const stock = Number(product?.stock ?? product?.data?.stock);
               if (!Number.isFinite(stock)) return item;
+
               return {
                 ...item,
                 stock,
@@ -166,8 +168,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
           }),
         ).then((items) => dispatch({ type: "hydrate", payload: items }));
-      } else {
-        dispatch({ type: "hydrate", payload: [] });
       }
     } catch (err) {
       console.error("Failed to hydrate cart", err);

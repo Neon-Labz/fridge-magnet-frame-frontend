@@ -44,7 +44,7 @@ function CartItem({
         item.id,
         item.frameType,
         item.colorOption,
-        Math.min(Math.max(4, qty), item.stock ?? Number.POSITIVE_INFINITY)
+        Math.min(Math.max(1, qty), item.stock ?? Number.POSITIVE_INFINITY)
       );
     }
   };
@@ -101,7 +101,7 @@ function CartItem({
                   item.id,
                   item.frameType,
                   item.colorOption,
-                  Math.max(4, item.quantity - 1)
+                  Math.max(1, item.quantity - 1)
                 )
               }
               className="px-3 py-1 hover:bg-gray-100"
@@ -115,7 +115,7 @@ function CartItem({
               className="w-10 text-center outline-none text-sm"
               type="number"
               inputMode="numeric"
-              min={4}
+              min={1}
               max={item.stock}
             />
 
