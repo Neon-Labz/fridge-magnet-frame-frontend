@@ -11,6 +11,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { clearWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 
 const NAV_ITEMS = [
   { label: 'Products', icon: Package, href: '/dashboard/products' },
@@ -30,9 +31,17 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
+    // BUG-023 FIX: On admin login, LoginForm.tsx writes two storage entries:
+    //   localStorage['token'] + cookie 'token'       — used by useWebsiteAuthSession
+    //   localStorage['adminToken'] + cookie 'adminToken' — used by admin middleware
+    // The old code only removed 'adminToken', leaving 'token' intact so the
+    // website Navbar still showed the user as authenticated after logout.
+    // clearWebsiteAuthSession() removes 'token' + its cookie and fires the
+    // auth-changed event so any listener (Navbar) updates immediately.
+    clearWebsiteAuthSession();
     localStorage.removeItem('adminToken');
     document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    router.push('/');
+    router.push('/login');
   };
 
   return (
