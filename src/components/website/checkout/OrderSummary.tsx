@@ -18,8 +18,12 @@ export type SummaryItem = {
 interface OrderSummaryProps {
   items: SummaryItem[];
   subtotal: number;
+  shipping?: number;
+  shippingEntered?: boolean;
   onPlaceOrder?: () => void;
   disabled?: boolean;
+  paymentMethod?: "card" | "cod";
+  onPaymentMethodChange?: (method: "card" | "cod") => void;
 }
 
 const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradient" => {
@@ -41,11 +45,16 @@ const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradien
 export default function OrderSummary({
   items,
   subtotal,
+  shipping = 0,
+  shippingEntered = false,
   onPlaceOrder,
   disabled = false,
+  paymentMethod = "card",
+  onPaymentMethodChange,
 }: OrderSummaryProps) {
   const hasItems = items.length > 0;
   const isDisabled = disabled || !hasItems;
+  const total = subtotal + (shippingEntered ? shipping : 0);
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm py-6">
@@ -107,9 +116,15 @@ export default function OrderSummary({
 
         <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
           <span>Shipping</span>
-          <span className="text-[#5D1900] text-xs">
-            Enter your shipping address
-          </span>
+          {shippingEntered ? (
+            <span className="font-medium">
+              Rs{shipping.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </span>
+          ) : (
+            <span className="text-[#5D1900] text-xs">
+              Enter your shipping address
+            </span>
+          )}
         </div>
       </div>
 
@@ -120,7 +135,7 @@ export default function OrderSummary({
           Total
         </span>
         <span className="text-sm sm:text-base font-semibold text-[#0040A1]">
-          Rs{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          Rs{total.toLocaleString(undefined, { maximumFractionDigits: 2 })}
         </span>
       </div>
 
@@ -135,7 +150,9 @@ export default function OrderSummary({
             <input
               type="radio"
               name="payment"
-              defaultChecked
+              value="card"
+              checked={paymentMethod === "card"}
+              onChange={() => onPaymentMethodChange?.("card")}
               className="h-4 w-4 accent-[#002B73]"
             />
             <CreditCard className="h-4 w-4 text-[#747784]" />
@@ -148,6 +165,9 @@ export default function OrderSummary({
             <input
               type="radio"
               name="payment"
+              value="cod"
+              checked={paymentMethod === "cod"}
+              onChange={() => onPaymentMethodChange?.("cod")}
               className="h-4 w-4 accent-[#002B73]"
             />
             <Lock className="h-4 w-4 text-[#747784]" />
@@ -171,7 +191,7 @@ export default function OrderSummary({
           disabled={isDisabled}
         >
           <Lock className="h-4 w-4" />
-          Place Order
+          {paymentMethod === "card" ? "Proceed to Payment" : "Place Order"}
         </Button>
 
         {isDisabled && (
