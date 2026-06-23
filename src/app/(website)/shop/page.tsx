@@ -85,10 +85,10 @@ function normalizeProduct(rawProduct: RawProduct): RawProduct {
 }
 
 async function fetchProductsForShop(): Promise<RawProduct[]> {
-  const baseUrl = 'http://localhost:5000/api/v1';
+  const backendBase = process.env.NEXT_BACKEND_URL || 'http://localhost:5000';
 
   try {
-    const response = await fetch(`${baseUrl}/api/products`, {
+    const response = await fetch(`${backendBase}/api/v1/api/products`, {
       cache: 'no-store',
     });
 
