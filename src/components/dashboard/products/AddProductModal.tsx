@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { ChangeEvent, CSSProperties, FormEvent } from 'react';
+import type { ChangeEvent, CSSProperties } from 'react';
 import { X, ImagePlus, Images, Plus } from 'lucide-react';
 import type { ProductFormData } from '@/types/product';
 
@@ -25,13 +25,22 @@ const EMPTY: ProductFormData = {
   galleryImages: [],
 };
 
+const MAX_GALLERY = 5;
+
+type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price', string>>;
+
 export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalProps) {
   const [form, setForm] = useState<ProductFormData>(EMPTY);
   const [personalizationText, setPersonalizationText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name in fieldErrors) {
+      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    }
     setForm(prev => ({
       ...prev,
       [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
@@ -44,12 +53,30 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
     if (type === 'primary') {
       setForm(prev => ({ ...prev, primaryImage: e.target.files![0] ?? null }));
     } else {
-      setForm(prev => ({ ...prev, galleryImages: Array.from(e.target.files!) }));
+      const files = Array.from(e.target.files!);
+      if (files.length > MAX_GALLERY) {
+        setGalleryError(`You can upload a maximum of ${MAX_GALLERY} gallery images.`);
+        return;
+      }
+      setGalleryError(null);
+      setForm(prev => ({ ...prev, galleryImages: files }));
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
   e.preventDefault();
+  if (galleryError) return;
+
+  const errors: FieldErrors = {};
+  if (!form.name.trim()) errors.name = 'Product name is required.';
+  if (!form.productId.trim()) errors.productId = 'Product ID is required.';
+  if (!form.description.trim()) errors.description = 'Description is required.';
+  if (!form.price || form.price <= 0) errors.price = 'Price must be greater than 0.';
+  if (Object.keys(errors).length > 0) {
+    setFieldErrors(errors);
+    return;
+  }
+
   setIsSubmitting(true);
 
   try {
@@ -71,6 +98,8 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
     if (shouldReset !== false) {
       setForm(EMPTY);
       setPersonalizationText('');
+      setGalleryError(null);
+      setFieldErrors({});
     }
   } catch {
     // Parent submit handler owns the user-facing error message.
@@ -147,8 +176,11 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
               value={form.name}
               onChange={handleChange}
               placeholder="e.g. Vintage Walnut Frame"
-              style={inputStyle}
+              style={{ ...inputStyle, border: fieldErrors.name ? '1px solid #BC0000' : inputStyle.border }}
             />
+            {fieldErrors.name && (
+              <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{fieldErrors.name}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -162,8 +194,11 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                 value={form.productId}
                 onChange={handleChange}
                 placeholder="SKU-000"
-                style={inputStyle}
+                style={{ ...inputStyle, border: fieldErrors.productId ? '1px solid #BC0000' : inputStyle.border }}
               />
+              {fieldErrors.productId && (
+                <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{fieldErrors.productId}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -224,9 +259,12 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                   min={0}
                   onChange={handleChange}
                   placeholder="1200"
-                  style={{ ...inputStyle, paddingLeft: 60 }}
+                  style={{ ...inputStyle, paddingLeft: 60, border: fieldErrors.price ? '1px solid #BC0000' : inputStyle.border }}
                 />
               </div>
+              {fieldErrors.price && (
+                <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{fieldErrors.price}</p>
+              )}
             </div>
           </div>
 
@@ -243,13 +281,16 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
               className="w-full resize-none outline-none p-4"
               style={{
                 background: '#F3F3F8',
-                border: '1px solid #C3C6D4',
+                border: fieldErrors.description ? '1px solid #BC0000' : '1px solid #C3C6D4',
                 borderRadius: 8,
                 fontSize: 16,
                 color: '#1A1C1F',
                 minHeight: 120,
               }}
             />
+            {fieldErrors.description && (
+              <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{fieldErrors.description}</p>
+            )}
           </div>
 
           <div className="pt-2" style={{ borderTop: '1px solid #F1F5F9' }}>
@@ -355,20 +396,25 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                   className="flex flex-col items-center justify-center gap-2 p-6"
                   style={{
                     background: '#F8FAFC',
-                    border: '2px dashed #C3C6D4',
+                    border: `2px dashed ${galleryError ? '#BC0000' : '#C3C6D4'}`,
                     borderRadius: 12,
                     minHeight: 120,
                   }}
                 >
-                  <Images size={25} color="#94A3B8" />
+                  <Images size={25} color={galleryError ? '#BC0000' : '#94A3B8'} />
                   <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#64748B' }}>
                     Multi Upload
                   </span>
                   <span className="text-xs" style={{ color: '#94A3B8' }}>
-                    {form.galleryImages.length > 0 ? `${form.galleryImages.length} images` : 'Grid of detail shots'}
+                    {form.galleryImages.length > 0 ? `${form.galleryImages.length} images` : `Up to ${MAX_GALLERY} images`}
                   </span>
                 </div>
               </label>
+              {galleryError && (
+                <p className="text-xs font-semibold mt-1" style={{ color: '#BC0000' }}>
+                  {galleryError}
+                </p>
+              )}
             </div>
           </div>
         </form>
