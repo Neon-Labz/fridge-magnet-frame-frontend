@@ -20,6 +20,8 @@ interface OrderSummaryProps {
   subtotal: number;
   onPlaceOrder?: () => void;
   disabled?: boolean;
+  paymentMethod?: "card" | "cod";
+  onPaymentMethodChange?: (method: "card" | "cod") => void;
 }
 
 const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradient" => {
@@ -43,6 +45,8 @@ export default function OrderSummary({
   subtotal,
   onPlaceOrder,
   disabled = false,
+  paymentMethod = "card",
+  onPaymentMethodChange,
 }: OrderSummaryProps) {
   const hasItems = items.length > 0;
   const isDisabled = disabled || !hasItems;
@@ -135,7 +139,9 @@ export default function OrderSummary({
             <input
               type="radio"
               name="payment"
-              defaultChecked
+              value="card"
+              checked={paymentMethod === "card"}
+              onChange={() => onPaymentMethodChange?.("card")}
               className="h-4 w-4 accent-[#002B73]"
             />
             <CreditCard className="h-4 w-4 text-[#747784]" />
@@ -148,6 +154,9 @@ export default function OrderSummary({
             <input
               type="radio"
               name="payment"
+              value="cod"
+              checked={paymentMethod === "cod"}
+              onChange={() => onPaymentMethodChange?.("cod")}
               className="h-4 w-4 accent-[#002B73]"
             />
             <Lock className="h-4 w-4 text-[#747784]" />
@@ -171,7 +180,7 @@ export default function OrderSummary({
           disabled={isDisabled}
         >
           <Lock className="h-4 w-4" />
-          Place Order
+          {paymentMethod === "card" ? "Proceed to Payment" : "Place Order"}
         </Button>
 
         {isDisabled && (

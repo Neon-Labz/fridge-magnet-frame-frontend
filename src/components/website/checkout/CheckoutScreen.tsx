@@ -6,12 +6,16 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import OrderSummary, { SummaryItem } from "./OrderSummary";
-import { saveOrder } from "@/services/cartService";
 import { useCart } from "@/context/CartContext";
 import { useFrameStore } from "@/store/frameStore";
 import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
 import { Truck, UserRound } from "lucide-react";
-import { apiV1Url } from "@/lib/backendUrl";
+import {
+  PaymentMethod,
+  PendingOrder,
+  savePendingOrder,
+  submitOrder,
+} from "@/services/orderService";
 
 const generateOrderNumber = () =>
   `MAG-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -108,6 +112,7 @@ export default function CheckoutScreen() {
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
   const setField = (k: keyof FormState, v: string) =>
     setForm((s) => ({ ...s, [k]: v }));
@@ -180,50 +185,55 @@ export default function CheckoutScreen() {
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const shippingAddress = `${form.street}, ${form.city}, ${form.state} ${form.zip}`.trim();
     const customerName = `${form.firstName} ${form.lastName}`.trim();
+    const totalValue = subtotal + shipping;
 
+    const pendingOrder: PendingOrder = {
+      paymentMethod,
+      amount: totalValue,
+      backendPayload: {
+        orderId: orderNumber,
+        customerName,
+        customerId: `CUST-${Date.now()}`,
+        email: form.email,
+        phone: form.phone,
+        qty: totalQuantity,
+        totalValue,
+        shippingAddress,
+        adminNote: form.notes?.trim() || undefined,
+        items: items.map((item) => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          frameType: item.frameType,
+          colorOption: item.colorOption,
+        })),
+      },
+      orderRecord: {
+        items,
+        subtotal,
+        shipping,
+        orderNumber,
+        createdAt: new Date().toISOString(),
+        customerDetails: form,
+      },
+    };
+
+    // Card payments must go through the payment gateway before the order is
+    // finalized. Store the prepared order and redirect to the payment page.
+    if (paymentMethod === "card") {
+      savePendingOrder(pendingOrder);
+      router.push("/payment");
+      return;
+    }
+
+    // Cash on delivery: place the order immediately.
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
-      const response = await fetch(apiV1Url("/orders"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: orderNumber,
-          customerName,
-          customerId: `CUST-${Date.now()}`,
-          email: form.email,
-          phone: form.phone,
-          qty: totalQuantity,
-          totalValue: subtotal + shipping,
-          shippingAddress,
-          adminNote: form.notes?.trim() || undefined,
-          items: items.map((item) => ({
-            productId: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.image,
-            frameType: item.frameType,
-            colorOption: item.colorOption,
-          })),
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.message || `Order failed: ${response.status}`);
-      }
-
-      saveOrder({
-      items,
-      subtotal,
-      shipping,
-      orderNumber,
-      createdAt: new Date().toISOString(),
-      customerDetails: form,
-      });
-
+      await submitOrder(pendingOrder);
       clearCart();
       setSelectedFrame("black-frame");
       router.push("/order-confirmation");
@@ -290,6 +300,8 @@ export default function CheckoutScreen() {
             subtotal={subtotal}
             onPlaceOrder={handlePlaceOrder}
             disabled={!isFormValid || isSubmitting}
+            paymentMethod={paymentMethod}
+            onPaymentMethodChange={setPaymentMethod}
           />
           {submitError && (
             <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
