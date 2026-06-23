@@ -28,12 +28,11 @@ interface ForgotPasswordData {
 
 type AuthResponseData = {
   token?: string
-  accessToken?: string
-  access_token?: string
-  data?: {
-    token?: string
-    accessToken?: string
-    access_token?: string
+  user?: {
+    id?: string
+    fullName?: string
+    email?: string
+    role?: string
   }
 }
 
