@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
+import { SRI_LANKA_DISTRICTS } from "@/lib/sriLankaDistricts";
 import OrderSummary, { SummaryItem } from "./OrderSummary";
 import { useCart } from "@/context/CartContext";
 import { useFrameStore } from "@/store/frameStore";
@@ -216,6 +218,7 @@ export default function CheckoutScreen() {
         qty: totalQuantity,
         totalValue,
         shippingAddress,
+        district: form.state,
         adminNote: form.notes?.trim() || undefined,
         items: items.map((item) => ({
           productId: item.id,
@@ -362,13 +365,15 @@ export default function CheckoutScreen() {
                     />
                   </Field>
 
-                  <Field label="State / Province" error={getFieldError("state")}>
-                    <Input
+                  <Field label="District" error={getFieldError("state")}>
+                    <SearchableSelect
                       className={inputClass}
-                      placeholder="Sri Lanka"
+                      options={SRI_LANKA_DISTRICTS}
                       value={form.state}
-                      onChange={(e) => setField("state", e.target.value)}
+                      onChange={(v) => setField("state", v)}
                       onBlur={() => markTouched("state")}
+                      placeholder="Select district"
+                      searchPlaceholder="Search district..."
                     />
                   </Field>
 

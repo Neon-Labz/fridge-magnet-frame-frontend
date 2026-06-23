@@ -121,8 +121,11 @@ export default function OrderConfirmationScreen() {
               </div>
 
               <div className="divide-y">
-                {order.items.map((item) => (
-                  <div key={item.id} className="flex gap-4 px-6 py-4">
+                {order.items.map((item, index) => (
+                  <div
+                    key={`${item.id}-${item.frameType ?? ""}-${item.colorOption ?? ""}-${index}`}
+                    className="flex gap-4 px-6 py-4"
+                  >
                     <div className="w-24 h-24 border rounded-lg overflow-hidden flex items-center justify-center">
                       <Image
                         src={item.image || "/home-product-1.png"}
