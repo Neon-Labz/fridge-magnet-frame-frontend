@@ -22,6 +22,8 @@ const generateOrderNumber = () =>
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const SHIPPING_FEE = 200;
+
 type FormState = {
   firstName: string;
   lastName: string;
@@ -107,6 +109,18 @@ export default function CheckoutScreen() {
 
   const subtotal = cartSubtotal;
 
+  // Shipping details are considered "entered" once all delivery fields are filled.
+  const shippingDetailsEntered = useMemo(
+    () =>
+      form.street.trim() !== "" &&
+      form.city.trim() !== "" &&
+      form.state.trim() !== "" &&
+      form.zip.trim() !== "",
+    [form.street, form.city, form.state, form.zip]
+  );
+
+  const shipping = shippingDetailsEntered ? SHIPPING_FEE : 0;
+
   const [touched, setTouched] = useState<
     Partial<Record<keyof FormState, boolean>>
   >({});
@@ -181,7 +195,6 @@ export default function CheckoutScreen() {
     if (!isFormValid || items.length === 0) return;
 
     const orderNumber = generateOrderNumber();
-    const shipping = 200;
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const shippingAddress = `${form.street}, ${form.city}, ${form.state} ${form.zip}`.trim();
     const customerName = `${form.firstName} ${form.lastName}`.trim();
@@ -298,6 +311,8 @@ export default function CheckoutScreen() {
           <OrderSummary
             items={items}
             subtotal={subtotal}
+            shipping={shipping}
+            shippingEntered={shippingDetailsEntered}
             onPlaceOrder={handlePlaceOrder}
             disabled={!isFormValid || isSubmitting}
             paymentMethod={paymentMethod}

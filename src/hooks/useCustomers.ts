@@ -20,6 +20,9 @@ type RawCustomer = {
   customerAddress?: string;
   address?: string;
   createdAt?: string;
+  isActive?: boolean;
+  source?: 'user' | 'customer';
+  recordId?: string;
 };
 
 const getInitials = (name: string) =>
@@ -42,6 +45,9 @@ const mapCustomer = (customer: RawCustomer): Customer => {
     email: customer.emailAddress || customer.email || '',
     phone: customer.phoneNumber || customer.phone || 'Not provided',
     address: customer.customerAddress || customer.address || 'Not provided',
+    isActive: customer.isActive === true,
+    source: customer.source || 'customer',
+    recordId: customer.recordId || customer._id || id,
   };
 };
 
@@ -57,7 +63,9 @@ export const useCustomers = () => {
 
   // Pagination state
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  // The customer directory design shows four complete rows per page so the
+  // table footer and pagination remain visible inside the dashboard viewport.
+  const [limit] = useState(4);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 

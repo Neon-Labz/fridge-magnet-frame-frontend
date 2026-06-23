@@ -18,6 +18,8 @@ export type SummaryItem = {
 interface OrderSummaryProps {
   items: SummaryItem[];
   subtotal: number;
+  shipping?: number;
+  shippingEntered?: boolean;
   onPlaceOrder?: () => void;
   disabled?: boolean;
   paymentMethod?: "card" | "cod";
@@ -43,6 +45,8 @@ const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradien
 export default function OrderSummary({
   items,
   subtotal,
+  shipping = 0,
+  shippingEntered = false,
   onPlaceOrder,
   disabled = false,
   paymentMethod = "card",
@@ -50,6 +54,7 @@ export default function OrderSummary({
 }: OrderSummaryProps) {
   const hasItems = items.length > 0;
   const isDisabled = disabled || !hasItems;
+  const total = subtotal + (shippingEntered ? shipping : 0);
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm py-6">
@@ -111,9 +116,15 @@ export default function OrderSummary({
 
         <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
           <span>Shipping</span>
-          <span className="text-[#5D1900] text-xs">
-            Enter your shipping address
-          </span>
+          {shippingEntered ? (
+            <span className="font-medium">
+              Rs{shipping.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </span>
+          ) : (
+            <span className="text-[#5D1900] text-xs">
+              Enter your shipping address
+            </span>
+          )}
         </div>
       </div>
 
@@ -124,7 +135,7 @@ export default function OrderSummary({
           Total
         </span>
         <span className="text-sm sm:text-base font-semibold text-[#0040A1]">
-          Rs{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          Rs{total.toLocaleString(undefined, { maximumFractionDigits: 2 })}
         </span>
       </div>
 
