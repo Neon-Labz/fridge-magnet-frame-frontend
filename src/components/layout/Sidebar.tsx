@@ -30,9 +30,15 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
+    // Clear every auth artifact so no stale session remains.
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    router.push('/');
+    document.cookie = 'token=; path=/; max-age=0; samesite=lax';
+
+    router.replace('/dashboard/login');
   };
 
   return (
