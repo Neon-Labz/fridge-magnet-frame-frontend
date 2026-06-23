@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import { apiV1Url } from "@/lib/backendUrl";
 
 export type CartItem = {
   id: string;
@@ -10,6 +11,7 @@ export type CartItem = {
   colorOption?: string;
   quantity: number;
   price: number;
+  stock?: number;
 };
 
 type State = { items: CartItem[] };
@@ -26,6 +28,14 @@ const initialState: State = { items: [] };
 
 function getSafeItems(items: unknown): CartItem[] {
   return Array.isArray(items) ? items : [];
+}
+
+function clampQuantity(quantity: number, stock?: number): number {
+  const safeQuantity = Math.max(4, Number(quantity) || 4);
+  const safeStock = Number(stock);
+  return Number.isFinite(safeStock) && safeStock >= 0
+    ? Math.min(safeQuantity, safeStock)
+    : safeQuantity;
 }
 
 function reducer(state: State, action: Action): State {
@@ -49,13 +59,28 @@ function reducer(state: State, action: Action): State {
             i.id === action.payload.id &&
             i.frameType === action.payload.frameType &&
             i.colorOption === action.payload.colorOption
-              ? { ...i, quantity: i.quantity + action.payload.quantity }
+              ? {
+                  ...i,
+                  stock: action.payload.stock ?? i.stock,
+                  quantity: clampQuantity(
+                    i.quantity + action.payload.quantity,
+                    action.payload.stock ?? i.stock,
+                  ),
+                }
               : i
           ),
         };
       }
 
-      return { items: [...currentItems, action.payload] };
+      return {
+        items: [
+          ...currentItems,
+          {
+            ...action.payload,
+            quantity: clampQuantity(action.payload.quantity, action.payload.stock),
+          },
+        ],
+      };
     }
 
     case "remove":
@@ -78,10 +103,10 @@ function reducer(state: State, action: Action): State {
             ? i.id === action.payload.id &&
               i.frameType === action.payload.frameType &&
               i.colorOption === action.payload.colorOption
-              ? { ...i, quantity: Math.max(1, action.payload.quantity) }
+              ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock) }
               : i
             : i.id === action.payload.id
-            ? { ...i, quantity: Math.max(1, action.payload.quantity) }
+            ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock) }
             : i
         ),
       };
@@ -123,6 +148,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           : [];
 
         dispatch({ type: "hydrate", payload: safeItems });
+        void Promise.all(
+          safeItems.map(async (item: CartItem) => {
+            try {
+              const response = await fetch(apiV1Url(`/api/products/${item.id}`));
+              if (!response.ok) return item;
+              const product = await response.json();
+              const stock = Number(product?.stock ?? product?.data?.stock);
+              if (!Number.isFinite(stock)) return item;
+              return {
+                ...item,
+                stock,
+                quantity: clampQuantity(item.quantity, stock),
+              };
+            } catch {
+              return item;
+            }
+          }),
+        ).then((items) => dispatch({ type: "hydrate", payload: items }));
+      } else {
+        dispatch({ type: "hydrate", payload: [] });
       }
     } catch (err) {
       console.error("Failed to hydrate cart", err);

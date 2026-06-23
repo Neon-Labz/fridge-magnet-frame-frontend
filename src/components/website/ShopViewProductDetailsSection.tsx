@@ -9,10 +9,12 @@ import { useRouter } from "next/navigation";
 
 interface ShopViewProductDetailsSectionProps {
   products: ShopProduct[];
+  initialFrameType?: string;
 }
 
 export default function ShopViewProductDetailsSection({
   products,
+  initialFrameType,
 }: ShopViewProductDetailsSectionProps) {
   const router = useRouter();
   const { addToCart } = useCart();
@@ -20,8 +22,18 @@ export default function ShopViewProductDetailsSection({
   const { isAuthenticated } = useWebsiteAuthSession();
 
   const [quantity, setQuantity] = useState(4);
-  const [selectedOption, setSelectedOption] = useState("Without Frame");
-  const [selectedColor, setSelectedColor] = useState("");
+  const initialHasFrame =
+    initialFrameType === "black-frame" || initialFrameType === "white-frame";
+  const [selectedOption, setSelectedOption] = useState(
+    initialHasFrame ? "With Frame" : "Without Frame"
+  );
+  const [selectedColor, setSelectedColor] = useState(
+    initialFrameType === "black-frame"
+      ? "Black"
+      : initialFrameType === "white-frame"
+        ? "White"
+        : ""
+  );
 
   if (!products || products.length === 0) {
     return (
@@ -33,30 +45,33 @@ export default function ShopViewProductDetailsSection({
     );
   }
 
-  const findProductByName = (name: string) =>
-    products.find((p) =>
-      p.productName?.toLowerCase().includes(name.toLowerCase())
-    );
+  const findProductByVariant = (variant: "without" | "black" | "white") =>
+    products.find((product) => {
+      const name = product.productName?.toLowerCase() ?? "";
+      if (variant === "black") return name.includes("black frame");
+      if (variant === "white") return name.includes("white frame");
+      return (
+        name.includes("without frame") ||
+        (!name.includes("with frame") &&
+          !name.includes("black frame") &&
+          !name.includes("white frame"))
+      );
+    });
 
   const selectedProduct =
     selectedOption === "Without Frame"
-      ? findProductByName("Without Frame") ||
-        findProductByName("Magnet Frame") ||
-        products[0]
+      ? findProductByVariant("without") || products[0]
       : selectedColor === "Black"
-      ? findProductByName("Black Frame") ||
-        findProductByName("Magnet With Black Frame") ||
-        products[0]
+      ? findProductByVariant("black") || products[0]
       : selectedColor === "White"
-      ? findProductByName("White Frame") ||
-        findProductByName("Magnet With White Frame") ||
-        products[0]
+      ? findProductByVariant("white") || products[0]
       : products[0];
 
   const title = selectedProduct?.productName ?? "";
   const price = Number(selectedProduct?.price ?? 0);
   const description = selectedProduct?.description ?? "";
   const status = selectedProduct?.status ?? "Out of Stock";
+  const availableStock = Math.max(Number(selectedProduct?.stock ?? 0), 0);
   const mainImage = selectedProduct?.primaryImage?.secure_url ?? "";
 
   const handleAddToCart = () => {
@@ -78,6 +93,7 @@ export default function ShopViewProductDetailsSection({
       colorOption: selectedOption === "With Frame" ? selectedColor : "",
       quantity,
       image: mainImage,
+      stock: availableStock,
     });
 
     addToast("Product added to cart successfully!", "success");
@@ -94,6 +110,15 @@ export default function ShopViewProductDetailsSection({
   };
 
   const handleIncreaseQuantity = () => {
+    if (quantity >= availableStock) {
+      addToast(`Only ${availableStock} items are available.`, "error");
+      return;
+    }
+
+    if (quantity > availableStock) {
+      addToast(`Only ${availableStock} items are available.`, "error");
+      return;
+    }
     setQuantity((current) => current + 1);
   };
 
@@ -151,7 +176,7 @@ export default function ShopViewProductDetailsSection({
               {status}
             </span>
             <span className="text-sm text-slate-500">
-({Number((selectedProduct as any)?.stock ?? 0)} Available)
+({Number(selectedProduct?.stock ?? 0)} Available)
   </span>
           </div>
 
@@ -175,6 +200,7 @@ export default function ShopViewProductDetailsSection({
               onChange={(e) => {
                 setSelectedOption(e.target.value);
                 setSelectedColor("");
+                setQuantity(4);
               }}
               className="h-11 w-full max-w-[260px] rounded-full border-2 border-[#002B73] px-4 text-sm outline-none"
             >
@@ -192,7 +218,10 @@ export default function ShopViewProductDetailsSection({
               <div className="flex gap-5">
                 <button
                   type="button"
-                  onClick={() => setSelectedColor("Black")}
+                  onClick={() => {
+                    setSelectedColor("Black");
+                    setQuantity(4);
+                  }}
                   className="flex flex-col items-center gap-1 text-xs"
                 >
                   <span
@@ -207,7 +236,10 @@ export default function ShopViewProductDetailsSection({
 
                 <button
                   type="button"
-                  onClick={() => setSelectedColor("White")}
+                  onClick={() => {
+                    setSelectedColor("White");
+                    setQuantity(4);
+                  }}
                   className="flex flex-col items-center gap-1 text-xs"
                 >
                   <span
@@ -244,7 +276,8 @@ export default function ShopViewProductDetailsSection({
               <button
                 type="button"
                 onClick={handleIncreaseQuantity}
-                className="flex h-10 w-10 items-center justify-center"
+                disabled={quantity >= availableStock}
+                className="flex h-10 w-10 items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
               </button>
@@ -254,7 +287,7 @@ export default function ShopViewProductDetailsSection({
           <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
             <button
               onClick={handleAddToCart}
-              disabled={status === "Out of Stock"}
+              disabled={status === "Out of Stock" || availableStock < 4}
               className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
             >
               🛒 Add to Cart

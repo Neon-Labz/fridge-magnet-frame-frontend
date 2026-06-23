@@ -15,6 +15,7 @@ type CartItemData = {
   image: string;
   frameType?: string;
   colorOption?: string;
+  stock?: number;
 };
 
 function CartItem({
@@ -43,7 +44,7 @@ function CartItem({
         item.id,
         item.frameType,
         item.colorOption,
-        Math.max(1, qty)
+        Math.min(Math.max(4, qty), item.stock ?? Number.POSITIVE_INFINITY)
       );
     }
   };
@@ -114,6 +115,8 @@ function CartItem({
               className="w-10 text-center outline-none text-sm"
               type="number"
               inputMode="numeric"
+              min={4}
+              max={item.stock}
             />
 
             <button
@@ -123,10 +126,11 @@ function CartItem({
                   item.id,
                   item.frameType,
                   item.colorOption,
-                  item.quantity + 1
+                  Math.min(item.quantity + 1, item.stock ?? Number.POSITIVE_INFINITY)
                 )
               }
-              className="px-3 py-1 hover:bg-gray-100"
+              disabled={item.stock !== undefined && item.quantity >= item.stock}
+              className="px-3 py-1 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               +
             </button>
@@ -203,6 +207,7 @@ export default function CartPage() {
                 image: it.image,
                 frameType: it.frameType,
                 colorOption: it.colorOption,
+                stock: it.stock,
               };
 
               return (
