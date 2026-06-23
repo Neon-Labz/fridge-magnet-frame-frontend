@@ -5,6 +5,9 @@ export interface Customer {
   email: string;
   phone: string;
   address: string;
+  isActive: boolean;
+  source: 'user' | 'customer';
+  recordId: string;
   [key: string]: unknown; // allow extra fields from backend
 }
 
@@ -21,6 +24,9 @@ export interface CustomerApiItem {
   customerAddress?: string;
   address?: string;
   createdAt?: string;
+  isActive?: boolean;
+  source?: 'user' | 'customer';
+  recordId?: string;
 }
 
 export interface CustomerStats {
