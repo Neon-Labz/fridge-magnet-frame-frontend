@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const subjectOptions = [
   "General Inquiry",
@@ -17,7 +18,8 @@ export default function ContactSection() {
     message: "",
   });
 
-  // ✅ proper typing (best)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -31,14 +33,45 @@ export default function ContactSection() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    try {
+      setIsSubmitting(true);
+
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1").replace(/\/$/, "");
+      const response = await fetch(`${apiUrl}/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, name: formData.fullName, fullName: undefined }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      toast.success("Message sent successfully!");
+
+      setFormData({
+        fullName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error("Contact form error:", error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="w-full">
-<div className="relative w-full max-w-[760px] rounded-[12px] px-3 sm:px-5 lg:px-[-5px]">
-              <div className="relative z-10">
+      <div className="relative w-full max-w-[760px] rounded-[12px] px-3 sm:px-5 lg:px-0">
+        <div className="relative z-10">
           <h2 className="text-[30px] font-bold leading-[36px] text-[#1A1C1F]">
             Send a Message
           </h2>
@@ -56,6 +89,7 @@ export default function ContactSection() {
                 <input
                   id="fullName"
                   type="text"
+                  required
                   placeholder="John Doe"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -70,6 +104,7 @@ export default function ContactSection() {
                 <input
                   id="email"
                   type="email"
+                  required
                   placeholder="john@example.com"
                   value={formData.email}
                   onChange={handleChange}
@@ -78,18 +113,19 @@ export default function ContactSection() {
               </div>
             </div>
 
-            <div>
+            <div className="relative">
               <label className="mb-1 block text-[14px] font-semibold text-[#434652]">
                 Subject
               </label>
               <select
                 id="subject"
+                required
                 value={formData.subject}
                 onChange={handleChange}
-                className="h-[40px] w-full appearance-none rounded-[8px] border border-[#C3C6D4] bg-white px-4 text-[16px] outline-none focus:border-[#0040A1]"
+                className="h-[40px] w-full appearance-none rounded-[8px] border border-[#C3C6D4] bg-white px-4 pr-10 text-[16px] outline-none focus:border-[#0040A1]"
               >
                 <option value="" disabled>
-                  General Inquiry
+                  Select subject
                 </option>
                 {subjectOptions.map((subject) => (
                   <option key={subject} value={subject}>
@@ -97,9 +133,10 @@ export default function ContactSection() {
                   </option>
                 ))}
               </select>
+
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black-500"
+                className="pointer-events-none absolute right-3 top-[38px] h-4 w-4 text-black"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -120,6 +157,7 @@ export default function ContactSection() {
               <textarea
                 id="message"
                 rows={4}
+                required
                 placeholder="Tell us about your project or inquiry..."
                 value={formData.message}
                 onChange={handleChange}
@@ -129,17 +167,19 @@ export default function ContactSection() {
 
             <button
               type="submit"
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#E61C10] text-[16px] font-bold text-white shadow-[0px_10px_15px_-3px_rgba(188,0,0,0.2),0px_4px_6px_-4px_rgba(188,0,0,0.2)] transition hover:bg-[#d0190e]"
+              disabled={isSubmitting}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#E61C10] text-[16px] font-bold text-white shadow-[0px_10px_15px_-3px_rgba(188,0,0,0.2),0px_4px_6px_-4px_rgba(188,0,0,0.2)] transition hover:bg-[#d0190e] disabled:cursor-not-allowed disabled:opacity-70"
             >
               <span className="flex items-center gap-2">
-                <span>Send Message</span>
-
-                <span
-                  className="flex items-center pt-0.5 justify-center text-[24px] leading-none"
-                  aria-hidden="true"
-                >
-                  &#x27A3;
-                </span>
+                <span>{isSubmitting ? "Sending..." : "Send Message"}</span>
+                {!isSubmitting && (
+                  <span
+                    className="flex items-center justify-center pt-0.5 text-[24px] leading-none"
+                    aria-hidden="true"
+                  >
+                    &#x27A3;
+                  </span>
+                )}
               </span>
             </button>
           </form>

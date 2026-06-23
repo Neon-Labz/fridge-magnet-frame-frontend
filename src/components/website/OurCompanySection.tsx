@@ -18,6 +18,7 @@ type ContactCard = {
 type SocialIcon = {
   id: string;
   label: string;
+  url: string;
   icon?: LucideIcon;
   imagePath?: string;
 };
@@ -47,10 +48,30 @@ const contactCards: ContactCard[] = [
 ];
 
 const socialIcons: SocialIcon[] = [
-  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-  { id: "facebook", label: "Facebook", imagePath: "/facebook.svg" },
-  { id: "instagram", label: "Instagram", imagePath: "/instagram-icon.svg" },
-  { id: "tiktok", label: "TikTok", imagePath: "/tiktok-icon.svg" },
+  {
+    id: "whatsapp",
+    label: "WhatsApp",
+    url: "https://wa.me/94753912534",
+    icon: MessageCircle,
+  },
+  {
+    id: "facebook",
+    label: "Facebook",
+    url: "https://web.facebook.com/MagnifyMagnets",
+    imagePath: "/facebook.svg",
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    url: "https://www.instagram.com/magnify_magnets?igsh=MWZxc2U3ZmR1OXR1Mw==",
+    imagePath: "/instagram-icon.svg",
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    url: "https://www.tiktok.com/@magnify_magnets?_r=1&_t=ZS-97RfTSn7LJE",
+    imagePath: "/tiktok-icon.svg",
+  },
 ];
 
 function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
@@ -79,10 +100,11 @@ function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
 
 export default function OurCompanySection() {
   return (
-<div
-  className="w-full px-0 sm:px-2 md:pl-4 lg:pl-6"
-  aria-labelledby="our-company-title"
->      <header className="flex flex-col gap-2">
+    <div
+      className="w-full px-0 sm:px-2 md:pl-4 lg:pl-6"
+      aria-labelledby="our-company-title"
+    >
+      <header className="flex flex-col gap-2">
         <h1
           id="our-company-title"
           className="font-manrope text-[30px] font-bold leading-[1.2] text-[#002B73]"
@@ -108,10 +130,12 @@ export default function OurCompanySection() {
         </p>
 
         <div className="flex gap-4">
-          {socialIcons.map(({ id, label, imagePath }) => (
-            <button
+          {socialIcons.map(({ id, label, imagePath, url }) => (
+            <a
               key={id}
-              type="button"
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDEDF2] transition hover:bg-[#DFE1EB]"
               aria-label={label}
             >
@@ -134,7 +158,7 @@ export default function OurCompanySection() {
                   />
                 )
               )}
-            </button>
+            </a>
           ))}
         </div>
       </div>

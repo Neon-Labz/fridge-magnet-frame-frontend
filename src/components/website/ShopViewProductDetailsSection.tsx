@@ -19,7 +19,7 @@ export default function ShopViewProductDetailsSection({
   const { addToast } = useToastStore();
   const { isAuthenticated } = useWebsiteAuthSession();
 
-  const [quantity, setQuantity] = useState(4);
+  const [quantity, setQuantity] = useState(1);
   const [selectedOption, setSelectedOption] = useState("Without Frame");
   const [selectedColor, setSelectedColor] = useState("");
 
@@ -85,8 +85,8 @@ export default function ShopViewProductDetailsSection({
   };
 
   const handleDecreaseQuantity = () => {
-    if (quantity <= 4) {
-      addToast("You must select a minimum of 4 magnets.", "error");
+    if (quantity <= 1) {
+      addToast("Quantity cannot be less than 1.", "error");
       return;
     }
 
@@ -150,9 +150,10 @@ export default function ShopViewProductDetailsSection({
             >
               {status}
             </span>
+
             <span className="text-sm text-slate-500">
-({Number((selectedProduct as any)?.stock ?? 0)} Available)
-  </span>
+              ({Number((selectedProduct as any)?.stock ?? 0)} Available)
+            </span>
           </div>
 
           <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
@@ -253,6 +254,7 @@ export default function ShopViewProductDetailsSection({
 
           <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
             <button
+              type="button"
               onClick={handleAddToCart}
               disabled={status === "Out of Stock"}
               className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
@@ -263,11 +265,11 @@ export default function ShopViewProductDetailsSection({
             <button
               type="button"
               onClick={handleBuyNow}
-              disabled={!isAuthenticated || status === "Out of Stock"}
+              disabled={status === "Out of Stock"}
               className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
-                isAuthenticated && status !== "Out of Stock"
+                status !== "Out of Stock"
                   ? "bg-[#E62A24]"
-                  : "bg-[#E62A24]/60"
+                  : "bg-[#E62A24]/60 cursor-not-allowed opacity-50"
               }`}
             >
               Buy Now
