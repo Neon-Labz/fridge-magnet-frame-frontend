@@ -324,7 +324,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
                             LKR {(item.price * item.quantity).toFixed(2)}
                           </p>
                           <p className="text-[13px] font-bold text-[#434652]">
-                            LKR {item.price.toFixed(2)} ea
+                            LKR {item.price.toFixed(2)} 
                           </p>
                         </div>
                       </div>

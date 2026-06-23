@@ -3,9 +3,14 @@
 import React from 'react';
 import { useCustomers } from '@/hooks/useCustomers';
 
-const TopCards = () => {
+type TopCardsProps = {
+  onAddCustomer?: () => void;
+};
+
+const TopCards = ({ onAddCustomer }: TopCardsProps) => {
   const { stats } = useCustomers();
-  const satisfactionRate = stats.satisfactionRate > 0 ? `${stats.satisfactionRate.toFixed(1)}%` : '-';
+  const satisfactionRate =
+    stats.satisfactionRate > 0 ? `${stats.satisfactionRate.toFixed(1)}%` : '-';
 
   return (
     <>
@@ -13,7 +18,11 @@ const TopCards = () => {
         <div className="card statsCard">
           <div className="statGroup">
             <span className="statTitle">Total Active Customers</span>
-            <span className="statValue">{stats.totalActiveCustomers > 0 ? stats.totalActiveCustomers.toLocaleString() : '-'}</span>
+            <span className="statValue">
+              {stats.totalActiveCustomers > 0
+                ? stats.totalActiveCustomers.toLocaleString()
+                : '-'}
+            </span>
           </div>
 
           <div className="statDivider"></div>
@@ -34,7 +43,14 @@ const TopCards = () => {
           <div style={{ zIndex: 1 }}>
             <div className="priorityTitle">Priority Support</div>
             <div className="priorityValue">Dedicated Desk</div>
-            <button className="connectBtn">Connect Now</button>
+
+            <button
+              type="button"
+              className="connectBtn"
+              onClick={onAddCustomer}
+            >
+              Connect Now
+            </button>
           </div>
 
           <svg className="supportIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
@@ -45,19 +61,21 @@ const TopCards = () => {
           </svg>
         </div>
       </div>
+
       <style jsx>{`
         .cardsContainer {
           display: flex;
-          gap: 24px;
-          margin-bottom: 24px;
+          gap: 16px;
+          margin-bottom: 18px;
         }
 
         .card {
-          background-color: var(--bg-panel);
+          background-color: #ffffff;
           border-radius: 8px;
-          border: 1px solid var(--border-color);
-          padding: 24px;
+          border: 1px solid #cbd5e1;
+          padding: 16px 20px;
           flex: 1;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
         }
 
         .statsCard {
@@ -69,7 +87,7 @@ const TopCards = () => {
         .statGroup {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 5px;
         }
 
         .statTitle {
@@ -79,7 +97,7 @@ const TopCards = () => {
         }
 
         .statValue {
-          font-size: 24px;
+          font-size: 18px;
           font-weight: 600;
           color: var(--color-primary-dark);
         }
@@ -88,11 +106,11 @@ const TopCards = () => {
           width: 1px;
           height: 40px;
           background-color: var(--border-color);
-          margin: 0 24px;
+          margin: 0 18px;
         }
 
         .chartPlaceholder {
-          width: 60px;
+          width: 44px;
           height: 40px;
           background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
           border-radius: 4px;
@@ -103,8 +121,8 @@ const TopCards = () => {
 
         .chartPlaceholder svg {
           color: var(--color-primary);
-          width: 32px;
-          height: 32px;
+          width: 24px;
+          height: 24px;
         }
 
         .priorityCard {
@@ -122,23 +140,25 @@ const TopCards = () => {
           font-size: 14px;
           font-weight: 500;
           opacity: 0.9;
-          margin-bottom: 8px;
+          margin-bottom: 4px;
         }
 
         .priorityValue {
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 600;
-          margin-bottom: 16px;
+          margin-bottom: 10px;
         }
 
         .connectBtn {
           background-color: white;
-          color: var(--color-primary-dark);
-          padding: 8px 16px;
+          color: blue;
+          padding: 6px 14px;
           border-radius: 20px;
           font-weight: 600;
           font-size: 14px;
           width: fit-content;
+          border: none;
+          cursor: pointer;
           transition: transform 0.2s;
         }
 
@@ -154,6 +174,12 @@ const TopCards = () => {
           height: 120px;
           opacity: 0.1;
           color: white;
+        }
+
+        @media (max-width: 768px) {
+          .cardsContainer {
+            flex-direction: column;
+          }
         }
       `}</style>
     </>

@@ -1,25 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCustomers } from '@/hooks/useCustomers';
 import AddCustomerModal from './AddCustomerModal';
 
 const styles: Record<string, React.CSSProperties> = {
-  tableContainer: {
-    backgroundColor: 'var(--bg-panel)',
-    border: '1px solid var(--border-color)',
-    borderRadius: 8,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
+ tableContainer: {
+  width: '100%',
+  backgroundColor: '#ffffff',
+  border: '1px solid #cbd5e1',
+  borderRadius: 16,
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: 0,
+ boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
+},
+
+tableScroll: {
+  width: '100%',
+  overflowX: 'auto',
+  overflowY: 'visible',
+},
+
+table: {
+  width: '100%',
+  minWidth: 1100,
+  tableLayout: 'fixed',
+  borderCollapse: 'separate',
+  borderSpacing: 0,
+},
   tableHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '16px 24px',
-    borderBottom: '1px solid var(--border-color)',
-  },
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '18px 24px',
+  borderBottom: '1px solid #e5e7eb',
+  backgroundColor: '#ffffff',
+},
   tableTitleGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -58,26 +76,36 @@ const styles: Record<string, React.CSSProperties> = {
     background: 'transparent',
     cursor: 'pointer',
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
+ th: {
+  textAlign: 'center',
+  padding: '14px',
+  backgroundColor: '#F8FAFC',
+  color: '#64748B',
+  fontSize: 11,
+  fontWeight: 700,
+  borderBottom: '1px solid #E5E7EB',
+
+},
+ td: {
+  padding: '10px 14px',
+  borderBottom: '1px solid #E5E7EB',
+  textAlign: 'center',
+  background: '#fff',
+  color: '#0F172A',
+  fontSize: 14,
+},
+  emailCell: {
+    overflowWrap: 'anywhere',
+    lineHeight: 1.35,
   },
-  th: {
+  addressCell: {
+    maxWidth: 230,
+    margin: '0 auto',
+    color: '#334155',
+    lineHeight: 1.4,
     textAlign: 'left',
-    padding: '16px 24px',
-    backgroundColor: 'var(--bg-table-header)',
-    color: 'var(--text-muted)',
-    fontSize: 12,
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    borderBottom: '1px solid var(--border-color)',
-  },
-  td: {
-    padding: '20px 24px',
-    fontSize: 14,
-    color: 'var(--text-main)',
-    borderBottom: '1px solid var(--border-color)',
+    whiteSpace: 'normal',
+    overflowWrap: 'break-word',
   },
   emptyState: {
     padding: '60px 24px',
@@ -94,13 +122,15 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     fontSize: 'inherit',
   },
-  pagination: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '16px 24px',
-    backgroundColor: 'var(--bg-table-header)',
-  },
+ pagination: {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '16px 24px',
+  backgroundColor: '#ffffff',
+  borderTop: '1px solid #e5e7eb',
+  flexShrink: 0,
+},
   paginationInfo: {
     fontSize: 14,
     color: 'var(--text-muted)',
@@ -111,25 +141,26 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap',
   },
   pageBtn: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderStyle: 'solid',
     borderWidth: '1px',
-    borderColor: 'var(--border-color)',
+    borderColor: 'transparent',
     backgroundColor: 'white',
-    borderRadius: 4,
-    fontSize: 14,
-    color: 'var(--text-muted)',
+    borderRadius: 10,
+    fontSize: 16,
+    color: '#334155',
     transition: 'all 0.2s',
     cursor: 'pointer',
   },
   pageBtnActive: {
-    backgroundColor: 'var(--color-primary-dark)',
+    backgroundColor: '#003B7A',
     color: 'white',
-    borderColor: 'var(--color-primary-dark)',
+    borderColor: '#003B7A',
+    boxShadow: '0 4px 10px rgba(0, 59, 122, 0.18)',
   },
   pageBtnDisabled: {
     opacity: 0.4,
@@ -152,50 +183,50 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 10,
   },
   avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: '50%',
-    backgroundColor: '#e0e7ff',
-    color: '#174092',
-    fontSize: 12,
-    fontWeight: 700,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  background: '#DBEAFE',
+  color: '#1E40AF',
+  fontSize: 12,
+  fontWeight: 700,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+viewBtn: {
+  width: 34,
+  height: 34,
+  borderRadius: 8,
+  border: '1px solid #CBD5E1',
+  background: '#fff',
+  color: '#1E3A8A',
+  cursor: 'pointer',
+},
   actionBtns: {
     display: 'flex',
     gap: 8,
   },
   editBtn: {
-    width: 30,
+  width: 30,
+  height: 30,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 8,
+  border: '1px solid #cbd5e1',
+  color: '#0f172a',
+  background: '#ffffff',
+  cursor: 'pointer',
+},
+
+  statusBtn: {
+    minWidth: 76,
     height: 30,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 6,
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    borderColor: 'var(--border-color)',
-    color: 'var(--text-muted)',
-    transition: 'all 0.2s',
-    background: 'transparent',
-    cursor: 'pointer',
-  },
-  deleteBtn: {
-    width: 30,
-    height: 30,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 6,
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    borderColor: 'var(--border-color)',
-    color: '#dc2626',
-    transition: 'all 0.2s',
-    background: 'transparent',
+    padding: '0 12px',
+    borderRadius: 8,
+    fontSize: 12,
+    fontWeight: 700,
     cursor: 'pointer',
   },
   deleteOverlay: {
@@ -308,18 +339,9 @@ const CustomerTable = () => {
   const { customers, stats, loading, error, page, total, totalPages, limit, goToPage, refresh } = useCustomers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<typeof customers[number] | null>(null);
-  const [customerToDelete, setCustomerToDelete] = useState<typeof customers[number] | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
   const [hoveredRow, setHoveredRow] = useState<string | number | null>(null);
-  const [isSmallViewport, setIsSmallViewport] = useState(false);
-
-  useEffect(() => {
-    const updateViewport = () => setIsSmallViewport(window.innerWidth <= 768);
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
 
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
@@ -334,14 +356,17 @@ const CustomerTable = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async () => {
-    if (!customerToDelete) return;
-
-    setDeleting(true);
-    setDeleteError(null);
+  const handleStatusChange = async (customer: typeof customers[number]) => {
+    setUpdatingStatusId(customer.id);
+    setStatusError(null);
     try {
-      const res = await fetch(`/api/v1/customers/${customerToDelete.id}`, {
-        method: 'DELETE',
+      const res = await fetch(`/api/v1/customers/${customer.recordId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isActive: !customer.isActive,
+          source: customer.source,
+        }),
       });
 
       if (!res.ok) {
@@ -349,12 +374,13 @@ const CustomerTable = () => {
         throw new Error(data?.message ?? `Server error: ${res.status}`);
       }
 
-      setCustomerToDelete(null);
       await refresh();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'An error occurred');
+      setStatusError(
+        err instanceof Error ? err.message : 'Unable to update customer status',
+      );
     } finally {
-      setDeleting(false);
+      setUpdatingStatusId(null);
     }
   };
 
@@ -364,50 +390,87 @@ const CustomerTable = () => {
     ...(disabled ? styles.pageBtnDisabled : {}),
   });
 
-  const deleteMessageStyle: React.CSSProperties = isSmallViewport
-    ? { ...styles.deleteMessage, margin: '0 20px', padding: '22px', fontSize: 15 }
-    : (styles.deleteMessage as React.CSSProperties);
-
-  const deleteActionsStyle: React.CSSProperties = {
-    ...styles.deleteActions,
-    flexDirection: isSmallViewport ? 'column' : 'row',
-  };
-
-  const deleteCancelBtnStyle: React.CSSProperties = isSmallViewport
-    ? { ...styles.deleteCancelBtn, width: '100%', minWidth: 0 }
-    : (styles.deleteCancelBtn as React.CSSProperties);
-
-  const deleteConfirmBtnStyle: React.CSSProperties = isSmallViewport
-    ? { ...styles.deleteConfirmBtn, width: '100%', minWidth: 0 }
-    : (styles.deleteConfirmBtn as React.CSSProperties);
+  const firstVisiblePage = Math.max(
+    1,
+    Math.min(page - 2, Math.max(totalPages - 4, 1)),
+  );
+  const visiblePages = Array.from(
+    { length: Math.min(5, totalPages) },
+    (_, index) => firstVisiblePage + index,
+  );
 
   return (
     <>
       <div style={styles.tableContainer}>
-        <div style={styles.tableHeader}>
-          <div style={styles.tableTitleGroup}>
-            <h2 style={styles.tableTitle}>Active Directory</h2>
-            {stats.newToday > 0 && (
-              <span style={styles.newPill}>+{stats.newToday} New Today</span>
-            )}
-          </div>
-          <div style={styles.tableActions}>
-            <button type="button" style={styles.iconBtn} aria-label="Filter">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-              </svg>
-            </button>
-            <button type="button" style={styles.iconBtn} aria-label="Download">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
+       <div
+  style={{
+    ...styles.tableHeader,
+    background: '#fff',
+    padding: '14px 20px',
+  }}
+>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <h2 style={styles.tableTitle}>Active Directory</h2>
 
+    {stats.newToday > 0 && (
+      <span
+        style={{
+          background: '#E0E7FF',
+          color: '#1D4ED8',
+          padding: '4px 10px',
+          borderRadius: 20,
+          fontSize: 12,
+          fontWeight: 700,
+        }}
+      >
+        +{stats.newToday} New Today
+      </span>
+    )}
+  </div>
+
+  <div style={styles.tableActions}>
+    <button type="button" style={styles.iconBtn} aria-label="Filter customers">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+      </svg>
+    </button>
+
+    <button type="button" style={styles.iconBtn} aria-label="Download customers">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+{statusError && (
+  <div
+    role="alert"
+    style={{
+      padding: '10px 20px',
+      color: '#b91c1c',
+      background: '#fef2f2',
+      borderBottom: '1px solid #fecaca',
+      fontSize: 13,
+      fontWeight: 600,
+    }}
+  >
+    {statusError}
+  </div>
+)}
+
+<div style={styles.tableScroll}>
         <table style={styles.table}>
+          <colgroup>
+            <col style={{ width: '11%' }} />
+            <col style={{ width: '17%' }} />
+            <col style={{ width: '22%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '23%' }} />
+            <col style={{ width: '13%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th style={styles.th}>Customer ID</th>
@@ -465,38 +528,47 @@ const CustomerTable = () => {
                       <span>{customer.name}</span>
                     </div>
                   </td>
-                  <td style={styles.td}>{customer.email}</td>
+                  <td style={{ ...styles.td, ...styles.emailCell }}>{customer.email}</td>
                   <td style={styles.td}>{customer.phone}</td>
-                  <td style={styles.td}>{customer.address}</td>
                   <td style={styles.td}>
-                    {customer.source === 'user' ? (
-                      <span style={styles.idBadge}>Registered user</span>
-                    ) : (
-                      <div style={styles.actionBtns}>
+                    <div style={styles.addressCell}>{customer.address}</div>
+                  </td>
+                  <td style={styles.td}>
+                    <div style={styles.actionBtns}>
+                      {customer.isActive && (
                         <button type="button" style={styles.editBtn} aria-label="Edit" onClick={() => handleEdit(customer)}>
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                           </svg>
                         </button>
-                        <button type="button" style={styles.deleteBtn} aria-label="Delete" onClick={() => setCustomerToDelete(customer)}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-                            <path d="M10 11v6"></path>
-                            <path d="M14 11v6"></path>
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    )}
+                      )}
+                      <button
+                        type="button"
+                        style={{
+                          ...styles.statusBtn,
+                          color: customer.isActive ? '#b91c1c' : '#166534',
+                          border: `1px solid ${customer.isActive ? '#fecaca' : '#bbf7d0'}`,
+                          background: customer.isActive ? '#fef2f2' : '#f0fdf4',
+                          opacity: updatingStatusId === customer.id ? 0.55 : 1,
+                        }}
+                        onClick={() => handleStatusChange(customer)}
+                        disabled={updatingStatusId === customer.id}
+                      >
+                        {updatingStatusId === customer.id
+                          ? 'Updating...'
+                          : customer.isActive
+                            ? 'Disable'
+                            : 'Enable'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-
+</div>
         <div style={styles.pagination}>
           <div style={styles.paginationInfo}>
             {total > 0 ? `Showing ${from}–${to} of ${total} customers` : 'No customers'}
@@ -510,7 +582,7 @@ const CustomerTable = () => {
             >
               &lt;
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            {visiblePages.map((p) => (
               <button
                 type="button"
                 key={p}
@@ -541,36 +613,6 @@ const CustomerTable = () => {
         initialData={editingCustomer}
       />
 
-      {customerToDelete && (
-        <div style={styles.deleteOverlay} onClick={() => setCustomerToDelete(null)}>
-          <div style={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.deleteTopBar} />
-            <div style={styles.deleteIconWrap}>
-              <div style={styles.deleteIconCircle}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3l-8.47-14.14a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-              </div>
-            </div>
-            <h3 style={styles.deleteTitle}>Delete Customer Profile</h3>
-            <div style={deleteMessageStyle}>
-              Are you sure you want to permanently delete the profile for <strong>{customerToDelete.name}</strong> (ID: <strong>#{customerToDelete.id}</strong>)? This action cannot be undone.
-            </div>
-            {deleteError && <p style={styles.deleteError}>{deleteError}</p>}
-            <div style={deleteActionsStyle}>
-              <button type="button" style={deleteCancelBtnStyle} onClick={() => setCustomerToDelete(null)} disabled={deleting}>
-                Cancel
-              </button>
-              <button type="button" style={deleteConfirmBtnStyle} onClick={handleDelete} disabled={deleting}>
-                {deleting ? 'Deleting...' : 'Confirm Delete'}
-              </button>
-            </div>
-            <div style={styles.deleteFooter}>Confirmation required • System audit log will be updated</div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
