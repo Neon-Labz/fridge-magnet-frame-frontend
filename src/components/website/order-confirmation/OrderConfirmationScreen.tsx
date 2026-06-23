@@ -6,7 +6,6 @@ import { CheckCircle } from "lucide-react";
 import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
 import Link from "next/link";
 import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
-import { useToast, ToastContainer } from "@/components/ui/toast";
 
 interface OrderItem {
   id: string | number;
@@ -50,7 +49,6 @@ const resolvePreview = (item: OrderItem): "updated-1" | "updated-2" | "gradient"
 
 export default function OrderConfirmationScreen() {
   const [order, setOrder] = useState<Order | null>(null);
-  const { toasts, removeToast } = useToast();
 
   useEffect(() => {
     const savedOrder = getSavedOrder();
@@ -194,7 +192,11 @@ export default function OrderConfirmationScreen() {
           </div>
 
           {/* Right */}
-          <FeedbackCard />
+          <FeedbackCard
+            orderNumber={order.orderNumber}
+            customerName={`${order.customerDetails.firstName} ${order.customerDetails.lastName}`.trim()}
+            email={order.customerDetails.email}
+          />
         </div>
 
         <div className="mt-12 text-center">
@@ -207,8 +209,6 @@ export default function OrderConfirmationScreen() {
         </div>
 
       </div>
-
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }
