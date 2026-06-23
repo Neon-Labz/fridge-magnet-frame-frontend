@@ -90,6 +90,16 @@ export default function LoginForm({
         const role = payload?.user?.role;
         const isAdmin = role === "admin";
 
+        // Admin dashboard login: reject non-admin accounts.
+        const isAdminLogin =
+          tokenKey === "adminToken" || redirectTo?.startsWith("/dashboard");
+
+        if (isAdminLogin && !isAdmin) {
+          setError("Access denied. Admin account required.");
+          setLoading(false);
+          return;
+        }
+
         if (token) {
   localStorage.setItem(tokenKey, token);
 

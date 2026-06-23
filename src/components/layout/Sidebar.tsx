@@ -30,9 +30,15 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    router.push('/');
+    // Clear all stored auth state.
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax'
+    document.cookie = 'token=; path=/; max-age=0; samesite=lax'
+
+    router.replace('/login')
   };
 
   return (
