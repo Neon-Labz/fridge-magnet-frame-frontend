@@ -12,6 +12,7 @@ import Pagination from '@/components/dashboard/shared/Pagination';
 import { useProducts } from '@/hooks/useProducts';
 import type { Product, ProductFormData } from '@/types/product';
 import { apiV1Url } from '@/lib/backendUrl';
+import { useToastStore } from '@/store/toastStore';
 
 const PAGE_SIZE = 4;
 
@@ -32,6 +33,7 @@ const getErrorMessage = (responseText: string) => {
 
 export default function ProductsPage() {
   const { products, isLoaded, refreshProducts } = useProducts();
+  const { addToast } = useToastStore();
 
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
@@ -134,7 +136,7 @@ export default function ProductsPage() {
     return true;
 
   } catch (error) {
-    setProductMessage(error instanceof Error ? error.message : 'Something went wrong');
+    addToast(error instanceof Error ? error.message : 'Something went wrong', 'error');
     return false;
   }
 };

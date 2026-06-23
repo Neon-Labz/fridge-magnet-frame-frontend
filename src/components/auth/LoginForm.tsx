@@ -21,17 +21,14 @@ type LoginFormData = {
   password: string;
 };
 
-type LoginPayload = {
+type LoginResponseData = {
   token?: string;
-  accessToken?: string;
-  access_token?: string;
   user?: {
+    id?: string;
+    fullName?: string;
+    email?: string;
     role?: string;
   };
-};
-
-type LoginResponseData = LoginPayload & {
-  data?: LoginPayload;
 };
 
 function GoogleIcon() {
@@ -79,38 +76,22 @@ export default function LoginForm({
       const response = await apiClient.login(data);
 
       if (response.success) {
-        const responseData = response.data as LoginResponseData | undefined;
-        const payload = responseData?.data ?? responseData;
-
-        const token =
-          payload?.token ||
-          payload?.accessToken ||
-          payload?.access_token;
-
+        const payload = response.data as LoginResponseData | undefined;
+        const token = payload?.token;
         const role = payload?.user?.role;
         const isAdmin = role === "admin";
 
         if (token) {
-  localStorage.setItem(tokenKey, token);
+          localStorage.setItem(tokenKey, token);
+          localStorage.setItem("user", JSON.stringify(payload?.user));
+          document.cookie = `${tokenKey}=${encodeURIComponent(token)}; path=/; samesite=lax`;
 
-  localStorage.setItem(
-    "user",
-    JSON.stringify(payload?.user)
-  );
+          if (isAdmin) {
+            localStorage.setItem("adminToken", token);
+            document.cookie = `adminToken=${encodeURIComponent(token)}; path=/; samesite=lax`;
+          }
 
-  document.cookie = `${tokenKey}=${encodeURIComponent(
-    token
-  )}; path=/; samesite=lax`;
-
-  if (isAdmin) {
-    localStorage.setItem("adminToken", token);
-
-    document.cookie = `adminToken=${encodeURIComponent(
-      token
-    )}; path=/; samesite=lax`;
-  }
-
-  dispatchWebsiteAuthChanged();
+          dispatchWebsiteAuthChanged();
 
           const finalRedirect =
             redirectTo ||
