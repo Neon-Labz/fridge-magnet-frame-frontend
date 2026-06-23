@@ -23,6 +23,7 @@ type LoginFormData = {
 
 type LoginResponseData = {
   token?: string;
+  access_token?: string;
   user?: {
     id?: string;
     fullName?: string;
@@ -77,7 +78,7 @@ export default function LoginForm({
 
       if (response.success) {
         const payload = response.data as LoginResponseData | undefined;
-        const token = payload?.token;
+        const token = payload?.token || payload?.access_token;
         const role = payload?.user?.role;
         const isAdmin = role === "admin";
 
