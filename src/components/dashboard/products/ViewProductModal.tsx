@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, Package, MapPin, History } from 'lucide-react';
 import type { Product } from '@/types/product';
+import { apiV1Url } from '@/lib/backendUrl';
 
 interface ViewProductModalProps {
   isOpen: boolean;
@@ -14,14 +15,11 @@ interface ViewProductModalProps {
   ) => boolean | void | Promise<boolean | void>;
 }
 
-type StockLog = {
-  productId: string;
-  productName: string;
-  date: string;
+type StockLogEntry = {
   previousStock: number;
-  addedStock: number;
-  updatedStock: number;
-  updatedBy: string;
+  newStock: number;
+  changedBy: string;
+  changedAt: string;
 };
 
 export default function ViewProductModal({
@@ -33,12 +31,16 @@ export default function ViewProductModal({
   const [extraStock, setExtraStock] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showLog, setShowLog] = useState(false);
-  const [stockLogs, setStockLogs] = useState<StockLog[]>([]);
+  const [stockLog, setStockLog] = useState<StockLogEntry[]>([]);
+  const [isLoadingLog, setIsLoadingLog] = useState(false);
+  const [logError, setLogError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setExtraStock(0);
       setShowLog(false);
+      setStockLog([]);
+      setLogError(null);
     }
   }, [isOpen, product?.id]);
 
@@ -56,22 +58,22 @@ export default function ViewProductModal({
   const currentLabel = getStatus(currentStock);
   const updatedStatus = getStatus(updatedStock);
 
-  const selectedProductLogs = stockLogs.filter(
-    (log) => log.productId === product.id,
-  );
-
-  const addStockLog = () => {
-    const newLog: StockLog = {
-      productId: product.id,
-      productName: product.name,
-      date: new Date().toLocaleString(),
-      previousStock: currentStock,
-      addedStock: extraStock,
-      updatedStock,
-      updatedBy: 'Admin',
-    };
-
-    setStockLogs((prev) => [newLog, ...prev]);
+  const handleViewLog = async () => {
+    const next = !showLog;
+    setShowLog(next);
+    if (!next) return;
+    setIsLoadingLog(true);
+    setLogError(null);
+    try {
+      const res = await fetch(apiV1Url(`/api/products/${product.id}/stock-log`));
+      if (!res.ok) throw new Error('Failed to fetch stock log');
+      const json = await res.json();
+      setStockLog(json.data ?? []);
+    } catch (err) {
+      setLogError(err instanceof Error ? err.message : 'Failed to fetch stock log');
+    } finally {
+      setIsLoadingLog(false);
+    }
   };
 
   const cardRadius = 16;
@@ -322,11 +324,11 @@ export default function ViewProductModal({
 
                 <button
                   type="button"
-                  onClick={() => setShowLog((prev) => !prev)}
+                  onClick={handleViewLog}
                   className="flex items-center gap-2 text-base font-bold"
                   style={{ color: '#002B73' }}
                 >
-                  View Log
+                  {showLog ? 'Hide Log' : 'View Log'}
 
                   <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
                     <History size={16} />
@@ -334,6 +336,86 @@ export default function ViewProductModal({
                 </button>
               </div>
             </div>
+
+            {/* STOCK LOG PANEL */}
+            {showLog && (
+              <div className="col-span-2 mt-2">
+                <h3
+                  className="font-bold text-lg mb-4"
+                  style={{ color: '#002B73' }}
+                >
+                  Stock Modification History
+                </h3>
+
+                {isLoadingLog ? (
+                  <p className="text-sm" style={{ color: '#64748B' }}>
+                    Loading...
+                  </p>
+                ) : logError ? (
+                  <p className="text-sm text-red-500">{logError}</p>
+                ) : stockLog.length === 0 ? (
+                  <p className="text-sm" style={{ color: '#64748B' }}>
+                    No stock changes recorded yet.
+                  </p>
+                ) : (
+                  <div
+                    style={{
+                      border: '1px solid #E5E7EB',
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <table className="w-full text-sm">
+                      <thead style={{ background: '#F5F6FB' }}>
+                        <tr>
+                          {['Date', 'Previous', 'Change', 'New Stock', 'Changed By'].map((h) => (
+                            <th
+                              key={h}
+                              className="text-left px-5 py-3 font-bold"
+                              style={{ color: '#002B73' }}
+                            >
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stockLog.map((entry, idx) => {
+                          const change = entry.newStock - entry.previousStock;
+                          return (
+                            <tr
+                              key={idx}
+                              style={{
+                                borderTop: idx > 0 ? '1px solid #F1F5F9' : undefined,
+                              }}
+                            >
+                              <td className="px-5 py-3" style={{ color: '#5C5F6C' }}>
+                                {new Date(entry.changedAt).toLocaleString()}
+                              </td>
+                              <td className="px-5 py-3 font-medium" style={{ color: '#1A1C1F' }}>
+                                {entry.previousStock}
+                              </td>
+                              <td
+                                className="px-5 py-3 font-bold"
+                                style={{ color: change >= 0 ? '#008000' : '#BC0000' }}
+                              >
+                                {change >= 0 ? `+${change}` : change}
+                              </td>
+                              <td className="px-5 py-3 font-medium" style={{ color: '#1A1C1F' }}>
+                                {entry.newStock}
+                              </td>
+                              <td className="px-5 py-3" style={{ color: '#5C5F6C' }}>
+                                {entry.changedBy}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -364,8 +446,6 @@ export default function ViewProductModal({
               setIsUpdating(true);
 
               try {
-                addStockLog();
-
                 const shouldStayOpen = await onUpdate?.(
                   product,
                   String(updatedStock),

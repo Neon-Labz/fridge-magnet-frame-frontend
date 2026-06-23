@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { ProductFormData } from '@/types/product';
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
 import { apiV1Url } from '@/lib/backendUrl';
+import { useToastStore } from '@/store/toastStore';
 
 const getProductStatus = (stock: number) => {
   if (stock > 10) return 'In Stock';
@@ -15,6 +16,7 @@ const getProductStatus = (stock: number) => {
 export default function CreateProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const router = useRouter();
+  const { addToast } = useToastStore();
 
  const handleSubmit = async (formData: ProductFormData) => {
   try {
@@ -47,7 +49,10 @@ export default function CreateProductPage() {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to create product");
+      const body = await response.json().catch(() => ({}));
+      const errorMessage = body?.message || 'Failed to create product. Please try again.';
+      addToast(errorMessage, 'error');
+      return false;
     }
 
     setIsModalOpen(false);
@@ -55,6 +60,7 @@ export default function CreateProductPage() {
 
   } catch (error) {
     console.error('Error creating product:', error);
+    addToast('Failed to create product. Please try again.', 'error');
     return false;
   }
 };
