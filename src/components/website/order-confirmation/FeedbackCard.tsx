@@ -2,28 +2,62 @@
 
 import { useState } from "react";
 import { Star } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
+import { useToastStore } from "@/store/toastStore";
+import { submitFeedback } from "@/services/feedbackService";
 
 interface FeedbackCardProps {
+  orderNumber?: string;
+  customerName?: string;
+  email?: string;
   onSubmit?: (rating: number, feedback: string) => void;
 }
 
-export default function FeedbackCard({ onSubmit }: FeedbackCardProps) {
+export default function FeedbackCard({
+  orderNumber,
+  customerName,
+  email,
+  onSubmit,
+}: FeedbackCardProps) {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const { showToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const { addToast } = useToastStore();
 
-  const handleSubmitFeedback = () => {
-    if (rating > 0 || feedback.trim()) {
+  const handleSubmitFeedback = async () => {
+    if (submitting || submitted) return;
+    if (rating === 0 && !feedback.trim()) {
+      addToast("Please add a rating or a comment first", "info");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await submitFeedback({
+        rating,
+        comment: feedback,
+        orderNumber,
+        customerName,
+        email,
+      });
+
       setSubmitted(true);
-      showToast("Thank you! Your feedback was submitted successfully", "success", 3000);
+      addToast("Thank you! Your feedback was submitted successfully", "success");
       onSubmit?.(rating, feedback);
+
       setTimeout(() => {
         setRating(0);
         setFeedback("");
         setSubmitted(false);
       }, 3000);
+    } catch (error) {
+      addToast(
+        error instanceof Error ? error.message : "Failed to submit feedback",
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -76,15 +110,15 @@ export default function FeedbackCard({ onSubmit }: FeedbackCardProps) {
       {/* Submit Button */}
       <button
         onClick={handleSubmitFeedback}
-        disabled={submitted}
+        disabled={submitted || submitting}
         className={`w-full rounded-lg sm:rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 font-bold text-xs sm:text-sm lg:text-base transition-all shadow-md ${
-          submitted
+          submitted || submitting
             ? "bg-[#E8E8ED] text-[#434652] cursor-not-allowed"
             : "bg-white text-[#0040A1] hover:bg-gray-50 active:scale-98"
         }`}
         type="button"
       >
-        {submitted ? "✓ Thank you!" : "Submit Feedback"}
+        {submitted ? "✓ Thank you!" : submitting ? "Submitting..." : "Submit Feedback"}
       </button>
     </div>
   );
