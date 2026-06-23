@@ -21,18 +21,19 @@ export default function ShopViewProductDetailsSection({
   const { addToast } = useToastStore();
   const { isAuthenticated } = useWebsiteAuthSession();
 
-  const [quantity, setQuantity] = useState(4);
   const initialHasFrame =
     initialFrameType === "black-frame" || initialFrameType === "white-frame";
+
+  const [quantity, setQuantity] = useState(4);
   const [selectedOption, setSelectedOption] = useState(
-    initialHasFrame ? "With Frame" : "Without Frame"
+    initialHasFrame ? "With Frame" : "Without Frame",
   );
   const [selectedColor, setSelectedColor] = useState(
     initialFrameType === "black-frame"
       ? "Black"
       : initialFrameType === "white-frame"
         ? "White"
-        : ""
+        : "",
   );
 
   if (!products || products.length === 0) {
@@ -48,8 +49,10 @@ export default function ShopViewProductDetailsSection({
   const findProductByVariant = (variant: "without" | "black" | "white") =>
     products.find((product) => {
       const name = product.productName?.toLowerCase() ?? "";
+
       if (variant === "black") return name.includes("black frame");
       if (variant === "white") return name.includes("white frame");
+
       return (
         name.includes("without frame") ||
         (!name.includes("with frame") &&
@@ -62,10 +65,10 @@ export default function ShopViewProductDetailsSection({
     selectedOption === "Without Frame"
       ? findProductByVariant("without") || products[0]
       : selectedColor === "Black"
-      ? findProductByVariant("black") || products[0]
-      : selectedColor === "White"
-      ? findProductByVariant("white") || products[0]
-      : products[0];
+        ? findProductByVariant("black") || products[0]
+        : selectedColor === "White"
+          ? findProductByVariant("white") || products[0]
+          : products[0];
 
   const title = selectedProduct?.productName ?? "";
   const price = Number(selectedProduct?.price ?? 0);
@@ -77,6 +80,11 @@ export default function ShopViewProductDetailsSection({
   const handleAddToCart = () => {
     if (status === "Out of Stock") {
       addToast("This product is out of stock!", "error");
+      return;
+    }
+
+    if (availableStock < quantity) {
+      addToast(`Only ${availableStock} items are available.`, "error");
       return;
     }
 
@@ -101,8 +109,8 @@ export default function ShopViewProductDetailsSection({
   };
 
   const handleDecreaseQuantity = () => {
-    if (quantity <= 4) {
-      addToast("You must select a minimum of 4 magnets.", "error");
+    if (quantity <= 1) {
+      addToast("Quantity cannot be less than 1.", "error");
       return;
     }
 
@@ -115,16 +123,22 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    if (quantity > availableStock) {
-      addToast(`Only ${availableStock} items are available.`, "error");
-      return;
-    }
     setQuantity((current) => current + 1);
   };
 
   const handleBuyNow = () => {
     if (!isAuthenticated) {
       router.push("/login");
+      return;
+    }
+
+    if (status === "Out of Stock") {
+      addToast("This product is out of stock!", "error");
+      return;
+    }
+
+    if (availableStock < quantity) {
+      addToast(`Only ${availableStock} items are available.`, "error");
       return;
     }
 
@@ -169,26 +183,27 @@ export default function ShopViewProductDetailsSection({
                 status === "Out of Stock"
                   ? "text-red-700"
                   : status === "Low Stock"
-                  ? "text-red-500"
-                  : "text-green-600"
+                    ? "text-red-500"
+                    : "text-green-600"
               }`}
             >
               {status}
             </span>
+
             <span className="text-sm text-slate-500">
-({Number(selectedProduct?.stock ?? 0)} Available)
-  </span>
+              ({availableStock} Available)
+            </span>
           </div>
 
-          <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
+          <div className="mb-6 text-[24px] font-bold text-[#1A2B5E] md:text-[32px]">
             Rs {price.toFixed(2)}
           </div>
 
-          <p className="mb-8 text-sm md:text-base leading-relaxed text-slate-600">
+          <p className="mb-8 text-sm leading-relaxed text-slate-600 md:text-base">
             {description}
           </p>
 
-          <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
+          <hr className="mb-8 w-full max-w-[551px] border-slate-200" />
 
           <div className="mb-8">
             <label className="mb-3 block text-[15px] text-slate-800">
@@ -286,8 +301,9 @@ export default function ShopViewProductDetailsSection({
 
           <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
             <button
+              type="button"
               onClick={handleAddToCart}
-              disabled={status === "Out of Stock" || availableStock < 4}
+              disabled={status === "Out of Stock" || availableStock < quantity}
               className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
             >
               🛒 Add to Cart
@@ -296,11 +312,11 @@ export default function ShopViewProductDetailsSection({
             <button
               type="button"
               onClick={handleBuyNow}
-              disabled={!isAuthenticated || status === "Out of Stock"}
+              disabled={status === "Out of Stock" || availableStock < quantity}
               className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
-                isAuthenticated && status !== "Out of Stock"
+                status !== "Out of Stock" && availableStock >= quantity
                   ? "bg-[#E62A24]"
-                  : "bg-[#E62A24]/60"
+                  : "cursor-not-allowed bg-[#E62A24]/60 opacity-50"
               }`}
             >
               Buy Now

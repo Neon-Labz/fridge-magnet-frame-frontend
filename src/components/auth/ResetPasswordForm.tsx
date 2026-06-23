@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Lock, Eye, EyeOff } from "lucide-react";
 import { useAuthModal } from "@/hooks/useAuthModal";
 import { apiClient } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
 
 const resetPasswordSchema = z
   .object({
@@ -29,6 +30,7 @@ export default function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { switchView } = useAuthModal();
+  const searchParams = useSearchParams();
 
   const {
     register,
@@ -44,7 +46,11 @@ export default function ResetPasswordForm() {
     setSuccess(false);
 
     try {
-      const token = "reset-token-from-url";
+      const token = searchParams.get("token");
+      if (!token) {
+        setError("This reset link is invalid or incomplete");
+        return;
+      }
 
       const response = await apiClient.resetPassword(
         token,
