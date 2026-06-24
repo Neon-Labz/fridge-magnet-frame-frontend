@@ -112,10 +112,24 @@ export default function ProductsPage() {
       extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
     data.append('personalizationEnabled', String(personalizationEnabled));
 
-    const personalizationOptions: string[] =
+    const personalizationOptions: { label: string; imageFile: File | null }[] =
       extendedData.personalizationOptions ?? [];
+
     if (personalizationOptions.length > 0) {
-      data.append('personalization', JSON.stringify(personalizationOptions));
+      // Build metadata (label + key reference to its image file, if any)
+      const optionsPayload = personalizationOptions.map((opt, index) => ({
+        label: opt.label,
+        imageField: opt.imageFile ? `personalizationImage_${index}` : null,
+      }));
+
+      data.append('personalization', JSON.stringify(optionsPayload));
+
+      // Append each option's image file under its own unique key
+      personalizationOptions.forEach((opt, index) => {
+        if (opt.imageFile) {
+          data.append(`personalizationImage_${index}`, opt.imageFile);
+        }
+      });
     }
 
     if (formData.primaryImage) {
