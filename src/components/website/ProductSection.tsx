@@ -69,7 +69,7 @@ export default function ProductsSection({
 
   return (
     <section className="w-full bg-[#F9F9FE] py-10 md:py-0">
-      <div className="mx-auto w-full max-w-[1800px] px-4 md:px-[120px]">
+      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[120px]">
         {/* HEADER */}
         <div className="mb-6 md:mb-[52px] flex items-start justify-between gap-4">
           <div>
@@ -98,11 +98,11 @@ export default function ProductsSection({
             No products available right now.
           </div>
         ) : (
-          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-3 md:gap-[28px] md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-[28px]">
             {visibleProducts.map((p) => (
               <div
                 key={p.id}
-                className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
+                className="flex h-full flex-col overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
               >
                 {/* IMAGE */}
                 <button
@@ -140,7 +140,7 @@ export default function ProductsSection({
                   </button>
 
                 {/* CONTENT */}
-                <div className="p-3 md:p-[20px]">
+                <div className="flex flex-1 flex-col p-3 md:p-[20px]">
                   <h3 className="font-manrope text-[16px] md:text-[22px] font-semibold leading-[1.15] text-[#1A1C1F]">
                     {p.title}
                   </h3>
@@ -150,7 +150,7 @@ export default function ProductsSection({
                   </p>
 
                   {/* PRICE + BUTTON */}
-                  <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <div className="mt-auto flex flex-col gap-2 pt-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                     <span className="font-inter text-[15px] md:text-[18px] font-semibold text-[#002B73]">
                       Rs {Number(p.price).toFixed(2)}
                     </span>

@@ -19,7 +19,7 @@ export default function Footer() {
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F9F9FE]">
 
       {/* MAIN FOOTER */}
-      <div className="mx-auto max-w-[1350px] px-5 py-6 sm:px-6 lg:px-7">
+      <div className="mx-auto w-full max-w-[1700px] px-4 py-6 sm:px-6 lg:px-[120px]">
 
         {/* ✅ RESPONSIVE GRID (Mobile → Tablet → Desktop) */}
         <div className="grid grid-cols-2 gap-15 sm:grid-cols-4 xl:grid-cols-4">
@@ -110,7 +110,7 @@ export default function Footer() {
 
       {/* BOTTOM FOOTER */}
       <div className="border-t border-[#D7DBE4]">
-        <div className="mx-auto max-w-7xl px-6 py-3">
+        <div className="mx-auto max-w-[1350px] px-5 py-3 sm:px-6 lg:px-7 min-[1280px]:max-[1365px]:w-full min-[1280px]:max-[1365px]:max-w-[1700px] min-[1280px]:max-[1365px]:px-[120px]">
           <p className="text-center font-inter text-[13px] text-[#64748B]">
             © 2026 Magnify Photo Frames. Curated Memories.
           </p>
