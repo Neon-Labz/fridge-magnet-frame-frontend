@@ -13,4 +13,6 @@ export interface ShopProduct {
   primaryImage?: ShopProductImage | null;
   personalizationInstructions?: string[] | string | null;
   personalization?: string[] | string | null;
+  galleryImages?: ShopProductImage[] | null;
+  personalizationEnabled?: boolean;
 }

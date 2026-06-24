@@ -81,6 +81,8 @@ function normalizeProduct(rawProduct: RawProduct): RawProduct {
     personalizationInstructions:
       rawProduct?.personalizationInstructions ?? [],
     personalization: rawProduct?.personalization ?? [],
+    galleryImages: Array.isArray(rawProduct?.galleryImages) ? rawProduct.galleryImages : [],
+    personalizationEnabled: rawProduct?.personalizationEnabled ?? false,
   };
 }
 
