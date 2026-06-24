@@ -29,7 +29,6 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
@@ -37,25 +36,6 @@ export function SearchableSelect({
     if (!q) return options;
     return options.filter((o) => o.toLowerCase().includes(q));
   }, [options, query]);
-
-  // Close on outside click and notify blur for validation.
-  useEffect(() => {
-    if (!open) return;
-
-    const handleClick = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-        setQuery("");
-        onBlur?.();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open, onBlur]);
 
   // Focus the search box when the menu opens.
   useEffect(() => {
@@ -70,10 +50,10 @@ export function SearchableSelect({
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen(!open)}
         aria-haspopup="listbox"
         aria-expanded={open}
         className={cn(
