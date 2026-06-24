@@ -25,17 +25,12 @@
 *.pem
 
 # logs
-npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 *.log
 
 # env files
 .env*
-
-# Ignore npm lockfile when using Yarn
-package-lock.json
 
 # vercel
 .vercel
