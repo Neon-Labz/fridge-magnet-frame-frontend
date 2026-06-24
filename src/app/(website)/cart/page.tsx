@@ -93,7 +93,7 @@ function CartItem({
         {/* BOTTOM ROW */}
         <div className="flex items-center justify-between">
           {/* QUANTITY */}
-          <div className="flex items-center border border-gray-300 w-[130px] sm:w-28 rounded-md overflow-hidden">
+          <div className="grid h-[34px] w-[130px] grid-cols-3 items-center overflow-hidden rounded-md border border-gray-300 sm:w-28">
             <button
               type="button"
               onClick={() =>
@@ -104,7 +104,7 @@ function CartItem({
                   Math.max(1, item.quantity - 1)
                 )
               }
-              className="px-3 py-1 hover:bg-gray-100"
+              className="flex h-full items-center justify-center hover:bg-gray-100"
             >
               -
             </button>
@@ -112,11 +112,10 @@ function CartItem({
             <input
               value={item.quantity}
               onChange={(e) => handleInput(e.target.value)}
-              className="w-10 text-center outline-none text-sm"
-              type="number"
+              className="h-full w-full appearance-none bg-transparent p-0 text-center text-sm outline-none"
+              type="text"
               inputMode="numeric"
-              min={1}
-              max={item.stock}
+              pattern="[0-9]*"
             />
 
             <button
@@ -130,7 +129,7 @@ function CartItem({
                 )
               }
               disabled={item.stock !== undefined && item.quantity >= item.stock}
-              className="px-3 py-1 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-full items-center justify-center hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               +
             </button>
