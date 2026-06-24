@@ -1,14 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { ChangeEvent, CSSProperties } from 'react';
-import { X, ImagePlus, Images, Plus } from 'lucide-react';
+import { X, ImagePlus, Images, Plus, Paperclip } from 'lucide-react';
 import type { ProductFormData } from '@/types/product';
 
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: ProductFormData) => boolean | void | Promise<boolean | void>;
+}
+
+interface PersonalizationOption {
+  label: string;
+  imageFile: File | null;
+  imagePreviewUrl?: string;
 }
 
 const CATEGORIES = ['Wooden Frames', 'Metal Frames', 'Shadow Boxes', 'Gallery Frames', 'Heritage Frames'];
@@ -26,15 +32,90 @@ const EMPTY: ProductFormData = {
 };
 
 const MAX_GALLERY = 5;
+const MAX_PERSONALIZATION_OPTIONS = 10;
 
 type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price', string>>;
 
 export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalProps) {
   const [form, setForm] = useState<ProductFormData>(EMPTY);
-  const [personalizationText, setPersonalizationText] = useState('');
+  const [tags, setTags] = useState<PersonalizationOption[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [tagLimitError, setTagLimitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  // Used to know which tag's hidden file input was triggered
+  const pendingTagIndexRef = useRef<number | null>(null);
+  const tagImageInputRef = useRef<HTMLInputElement | null>(null);
+
+  const addTag = (tag: string) => {
+    const parts = tag.split(',');
+    setTags(prev => {
+      let next = [...prev];
+      parts.forEach(part => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        if (next.length >= MAX_PERSONALIZATION_OPTIONS) {
+          setTagLimitError(`You can add a maximum of ${MAX_PERSONALIZATION_OPTIONS} personalization options.`);
+          return;
+        }
+        if (!next.some(t => t.label.toLowerCase() === trimmed.toLowerCase())) {
+          next.push({ label: trimmed, imageFile: null });
+          setTagLimitError(null);
+        }
+      });
+      return next;
+    });
+  };
+
+  const removeTag = (idx: number) => {
+    setTags(prev => prev.filter((_, i) => i !== idx));
+    setTagLimitError(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+      setTagInput('');
+    }
+  };
+
+  const handleBlur = () => {
+    if (tagInput.trim()) {
+      addTag(tagInput);
+      setTagInput('');
+    }
+  };
+
+  const triggerTagImagePicker = (idx: number) => {
+    pendingTagIndexRef.current = idx;
+    tagImageInputRef.current?.click();
+  };
+
+  const handleTagImageSelected = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    const idx = pendingTagIndexRef.current;
+    if (idx === null || !file) return;
+
+    setTags(prev =>
+      prev.map((t, i) =>
+        i === idx
+          ? { ...t, imageFile: file, imagePreviewUrl: URL.createObjectURL(file) }
+          : t,
+      ),
+    );
+
+    pendingTagIndexRef.current = null;
+    e.target.value = '';
+  };
+
+  const removeTagImage = (idx: number) => {
+    setTags(prev =>
+      prev.map((t, i) => (i === idx ? { ...t, imageFile: null, imagePreviewUrl: undefined } : t)),
+    );
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -79,16 +160,31 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
 
   setIsSubmitting(true);
 
+  // Capture final tagInput value if they haven't pressed Enter/comma
+  let finalTags = [...tags];
+  const finalInput = tagInput.trim();
+  if (finalInput) {
+    const parts = finalInput.split(',');
+    parts.forEach(part => {
+      const trimmed = part.trim();
+      if (
+        trimmed &&
+        !finalTags.some(t => t.label.toLowerCase() === trimmed.toLowerCase()) &&
+        finalTags.length < MAX_PERSONALIZATION_OPTIONS
+      ) {
+        finalTags.push({ label: trimmed, imageFile: null });
+      }
+    });
+  }
+
   try {
     const submitData = {
       ...form,
 
       personalizationEnabled: form.personalization,
 
-      personalizationOptions: personalizationText
-        .split(',')
-        .map(item => item.trim())
-        .filter(Boolean),
+      // Array of { label, imageFile } — image upload handled in parent (page.tsx)
+      personalizationOptions: finalTags,
     };
 
     const shouldReset = await onSubmit?.(
@@ -97,8 +193,10 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
 
     if (shouldReset !== false) {
       setForm(EMPTY);
-      setPersonalizationText('');
+      setTags([]);
+      setTagInput('');
       setGalleryError(null);
+      setTagLimitError(null);
       setFieldErrors({});
     }
   } catch {
@@ -125,6 +223,15 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+
+      {/* Hidden file input shared by all tag image pickers */}
+      <input
+        ref={tagImageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleTagImageSelected}
+        className="hidden"
+      />
 
       <div
         className="relative flex flex-col w-full overflow-hidden"
@@ -300,7 +407,7 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                   Personalization Options
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>
-                  Add options separated by comma
+                  Add options separated by comma. Optionally attach an image to each option.
                 </p>
               </div>
 
@@ -320,43 +427,91 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
             </div>
 
             {form.personalization && (
-  <div className="mt-4 space-y-4">
-    <div>
-      <label className="block text-sm font-semibold mb-2">
-        Frame Option
-      </label>
+              <div className="mt-4 space-y-4">
+                {/* Current tags list — each with optional image thumbnail + attach button */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 text-sm bg-blue-50 text-[#002B73] px-3 py-1.5 rounded-full font-semibold border border-blue-100 shadow-sm"
+                      >
+                        {tag.imagePreviewUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={tag.imagePreviewUrl}
+                            alt={tag.label}
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                        )}
+                        {tag.label}
+                        <button
+                          type="button"
+                          onClick={() => triggerTagImagePicker(idx)}
+                          title="Attach image to this option"
+                          className="text-[#002B73] hover:text-blue-900 focus:outline-none transition"
+                        >
+                          <Paperclip size={13} />
+                        </button>
+                        {tag.imagePreviewUrl && (
+                          <button
+                            type="button"
+                            onClick={() => removeTagImage(idx)}
+                            title="Remove image"
+                            className="text-[#94A3B8] hover:text-red-500 focus:outline-none text-xs transition"
+                          >
+                            img&times;
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(idx)}
+                          title="Remove option"
+                          className="text-[#002B73] hover:text-blue-900 focus:outline-none ml-1 transition"
+                        >
+                          &times;
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-      <select
-        value={personalizationText}
-        onChange={(e) => setPersonalizationText(e.target.value)}
-        style={inputStyle}
-      >
-        <option value="">Select option</option>
-        <option value="With Frame">With Frame</option>
-        <option value="Without Frame">Without Frame</option>
-      </select>
-    </div>
+                {tagLimitError && (
+                  <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{tagLimitError}</p>
+                )}
 
-    {personalizationText === "With Frame" && (
-      <div>
-        <label className="block text-sm font-semibold mb-2">
-          Select Color
-        </label>
+                {/* Input for new tag */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Type option and press Enter or comma..."
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleBlur}
+                    disabled={tags.length >= MAX_PERSONALIZATION_OPTIONS}
+                    style={inputStyle}
+                  />
+                </div>
 
-        <select
-          onChange={(e) =>
-            setPersonalizationText(`With Frame, ${e.target.value}`)
-          }
-          style={inputStyle}
-        >
-          <option value="">Select color</option>
-          <option value="Black">Black</option>
-          <option value="White">White</option>
-        </select>
-      </div>
-    )}
-  </div>
-)}
+                {/* Suggestions */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold text-slate-500">Suggestions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['With Frame', 'Without Frame', 'Black', 'White'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => addTag(preset)}
+                        className="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full font-medium transition active:scale-95"
+                      >
+                        + {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
