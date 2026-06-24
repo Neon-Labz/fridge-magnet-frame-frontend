@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToastStore } from "@/store/toastStore";
 import type { Order, OrderStatus as OrderStatusValue } from "@/types/order";
 import { mapApiOrder, statusToApi } from "@/lib/orders";
 import { apiV1Url } from "@/lib/backendUrl";
@@ -33,6 +34,7 @@ const STATUS_RANK: Record<OrderStatusValue, number> = {
 
 export default function OrderStatus({ order }: OrderStatusProps) {
   const router = useRouter();
+  const { addToast } = useToastStore();
   const [currentOrder, setCurrentOrder] = useState<OrderWithMongoId>(order);
   const [status, setStatus] = useState<OrderStatusValue>(
     order.status || "processing"
@@ -79,11 +81,27 @@ export default function OrderStatus({ order }: OrderStatusProps) {
         throw new Error(data?.message || `Update failed: ${response.status}`);
       }
 
-      const updatedOrder = mapApiOrder(await response.json());
+      const rawData = await response.json();
+      const emailNotif = rawData.emailNotification as
+        | { attempted: boolean; success: boolean; error?: string }
+        | undefined;
+
+      const updatedOrder = mapApiOrder(rawData);
       setCurrentOrder(updatedOrder);
       setStatus(updatedOrder.status);
       setAdminNote(updatedOrder.adminNote || "");
-      setSuccess("Order status updated");
+
+      if (!sendEmailNotification || !emailNotif?.attempted) {
+        addToast("Order updated successfully.", "success");
+      } else if (emailNotif.success) {
+        addToast("Order updated. Email notification sent.", "success");
+      } else {
+        addToast(
+          "Order updated, but the email notification failed to send. Please check with the customer manually.",
+          "error"
+        );
+      }
+
       router.push("/dashboard/orders");
     } catch (error) {
       console.error(error);
