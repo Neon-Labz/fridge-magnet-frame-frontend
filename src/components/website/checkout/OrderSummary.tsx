@@ -2,7 +2,6 @@
 
 import { CreditCard, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import FramePreview from "../FramePreview";
 import Image from "next/image";
 
 export type SummaryItem = {
@@ -26,22 +25,6 @@ interface OrderSummaryProps {
   onPaymentMethodChange?: (method: "card" | "cod") => void;
 }
 
-const resolvePreview = (item: SummaryItem): "updated-1" | "updated-2" | "gradient" => {
-  if (item.image === "updated-1" || item.image === "updated-2") {
-    return item.image;
-  }
-
-  if (item.name && item.name.toLowerCase().includes("white frame")) {
-    return "updated-1";
-  }
-
-  if (item.name && item.name.toLowerCase().includes("magnate frame")) {
-    return "updated-2";
-  }
-
-  return "gradient";
-};
-
 export default function OrderSummary({
   items,
   subtotal,
@@ -57,37 +40,35 @@ export default function OrderSummary({
   const total = subtotal + (shippingEntered ? shipping : 0);
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm py-6">
-      {/* Header */}
-      <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1C1F] mb-6 px-4 sm:px-6">
+    <div className="w-full rounded-xl border border-gray-200 bg-white py-6 shadow-sm">
+      <h2 className="mb-6 px-4 text-xl font-semibold text-[#1A1C1F] sm:px-6 sm:text-2xl">
         Order Summary
       </h2>
 
-      {/* Items List */}
-      <div className="space-y-4 mb-6 px-4 sm:px-6">
+      <div className="mb-6 space-y-4 px-4 sm:px-6">
         {hasItems ? (
           items.map((item) => (
             <div key={item.id} className="flex gap-3 sm:gap-4">
-              <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded border border-[#C3C6D4] bg-white overflow-hidden flex items-center justify-center">
-              <Image
-                src={item.image || "/home-product-1.png"}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="h-full w-full object-cover"
-              />
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-[#C3C6D4] bg-white sm:h-20 sm:w-20">
+                <Image
+                  src={item.image || "/home-product-1.png"}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                  className="h-full w-full object-cover"
+                />
               </div>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm sm:text-base font-semibold text-[#1A1C1F] line-clamp-2">
+              <div className="min-w-0 flex-1">
+                <h3 className="line-clamp-2 text-sm font-semibold text-[#1A1C1F] sm:text-base">
                   {item.name}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#434652] mt-1">
+                <p className="mt-1 text-xs text-[#434652] sm:text-sm">
                   Quantity: {item.quantity}
                 </p>
               </div>
 
-              <div className="text-sm sm:text-base font-semibold text-[#0040A1] text-right whitespace-nowrap">
+              <div className="whitespace-nowrap text-right text-sm font-semibold text-[#0040A1] sm:text-base">
                 Rs{(item.price * item.quantity).toFixed(2)}
               </div>
             </div>
@@ -104,87 +85,92 @@ export default function OrderSummary({
         )}
       </div>
 
-      <div className="border-t border-[#C3C6D4] mb-4 mx-4 sm:mx-6"></div>
+      <div className="mx-4 mb-4 border-t border-[#C3C6D4] sm:mx-6" />
 
-      <div className="space-y-3 mb-4 px-4 sm:px-6">
-        <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+      <div className="mb-4 space-y-3 px-4 sm:px-6">
+        <div className="flex justify-between text-xs text-[#434652] sm:text-sm">
           <span>Subtotal</span>
           <span className="font-medium">
             Rs{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
         </div>
 
-        <div className="flex justify-between text-xs sm:text-sm text-[#434652]">
+        <div className="flex justify-between gap-3 text-xs text-[#434652] sm:text-sm">
           <span>Shipping</span>
           {shippingEntered ? (
             <span className="font-medium">
               Rs{shipping.toLocaleString(undefined, { maximumFractionDigits: 2 })}
             </span>
           ) : (
-            <span className="text-[#5D1900] text-xs">
+            <span className="text-right text-xs text-[#5D1900]">
               Enter your shipping address
             </span>
           )}
         </div>
       </div>
 
-      <div className="border-t border-[#C3C6D4] mb-4 mx-4 sm:mx-6"></div>
+      <div className="mx-4 mb-4 border-t border-[#C3C6D4] sm:mx-6" />
 
-      <div className="flex justify-between mb-6 px-4 sm:px-6">
-        <span className="text-sm sm:text-base font-semibold text-[#434652]">
+      <div className="mb-6 flex justify-between px-4 sm:px-6">
+        <span className="text-sm font-semibold text-[#434652] sm:text-base">
           Total
         </span>
-        <span className="text-sm sm:text-base font-semibold text-[#0040A1]">
+        <span className="text-sm font-semibold text-[#0040A1] sm:text-base">
           Rs{total.toLocaleString(undefined, { maximumFractionDigits: 2 })}
         </span>
       </div>
 
       {/* Payment */}
-      <div className="bg-white rounded-lg border border-[#C3C6D4] p-4 mb-6 mx-4 sm:mx-6">
-        <h3 className="text-base font-semibold text-[#002B73] mb-3">
-          Payment Method
-        </h3>
+<div className="mx-4 mb-6 rounded-lg border border-[#C3C6D4] bg-white p-4 sm:mx-6">
+  <h3 className="mb-3 text-base font-semibold text-[#002B73]">
+    Payment Method
+  </h3>
 
-        <div className="space-y-2">
-          <label className="flex items-center gap-3 p-3 border border-[#C3C6D4] rounded cursor-pointer hover:bg-[#F9FAFB]">
-            <input
-              type="radio"
-              name="payment"
-              value="card"
-              checked={paymentMethod === "card"}
-              onChange={() => onPaymentMethodChange?.("card")}
-              className="h-4 w-4 accent-[#002B73]"
-            />
-            <CreditCard className="h-4 w-4 text-[#747784]" />
-            <span className="text-sm font-medium text-[#1A1C1F]">
-              Credit or Debit Card
-            </span>
-          </label>
+  <div className="space-y-3">
+    <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
+      <input
+        type="radio"
+        name="payment"
+        value="card"
+        checked={paymentMethod === "card"}
+        onChange={() => onPaymentMethodChange?.("card")}
+        className="h-4 w-4 accent-[#002B73]"
+      />
 
-          <label className="flex items-center gap-3 p-3 border border-[#C3C6D4] rounded cursor-pointer hover:bg-[#F9FAFB]">
-            <input
-              type="radio"
-              name="payment"
-              value="cod"
-              checked={paymentMethod === "cod"}
-              onChange={() => onPaymentMethodChange?.("cod")}
-              className="h-4 w-4 accent-[#002B73]"
-            />
-            <Lock className="h-4 w-4 text-[#747784]" />
-            <span className="text-sm font-medium text-[#1A1C1F]">
-              Cash on Delivery
-            </span>
-          </label>
-        </div>
+      <CreditCard className="h-4 w-4 text-[#747784]" />
+
+      <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
+        Credit or Debit Card
+      </span>
+    </label>
+
+    <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
+      <input
+        type="radio"
+        name="payment"
+        value="cod"
+        checked={paymentMethod === "cod"}
+        onChange={() => onPaymentMethodChange?.("cod")}
+        className="h-4 w-4 accent-[#002B73]"
+      />
+
+      <Lock className="h-4 w-4 text-[#747784]" />
+
+      <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
+        Cash on Delivery
+      </span>
+    </label>
+  </div>
+
+
       </div>
 
-      {/* Button */}
-      <div className="px-4 sm:px-6 mb-3">
+      <div className="mb-3 px-4 sm:px-6">
         <Button
           type="button"
-          className={`w-full text-white font-bold text-base py-3 rounded flex items-center justify-center gap-2 ${
+          className={`flex w-full items-center justify-center gap-2 rounded py-3 text-base font-bold text-white ${
             isDisabled
-              ? "bg-[#D3D3D3] cursor-not-allowed opacity-60"
+              ? "cursor-not-allowed bg-[#D3D3D3] opacity-60"
               : "bg-[#FF3B30] hover:bg-[#E61D11]"
           }`}
           onClick={() => !isDisabled && onPlaceOrder?.()}
@@ -195,7 +181,7 @@ export default function OrderSummary({
         </Button>
 
         {isDisabled && (
-          <p className="text-xs text-center text-[#FF3B30] mt-2">
+          <p className="mt-2 text-center text-xs text-[#FF3B30]">
             {!hasItems
               ? "Add items to cart to place order"
               : "Please fill all required fields to place order"}
@@ -203,8 +189,8 @@ export default function OrderSummary({
         )}
       </div>
 
-      <div className="flex items-center justify-center gap-1 text-xs text-[#434652] px-4 sm:px-6 pb-4 sm:pb-6">
-        <Lock className="h-3 w-3" />
+      <div className="flex items-center justify-center gap-1 px-4 pb-4 text-xs text-[#434652] sm:px-6 sm:pb-6">
+        <Lock className="h-3 w-3 shrink-0" />
         <span>SSL Encrypted Checkout</span>
       </div>
     </div>

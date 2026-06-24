@@ -1,7 +1,8 @@
 export default function HowItWorksSection() {
   return (
-<section className="w-full bg-[#F9F9FE] px-4 py-[30px] sm:px-6 lg:px-[120px] lg:py-[55px]">
-      <div className="mx-auto w-full max-w-[1800px] rounded-[22px] bg-[#07357E] px-5 py-8 text-white sm:px-8 sm:py-10 lg:px-[30px] lg:py-[42px]">
+    <section className="w-full bg-[#F9F9FE] py-[30px] lg:py-[55px]">
+      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[120px]">
+        <div className="rounded-[22px] bg-[#07357E] px-5 py-8 text-white sm:px-8 sm:py-10 lg:px-[30px] lg:py-[42px]">
 
         {/* TITLE */}
         <h2 className="text-center font-manrope text-[24px] font-bold leading-[34px] sm:text-left lg:text-[28px]">
@@ -81,6 +82,7 @@ export default function HowItWorksSection() {
 
         </div>
 
+        </div>
       </div>
     </section>
   );
