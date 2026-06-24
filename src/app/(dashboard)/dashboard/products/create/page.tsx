@@ -20,6 +20,10 @@ export default function CreateProductPage() {
 
  const handleSubmit = async (formData: ProductFormData) => {
   try {
+    // The modal casts its extended submitData as ProductFormData;
+    // use `any` to access the extra personalization fields it adds.
+    const extendedData = formData as any;
+
     const data = new FormData();
 
     data.append("productName", formData.name);
@@ -29,6 +33,21 @@ export default function CreateProductPage() {
     data.append("stock", String(formData.stock));
     data.append("description", formData.description);
     data.append("status", getProductStatus(formData.stock));
+
+    // BUG-011 FIX: Append personalization fields that the modal adds.
+    // Without this, personalizationEnabled and personalization options
+    // were silently dropped from the request every time.
+    const personalizationEnabled: boolean =
+      extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
+    data.append("personalizationEnabled", String(personalizationEnabled));
+
+    const personalizationOptions: string[] =
+      extendedData.personalizationOptions ?? [];
+    if (personalizationOptions.length > 0) {
+      // Send as a JSON array string; the backend normalizePersonalization()
+      // handles JSON-array strings correctly.
+      data.append("personalization", JSON.stringify(personalizationOptions));
+    }
 
     // primary image
     if (formData.primaryImage) {

@@ -96,6 +96,7 @@ export default function ProductsPage() {
 
   const handleAddProduct = async (formData: ProductFormData) => {
   try {
+    const extendedData = formData as any;
     const data = new FormData();
 
     data.append('productName', formData.name);
@@ -105,6 +106,17 @@ export default function ProductsPage() {
     data.append('price', String(formData.price));
     data.append('description', formData.description);
     data.append('status', getProductStatus(formData.stock));
+
+    // Append personalization fields
+    const personalizationEnabled: boolean =
+      extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
+    data.append('personalizationEnabled', String(personalizationEnabled));
+
+    const personalizationOptions: string[] =
+      extendedData.personalizationOptions ?? [];
+    if (personalizationOptions.length > 0) {
+      data.append('personalization', JSON.stringify(personalizationOptions));
+    }
 
     if (formData.primaryImage) {
       data.append('primaryImage', formData.primaryImage);
