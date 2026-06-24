@@ -49,6 +49,29 @@ const getStockStatus = (stock: number) => {
   return "Out of Stock";
 };
 
+const getFrameType = (productName: unknown, frameType: unknown) => {
+  const explicitFrameType = String(frameType ?? "").trim().toLowerCase();
+  const normalizedName = String(productName ?? "").trim().toLowerCase();
+
+  if (
+    explicitFrameType === "black-frame" ||
+    explicitFrameType === "black frame" ||
+    normalizedName.includes("black frame")
+  ) {
+    return "black-frame" as const;
+  }
+
+  if (
+    explicitFrameType === "white-frame" ||
+    explicitFrameType === "white frame" ||
+    normalizedName.includes("white frame")
+  ) {
+    return "white-frame" as const;
+  }
+
+  return "without-frame" as const;
+};
+
 async function getProducts() {
   try {
     // Correct URL: BACKEND_BASE + global prefix + controller prefix
@@ -82,7 +105,7 @@ async function getProducts() {
         desc: p.description,
         price: p.price,
         image: p.primaryImage?.secure_url || "",
-        frameType: p.category,
+        frameType: getFrameType(p.productName, p.frameType ?? p.frame),
         colorOption: "",
         badge: status,
         stock,

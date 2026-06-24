@@ -1,6 +1,5 @@
 import ShopClientWrapper from './ShopClientWrapper';
 import { Metadata } from 'next';
-import { productCatalog } from '@/lib/productCatalog';
 
 export const metadata: Metadata = {
   title: 'Shop | Magnify',
@@ -115,25 +114,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     ? resolvedSearchParams.frameType[0]
     : resolvedSearchParams.frameType;
 
-  let products = await fetchProductsForShop();
+  const products = await fetchProductsForShop();
 
   
-
-  const filteredProducts = requestedProductId
-    ? products.filter(
-        (product) =>
-          resolveProductId(product) === toComparableId(requestedProductId)
-      )
-    : products;
 
   return (
     <main>
       <ShopClientWrapper
-        products={
-          requestedProductId && filteredProducts.length > 0
-            ? filteredProducts
-            : products
-        }
+        products={products}
         selectedProductIdFromRoute={requestedProductId}
         selectedFrameType={requestedFrameType}
       />
