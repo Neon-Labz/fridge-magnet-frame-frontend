@@ -26,6 +26,7 @@ export default function FeedbackCard({
 
   const handleSubmitFeedback = async () => {
     if (submitting || submitted) return;
+
     if (rating === 0 && !feedback.trim()) {
       addToast("Please add a rating or a comment first", "info");
       return;
@@ -62,63 +63,65 @@ export default function FeedbackCard({
   };
 
   return (
-    <div className="rounded-2xl sm:rounded-3xl bg-[#0040A1] p-5 sm:p-6 lg:p-8 text-white shadow-lg w-full flex flex-col">
-      <h2 className="font-manrope text-lg sm:text-xl lg:text-2xl font-bold mb-2 sm:mb-3">
+    <div className="w-full overflow-hidden rounded-2xl bg-[#0040A1] p-5 text-white shadow-lg sm:rounded-3xl sm:p-6 lg:p-8">
+      <h2 className="mb-2 font-manrope text-lg font-bold sm:mb-3 sm:text-xl lg:text-2xl">
         Your order was successful
       </h2>
 
-      <p className="text-xs sm:text-sm text-[#A8C7FF] mb-3 sm:mb-4 leading-relaxed font-normal">
+      <p className="mb-3 text-xs font-normal leading-relaxed text-[#A8C7FF] sm:mb-4 sm:text-sm">
         Help us improve the framing experience for everyone.
       </p>
 
-      <p className="text-xs sm:text-sm font-semibold text-white mb-5 sm:mb-6">
+      <p className="mb-5 text-xs font-semibold text-white sm:mb-6 sm:text-sm">
         How would you rate your experience?
       </p>
 
-      {/* Star Rating */}
-      <div className="mb-6 sm:mb-8 flex justify-start gap-3 sm:gap-4">
+      <div className="mb-6 grid w-full grid-cols-5 gap-2 sm:mb-8 sm:gap-3">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             onClick={() => setRating(star)}
-            className={`flex h-16 w-16 sm:h-18 sm:w-18 lg:h-20 lg:w-20 items-center justify-center rounded-lg transition-all transform hover:scale-110 ${
+            className={`flex aspect-square w-full items-center justify-center rounded-lg border-2 transition-all hover:scale-105 ${
               rating >= star
-                ? "bg-[#0A56D4] border-2 border-[#FFD700]"
-                : "bg-[#0A56D4]/70 border-2 border-white/40"
+                ? "border-[#FFD700] bg-[#0A56D4]"
+                : "border-white/40 bg-[#0A56D4]/70"
             }`}
             type="button"
           >
-            <Star className={`h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 fill-current transition-all ${
-              rating >= star
-                ? "text-[#FFD700]"
-                : "text-white/50"
-            }`} />
+            <Star
+              className={`h-6 w-6 fill-current transition-all sm:h-7 sm:w-7 lg:h-8 lg:w-8 ${
+                rating >= star ? "text-[#FFD700]" : "text-white/50"
+              }`}
+            />
           </button>
         ))}
       </div>
 
-      {/* Feedback Textarea */}
-      <div className="mb-6 sm:mb-8 flex-1 flex flex-col">
+      <div className="mb-6 sm:mb-8">
         <textarea
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           placeholder="Tell us what you liked..."
-          className="w-full flex-1 rounded-xl sm:rounded-2xl bg-[#003A7F]/50 border-2 border-[#0A7FFF]/60 px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm text-white placeholder-[#A8C7FF]/60 focus:outline-none focus:border-[#FFB800] focus:bg-[#003A7F]/70 resize-none transition-all"
+          rows={4}
+          className="min-h-[120px] w-full resize-none rounded-xl border-2 border-[#0A7FFF]/60 bg-[#003A7F]/50 px-4 py-3 text-xs text-white placeholder-[#A8C7FF]/60 transition-all focus:border-[#FFB800] focus:bg-[#003A7F]/70 focus:outline-none sm:rounded-2xl sm:px-5 sm:py-4 sm:text-sm"
         />
       </div>
 
-      {/* Submit Button */}
       <button
         onClick={handleSubmitFeedback}
         disabled={submitted || submitting}
-        className={`w-full rounded-lg sm:rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 font-bold text-xs sm:text-sm lg:text-base transition-all shadow-md ${
+        className={`w-full rounded-lg px-5 py-2.5 text-xs font-bold shadow-md transition-all sm:rounded-xl sm:px-6 sm:py-3 sm:text-sm lg:text-base ${
           submitted || submitting
-            ? "bg-[#E8E8ED] text-[#434652] cursor-not-allowed"
-            : "bg-white text-[#0040A1] hover:bg-gray-50 active:scale-98"
+            ? "cursor-not-allowed bg-[#E8E8ED] text-[#434652]"
+            : "bg-white text-[#0040A1] hover:bg-gray-50 active:scale-95"
         }`}
         type="button"
       >
-        {submitted ? "✓ Thank you!" : submitting ? "Submitting..." : "Submit Feedback"}
+        {submitted
+          ? "✓ Thank you!"
+          : submitting
+            ? "Submitting..."
+            : "Submit Feedback"}
       </button>
     </div>
   );

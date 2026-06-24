@@ -17,14 +17,8 @@ const connectLinks = [
 export default function Footer() {
   return (
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F9F9FE]">
-
-      {/* MAIN FOOTER */}
-      <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 lg:px-10">
-
-        {/* ✅ RESPONSIVE GRID (Mobile → Tablet → Desktop) */}
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4">
-
-          {/* LOGO + DESCRIPTION */}
+      <div className="mx-auto w-full max-w-[980px] px-0 py-6">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="relative mb-[-50px] mt-[-55px] ml-[-12px] h-[150px] w-[250px]">
               <Image
@@ -43,7 +37,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* NAVIGATION */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Navigation
@@ -63,7 +56,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* CONNECT */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Connect
@@ -83,7 +75,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* NEWSLETTER */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Newsletter
@@ -108,9 +99,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* BOTTOM FOOTER */}
       <div className="border-t border-[#D7DBE4]">
-        <div className="mx-auto max-w-7xl px-6 py-3">
+        <div className="mx-auto w-full max-w-[980px] px-0 py-3">
           <p className="text-center font-inter text-[13px] text-[#64748B]">
             © 2026 Magnify Photo Frames. Curated Memories.
           </p>

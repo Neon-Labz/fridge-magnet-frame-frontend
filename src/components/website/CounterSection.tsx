@@ -63,7 +63,7 @@ export default function GalleryOfferSection({
 
   return (
     <section className="w-full bg-[#f9f9fe] pt-[40px] lg:pt-[10px] pb-[40px] lg:pb-[20px]">
-      <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-[120px]">
+      <div className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-[120px]">
         
         <div
           className="relative overflow-hidden rounded-[24px] px-5 py-8 sm:px-8 sm:py-10 lg:px-16 lg:py-14"
