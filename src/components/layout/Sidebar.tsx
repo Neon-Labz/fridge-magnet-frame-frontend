@@ -11,6 +11,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { clearWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 
 const NAV_ITEMS = [
   { label: 'Products', icon: Package, href: '/dashboard/products' },

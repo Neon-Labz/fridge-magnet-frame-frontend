@@ -102,14 +102,21 @@ export default function ProductsSection({
             {visibleProducts.map((p) => (
               <div
                 key={p.id}
-                className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white"
+                role="link"
+                tabIndex={0}
+                onClick={() => handleImageClick(p)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handleImageClick(p);
+                  }
+                }}
+                className="cursor-pointer overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#002B73] focus-visible:ring-offset-2"
+                aria-label={`View ${p.title} in shop`}
               >
                 {/* IMAGE */}
-                <button
-                  type="button"
-                  onClick={() => handleImageClick(p)}
+                <div
                   className="relative block h-[170px] w-full overflow-hidden sm:h-[220px] md:h-[350px]"
-                  aria-label={`View ${p.title} in shop`}
                 >
                   {p.image ? (
                     <Image
@@ -137,7 +144,7 @@ export default function ProductsSection({
                       {p.badge}
                     </span>
                   )}
-                  </button>
+                </div>
 
                 {/* CONTENT */}
                 <div className="p-3 md:p-[20px]">
@@ -156,7 +163,11 @@ export default function ProductsSection({
                     </span>
 
                     <button
-                      onClick={() => handleAddToCart(p)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleAddToCart(p);
+                      }}
+                      onKeyDown={(event) => event.stopPropagation()}
                       disabled={
                         p.stock <= 0 ||
                         p.status === "Out of Stock"
