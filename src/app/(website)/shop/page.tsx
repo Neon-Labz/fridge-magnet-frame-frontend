@@ -80,14 +80,16 @@ function normalizeProduct(rawProduct: RawProduct): RawProduct {
     personalizationInstructions:
       rawProduct?.personalizationInstructions ?? [],
     personalization: rawProduct?.personalization ?? [],
+    galleryImages: Array.isArray(rawProduct?.galleryImages) ? rawProduct.galleryImages : [],
+    personalizationEnabled: rawProduct?.personalizationEnabled ?? false,
   };
 }
 
 async function fetchProductsForShop(): Promise<RawProduct[]> {
-  const baseUrl = 'http://localhost:5000/api/v1';
+  const backendBase = process.env.NEXT_BACKEND_URL || 'http://localhost:5000';
 
   try {
-    const response = await fetch(`${baseUrl}/api/products`, {
+    const response = await fetch(`${backendBase}/api/v1/api/products`, {
       cache: 'no-store',
     });
 

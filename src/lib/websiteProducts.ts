@@ -13,12 +13,6 @@ export type WebsiteProduct = {
   status: string;
 };
 
-const FRAME_SEQUENCE: WebsiteProduct['frameType'][] = [
-  'without-frame',
-  'black-frame',
-  'white-frame',
-];
-
 function normalizeFrameType(value: unknown): WebsiteProduct['frameType'] | null {
   const normalized = String(value ?? '').trim().toLowerCase();
 
@@ -56,6 +50,23 @@ function normalizeFrameType(value: unknown): WebsiteProduct['frameType'] | null 
     normalized === '3'
   ) {
     return 'white-frame';
+  }
+
+  return null;
+}
+
+function inferFrameTypeFromTitle(
+  title: string,
+): WebsiteProduct['frameType'] | null {
+  const normalizedTitle = title.trim().toLowerCase();
+
+  if (normalizedTitle.includes('white frame')) return 'white-frame';
+  if (normalizedTitle.includes('black frame')) return 'black-frame';
+  if (
+    normalizedTitle.includes('without frame') ||
+    normalizedTitle.includes('frameless')
+  ) {
+    return 'without-frame';
   }
 
   return null;
@@ -121,8 +132,9 @@ export function mapBackendProductsToWebsiteProducts(
         item?.frameType ?? item?.frame,
       );
 
-      const fallbackFrameType =
-        FRAME_SEQUENCE[mappedProducts.length % FRAME_SEQUENCE.length];
+      const inferredFrameType = inferFrameTypeFromTitle(title);
+
+      const fallbackFrameType: WebsiteProduct['frameType'] = 'without-frame';
 
       const stock = Number(item?.stock ?? 0);
       const status = String(item?.status ?? 'Out of Stock').trim();
@@ -134,7 +146,7 @@ export function mapBackendProductsToWebsiteProducts(
         price,
         image,
         badge: status,
-        frameType: normalizedFrameType ?? fallbackFrameType,
+        frameType: normalizedFrameType ?? inferredFrameType ?? fallbackFrameType,
         colorOption: undefined,
         stock,
         status,

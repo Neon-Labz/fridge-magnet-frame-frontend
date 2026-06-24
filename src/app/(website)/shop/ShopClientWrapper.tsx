@@ -30,10 +30,26 @@ export default function ShopClientWrapper({ products, selectedProductIdFromRoute
     }
   }, [selectedFrameType, selectedProductIdFromRoute, setSelectedFrame, setSelectedProductId]);
 
+  const selectedProductIndex = selectedProductIdFromRoute
+    ? products.findIndex((product) => {
+        const productId = String(product._id ?? product.id ?? '').trim();
+        return productId === selectedProductIdFromRoute.trim();
+      })
+    : -1;
+
+  const orderedProducts =
+    selectedProductIndex > 0
+      ? [
+          products[selectedProductIndex],
+          ...products.filter((_, index) => index !== selectedProductIndex),
+        ]
+      : products;
+
   return (
     <ShopViewProductDetailsSection
-      key={selectedFrameType || 'without-frame'}
-      products={products}
+      key={`${selectedProductIdFromRoute || 'default'}-${selectedFrameType || 'without-frame'}`}
+      products={orderedProducts}
+      initialProductId={selectedProductIdFromRoute}
       initialFrameType={selectedFrameType}
     />
   );
