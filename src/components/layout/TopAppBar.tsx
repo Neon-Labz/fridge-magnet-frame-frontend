@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Bell, Menu, Package, ShoppingBag, UserCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { apiV1Url } from '@/lib/backendUrl';
@@ -107,6 +107,25 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
   const [loading, setLoading] = useState(false);
   const [notifs, setNotifs] = useState<NotifItem[]>([]);
   const [fetched, setFetched] = useState(false);
+
+  // Fetch notifications on mount so the unread indicator reflects real state
+  // without requiring the user to open the dropdown first.
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      setLoading(true);
+      const data = await fetchNotifications();
+      if (!active) return;
+      setNotifs(data);
+      setLoading(false);
+      setFetched(true);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleBellClick = useCallback(async () => {
     if (open) {
