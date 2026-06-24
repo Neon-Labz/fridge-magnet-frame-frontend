@@ -10,10 +10,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    
-       return
+    if (pathname === '/dashboard/login') {
+      return
+    }
 
-    const token = localStorage.getItem('adminToken')
+    const token =
+      localStorage.getItem('adminToken') || localStorage.getItem('token')
 
     if (!token) {
       router.replace('/dashboard/login')

@@ -31,17 +31,15 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
-    // BUG-023 FIX: On admin login, LoginForm.tsx writes two storage entries:
-    //   localStorage['token'] + cookie 'token'       — used by useWebsiteAuthSession
-    //   localStorage['adminToken'] + cookie 'adminToken' — used by admin middleware
-    // The old code only removed 'adminToken', leaving 'token' intact so the
-    // website Navbar still showed the user as authenticated after logout.
-    // clearWebsiteAuthSession() removes 'token' + its cookie and fires the
-    // auth-changed event so any listener (Navbar) updates immediately.
-    clearWebsiteAuthSession();
+    // Clear every auth artifact so no stale session remains.
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    router.push('/login');
+    document.cookie = 'token=; path=/; max-age=0; samesite=lax';
+
+    router.replace('/dashboard/login');
   };
 
   return (
