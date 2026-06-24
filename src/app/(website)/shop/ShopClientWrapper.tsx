@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import ShopViewProductDetailsSection from '@/components/website/ShopViewProductDetailsSection';
 import type { ShopProduct } from '@/types/shopProduct';
 import { useFrameStore } from '../../../store/frameStore';
@@ -14,25 +14,6 @@ interface ShopClientWrapperProps {
 
 function isFrameOption(value?: string): value is FrameOption {
   return value === 'without-frame' || value === 'black-frame' || value === 'white-frame';
-}
-
-function toComparableId(value: unknown): string {
-  if (typeof value === 'string' || typeof value === 'number') {
-    return String(value).trim();
-  }
-
-  if (!value || typeof value !== 'object') {
-    return '';
-  }
-
-  const record = value as Record<string, unknown>;
-  const oid = record.$oid ?? record.oid ?? record.id ?? record._id;
-  return typeof oid === 'string' || typeof oid === 'number' ? String(oid).trim() : '';
-}
-
-function resolveProductId(product: ShopProduct): string {
-  const candidate = (product as ShopProduct & { id?: unknown; productId?: unknown });
-  return toComparableId(candidate?._id ?? candidate?.id ?? candidate?.productId);
 }
 
 export default function ShopClientWrapper({ products, selectedProductIdFromRoute, selectedFrameType }: ShopClientWrapperProps) {
@@ -49,14 +30,27 @@ export default function ShopClientWrapper({ products, selectedProductIdFromRoute
     }
   }, [selectedFrameType, selectedProductIdFromRoute, setSelectedFrame, setSelectedProductId]);
 
-  const filteredProducts = useMemo(() => {
-    if (!selectedProductIdFromRoute || products.length === 0) {
-      return products;
-    }
+  const selectedProductIndex = selectedProductIdFromRoute
+    ? products.findIndex((product) => {
+        const productId = String(product._id ?? product.id ?? '').trim();
+        return productId === selectedProductIdFromRoute.trim();
+      })
+    : -1;
 
-    const selected = products.find((p) => resolveProductId(p) === toComparableId(selectedProductIdFromRoute));
-    return selected ? [selected] : [];
-  }, [selectedProductIdFromRoute, products]);
+  const orderedProducts =
+    selectedProductIndex > 0
+      ? [
+          products[selectedProductIndex],
+          ...products.filter((_, index) => index !== selectedProductIndex),
+        ]
+      : products;
 
-  return <ShopViewProductDetailsSection products={filteredProducts} />;
+  return (
+    <ShopViewProductDetailsSection
+      key={`${selectedProductIdFromRoute || 'default'}-${selectedFrameType || 'without-frame'}`}
+      products={orderedProducts}
+      initialProductId={selectedProductIdFromRoute}
+      initialFrameType={selectedFrameType}
+    />
+  );
 }
