@@ -11,6 +11,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { clearWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 
 const NAV_ITEMS = [
   { label: 'Products', icon: Package, href: '/dashboard/products' },
@@ -30,9 +31,15 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
+    // Clear every auth artifact so no stale session remains.
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    router.push('/');
+    document.cookie = 'token=; path=/; max-age=0; samesite=lax';
+
+    router.replace('/dashboard/login');
   };
 
   return (

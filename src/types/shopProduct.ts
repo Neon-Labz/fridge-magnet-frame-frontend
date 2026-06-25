@@ -10,7 +10,10 @@ export interface ShopProduct {
   price?: number | string;
   description?: string;
   status?: string;
+  stock?: number | string;
   primaryImage?: ShopProductImage | null;
   personalizationInstructions?: string[] | string | null;
   personalization?: string[] | string | null;
+  galleryImages?: ShopProductImage[] | null;
+  personalizationEnabled?: boolean;
 }

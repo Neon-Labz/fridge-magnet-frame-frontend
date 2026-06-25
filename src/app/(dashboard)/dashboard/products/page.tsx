@@ -96,6 +96,7 @@ export default function ProductsPage() {
 
   const handleAddProduct = async (formData: ProductFormData) => {
   try {
+    const extendedData = formData as any;
     const data = new FormData();
 
     data.append('productName', formData.name);
@@ -105,6 +106,31 @@ export default function ProductsPage() {
     data.append('price', String(formData.price));
     data.append('description', formData.description);
     data.append('status', getProductStatus(formData.stock));
+
+    // Append personalization fields
+    const personalizationEnabled: boolean =
+      extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
+    data.append('personalizationEnabled', String(personalizationEnabled));
+
+    const personalizationOptions: { label: string; imageFile: File | null }[] =
+      extendedData.personalizationOptions ?? [];
+
+    if (personalizationOptions.length > 0) {
+      // Build metadata (label + key reference to its image file, if any)
+      const optionsPayload = personalizationOptions.map((opt, index) => ({
+        label: opt.label,
+        imageField: opt.imageFile ? `personalizationImage_${index}` : null,
+      }));
+
+      data.append('personalization', JSON.stringify(optionsPayload));
+
+      // Append each option's image file under its own unique key
+      personalizationOptions.forEach((opt, index) => {
+        if (opt.imageFile) {
+          data.append(`personalizationImage_${index}`, opt.imageFile);
+        }
+      });
+    }
 
     if (formData.primaryImage) {
       data.append('primaryImage', formData.primaryImage);

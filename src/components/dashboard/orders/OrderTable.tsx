@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Eye, Mail, Trash2 } from 'lucide-react';
 import type { Order } from '@/types/order';
 import StatusBadge from './StatusBadge';
 import Link from "next/link";
@@ -82,14 +82,41 @@ export default function OrderTable({ orders, onDelete }: OrderTableProps) {
               </td>
 
               <td className="px-6 py-[16.5px] text-right">
-                <button
-                  onClick={() => onDelete(order)}
-                  className="inline-flex items-center justify-center rounded-lg transition hover:bg-red-50"
-                  style={{ width: 32, height: 34 }}
-                  aria-label="Delete order"
-                >
-                  <Trash2 size={16} color="#BC0000" />
-                </button>
+                <div className="inline-flex items-center gap-1">
+                  <Link
+                    href={`/dashboard/orders/${order.id}`}
+                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-blue-50"
+                    style={{ width: 32, height: 34 }}
+                    aria-label="View order"
+                  >
+                    <Eye size={16} color="#002B73" />
+                  </Link>
+
+                  <a
+                    href={order.email ? `mailto:${order.email}?subject=Regarding your Magnify order %23${order.orderId}` : undefined}
+                    onClick={!order.email ? (e) => e.preventDefault() : undefined}
+                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-blue-50"
+                    style={{
+                      width: 32,
+                      height: 34,
+                      opacity: order.email ? 1 : 0.35,
+                      cursor: order.email ? 'pointer' : 'not-allowed',
+                    }}
+                    aria-label="Message customer"
+                    aria-disabled={!order.email}
+                  >
+                    <Mail size={16} color="#002B73" />
+                  </a>
+
+                  <button
+                    onClick={() => onDelete(order)}
+                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-red-50"
+                    style={{ width: 32, height: 34 }}
+                    aria-label="Delete order"
+                  >
+                    <Trash2 size={16} color="#BC0000" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

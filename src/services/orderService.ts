@@ -26,6 +26,7 @@ export interface BackendOrderPayload {
   qty: number;
   totalValue: number;
   shippingAddress: string;
+  district?: string;
   adminNote?: string;
   items: BackendOrderItem[];
 }
