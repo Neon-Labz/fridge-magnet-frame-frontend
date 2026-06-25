@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bell, Menu, Package, ShoppingBag, UserCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { apiV1Url } from '@/lib/backendUrl';
@@ -11,6 +11,7 @@ type NotifItem = {
   title: string;
   sub: string;
   href: string;
+  createdAt?: string;
 };
 
 type ApiOrder = {
@@ -29,19 +30,32 @@ type ApiProduct = {
   stock: number;
 };
 
+const LAST_SEEN_KEY = 'admin_notif_last_seen';
+
+function getLastSeenTimestamp(): number {
+  if (typeof window === 'undefined') return 0;
+  const val = localStorage.getItem(LAST_SEEN_KEY);
+  return val ? parseInt(val, 10) : 0;
+}
+
+function setLastSeenTimestamp(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(LAST_SEEN_KEY, Date.now().toString());
+}
+
 async function fetchNotifications(): Promise<NotifItem[]> {
   const items: NotifItem[] = [];
 
   try {
     const [ordersRes, lowRes, outRes] = await Promise.all([
-      fetch(apiV1Url('/orders'), { cache: 'no-store' }),
+      fetch(apiV1Url('/orders?status=PENDING'), { cache: 'no-store' }),
       fetch(apiV1Url('/api/products?status=Low+Stock&limit=5'), { cache: 'no-store' }),
       fetch(apiV1Url('/api/products?status=Out+of+Stock&limit=5'), { cache: 'no-store' }),
     ]);
 
     if (ordersRes.ok) {
       const orders = (await ordersRes.json()) as ApiOrder[];
-      const recent = orders.slice(0, 3);
+      const recent = orders.slice(0, 10);
       for (const o of recent) {
         items.push({
           id: `order-${o._id || o.orderId}`,
@@ -49,6 +63,7 @@ async function fetchNotifications(): Promise<NotifItem[]> {
           title: `New order #${o.orderId}`,
           sub: `${o.customerName} · ${o.status.charAt(0) + o.status.slice(1).toLowerCase()}`,
           href: `/dashboard/orders`,
+          createdAt: o.createdAt,
         });
       }
     }
@@ -56,7 +71,8 @@ async function fetchNotifications(): Promise<NotifItem[]> {
     const extractProducts = async (res: Response): Promise<ApiProduct[]> => {
       if (!res.ok) return [];
       const body = await res.json();
-      return (body?.data?.products ?? []) as ApiProduct[];
+      if (Array.isArray(body)) return body as ApiProduct[];
+      return (body?.data?.products ?? body?.products ?? []) as ApiProduct[];
     };
 
     const [lowProducts, outProducts] = await Promise.all([
@@ -102,11 +118,66 @@ const dotColor = (type: NotifItem['type']) => {
   return '#FEF3C7';
 };
 
+/** Polling interval in ms — check for new notifications every 15 seconds */
+const POLL_INTERVAL = 15_000;
+
 export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notifs, setNotifs] = useState<NotifItem[]>([]);
-  const [fetched, setFetched] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Calculate unread count based on last-seen timestamp
+  const calcUnread = useCallback((items: NotifItem[]) => {
+    const lastSeen = getLastSeenTimestamp();
+    if (lastSeen === 0) {
+      // First visit — show total count
+      return items.length;
+    }
+    // Count items created after last seen
+    const newItems = items.filter((item) => {
+      if (!item.createdAt) return true; // no timestamp = treat as new
+      return new Date(item.createdAt).getTime() > lastSeen;
+    });
+    return newItems.length;
+  }, []);
+
+  // Fetch and update notifications
+  const refresh = useCallback(async () => {
+    const data = await fetchNotifications();
+    setNotifs(data);
+    setUnreadCount(calcUnread(data));
+    return data;
+  }, [calcUnread]);
+
+  // Initial fetch + start polling
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      setLoading(true);
+      const data = await fetchNotifications();
+      if (!active) return;
+      setNotifs(data);
+      setUnreadCount(calcUnread(data));
+      setLoading(false);
+    })();
+
+    // Poll for new notifications
+    pollRef.current = setInterval(async () => {
+      if (!active) return;
+      const data = await fetchNotifications();
+      if (!active) return;
+      setNotifs(data);
+      setUnreadCount(calcUnread(data));
+    }, POLL_INTERVAL);
+
+    return () => {
+      active = false;
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [calcUnread]);
 
   const handleBellClick = useCallback(async () => {
     if (open) {
@@ -115,17 +186,15 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
     }
 
     setOpen(true);
+    // Mark as seen when user opens the dropdown
+    setLastSeenTimestamp();
+    setUnreadCount(0);
 
-    if (!fetched) {
-      setLoading(true);
-      const data = await fetchNotifications();
-      setNotifs(data);
-      setLoading(false);
-      setFetched(true);
-    }
-  }, [open, fetched]);
-
-  const hasUnread = fetched && notifs.length > 0;
+    // Refresh on open
+    setLoading(true);
+    await refresh();
+    setLoading(false);
+  }, [open, refresh]);
 
   return (
     <>
@@ -207,11 +276,20 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
               aria-expanded={open}
             >
               <Bell size={20} color={open ? '#002B73' : '#64748B'} />
-              {hasUnread && (
+              {unreadCount > 0 && (
                 <span
-                  className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-red-500"
-                  aria-hidden="true"
-                />
+                  className="absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full bg-red-500 text-white font-bold"
+                  style={{
+                    minWidth: 18,
+                    height: 18,
+                    fontSize: 10,
+                    padding: '0 4px',
+                    lineHeight: 1,
+                  }}
+                  aria-label={`${unreadCount} new notifications`}
+                >
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
               )}
             </button>
 
