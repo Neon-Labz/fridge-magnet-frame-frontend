@@ -29,6 +29,20 @@ function toPersonalizationEntries(raw: any[] | undefined | null): Personalizatio
   );
 }
 
+// A pure color option such as "Black" / "White". These must NOT show up as their
+// own dropdown choices — they only appear as color swatches once a framed option
+// is selected.
+function labelIsColorOption(label: string): boolean {
+  const l = label.trim().toLowerCase();
+  return l === "black" || l === "white";
+}
+
+// "With Frame" (or any framed) option — Black/White color choice should be offered.
+function labelIsWithFrame(label: string): boolean {
+  const l = label.toLowerCase();
+  return l.includes("frame") && !l.includes("without");
+}
+
 export default function ShopViewProductDetailsSection({
   products,
   initialProductId,
@@ -145,6 +159,34 @@ export default function ShopViewProductDetailsSection({
     selectedProduct?.personalization as any[]
   );
 
+  
+  const colorOptionEntries = personalizationEntries.filter((e) =>
+    labelIsColorOption(e.label)
+  );
+  const frameOptionEntriesRaw = personalizationEntries.filter(
+    (e) => !labelIsColorOption(e.label)
+  );
+  
+  const frameOptionEntries =
+    frameOptionEntriesRaw.length > 0
+      ? frameOptionEntriesRaw
+      : personalizationEntries;
+
+  // Is the currently selected dropdown option a framed one (needs Black/White)?
+  const selectedIsWithFrame = selectedPersonalization
+    ? labelIsWithFrame(selectedPersonalization.label)
+    : false;
+
+  const availablePersonalizationColors =
+    colorOptionEntries.length > 0
+      ? colorOptionEntries.map((e) => e.label)
+      : ["Black", "White"];
+
+  // Only show the color swatches for personalized products when a framed option is active.
+  const showPersonalizationColors = Boolean(
+    isPersonalizedProduct && selectedIsWithFrame
+  );
+
   useEffect(() => {
     setActiveImageIndex(0);
     setPersonalizationImageOverride(null); // reset — primary image shows first on product change
@@ -152,12 +194,13 @@ export default function ShopViewProductDetailsSection({
 
     if (
       selectedProduct?.personalizationEnabled &&
-      personalizationEntries.length > 0
+      frameOptionEntries.length > 0
     ) {
-      setSelectedPersonalization(personalizationEntries[0]); // dropdown default value (for cart), image NOT switched yet
+      setSelectedPersonalization(frameOptionEntries[0]); // dropdown default value (for cart), image NOT switched yet
     } else {
       setSelectedPersonalization(null);
     }
+    setSelectedColor(""); // reset frame color when the product changes
   }, [selectedProduct?._id, selectedProduct?.id]);
 
   const title = selectedProduct?.productName ?? "";
@@ -182,12 +225,29 @@ export default function ShopViewProductDetailsSection({
     personalizationImageOverride ?? allImages[activeImageIndex] ?? mainImage;
 
   const handlePersonalizationChange = (label: string) => {
-    const entry = personalizationEntries.find((p) => p.label === label) ?? null;
+    const entry =
+      frameOptionEntries.find((p) => p.label === label) ??
+      personalizationEntries.find((p) => p.label === label) ??
+      null;
     setSelectedPersonalization(entry);
     // User explicitly selected this option — NOW show its image (if it has one)
     setPersonalizationImageOverride(entry?.image?.secure_url ?? null);
     setActiveImageIndex(0);
     setIsImageZoomed(false); // reset zoom when switching personalization option
+    setSelectedColor(""); // reset color — hidden for "Without Frame", re-chosen for "With Frame"
+  };
+
+  // Personalized products: pick Black/White once a "With Frame" option is selected.
+  const handlePersonalizationColorSelect = (color: string) => {
+    setSelectedColor(color);
+    const colorEntry = colorOptionEntries.find(
+      (e) => e.label.toLowerCase() === color.toLowerCase()
+    );
+    if (colorEntry?.image?.secure_url) {
+      setPersonalizationImageOverride(colorEntry.image.secure_url);
+      setActiveImageIndex(0);
+      setIsImageZoomed(false);
+    }
   };
 
   // Click on the image: zoom in centered on the click point. Click again to zoom out.
@@ -221,6 +281,11 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
+    if (isPersonalizedProduct && selectedIsWithFrame && !selectedColor) {
+      addToast("Please select frame color.", "error");
+      return;
+    }
+
     if (quantity > availableStock) {
       addToast(`Only ${availableStock} items are available.`, "error");
       return;
@@ -231,10 +296,13 @@ export default function ShopViewProductDetailsSection({
         ? selectedPersonalization.label
         : selectedOption;
 
-    const colorOption =
-      !isPersonalizedProduct && selectedOption === "With Frame"
+    const colorOption = isPersonalizedProduct
+      ? showPersonalizationColors
         ? selectedColor
-        : "";
+        : ""
+      : selectedOption === "With Frame"
+      ? selectedColor
+      : "";
 
     addToCart({
       id: selectedProduct?._id ?? selectedProduct?.id ?? `shop-${Date.now()}`,
@@ -289,6 +357,11 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
+    if (isPersonalizedProduct && selectedIsWithFrame && !selectedColor) {
+      addToast("Please select frame color.", "error");
+      return;
+    }
+
     if (quantity > availableStock) {
       addToast(`Only ${availableStock} items are available.`, "error");
       return;
@@ -299,10 +372,13 @@ export default function ShopViewProductDetailsSection({
         ? selectedPersonalization.label
         : selectedOption;
 
-    const colorOption =
-      !isPersonalizedProduct && selectedOption === "With Frame"
+    const colorOption = isPersonalizedProduct
+      ? showPersonalizationColors
         ? selectedColor
-        : "";
+        : ""
+      : selectedOption === "With Frame"
+      ? selectedColor
+      : "";
 
     addToCart({
       id: selectedProduct?._id ?? selectedProduct?.id ?? `shop-${Date.now()}`,
@@ -427,37 +503,86 @@ export default function ShopViewProductDetailsSection({
           <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
 
           {isPersonalizedProduct ? (
-            personalizationEntries.length > 0 && (
-              <div className="mb-8">
-                <label className="mb-3 block text-[15px] font-semibold text-slate-800">
-                  Personalization Options
-                </label>
+            frameOptionEntries.length > 0 && (
+              <>
+                <div className="mb-8">
+                  <label className="mb-3 block text-[15px] font-semibold text-slate-800">
+                    Personalization Options
+                  </label>
 
-                <div className="relative w-full max-w-[260px]">
-                  <select
-                    value={selectedPersonalization?.label ?? ""}
-                    onChange={(e) => handlePersonalizationChange(e.target.value)}
-                    className="h-11 w-full appearance-none rounded-full border-2 border-[#002B73] bg-white pl-4 pr-10 text-sm font-medium outline-none"
-                  >
-                    {personalizationEntries.map((opt, idx) => (
-                      <option key={`${opt.label}-${idx}`} value={opt.label}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative w-full max-w-[260px]">
+                    <select
+                      value={selectedPersonalization?.label ?? ""}
+                      onChange={(e) =>
+                        handlePersonalizationChange(e.target.value)
+                      }
+                      className="h-11 w-full appearance-none rounded-full border-2 border-[#002B73] bg-white pl-4 pr-10 text-sm font-medium outline-none"
+                    >
+                      {frameOptionEntries.map((opt, idx) => (
+                        <option key={`${opt.label}-${idx}`} value={opt.label}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
 
-                  {/* Custom arrow with proper spacing from the border */}
-                  <svg
-                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#002B73]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
+                    {/* Custom arrow with proper spacing from the border */}
+                    <svg
+                      className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#002B73]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+
+                {/* Black/White only appears for a "With Frame" option, hidden for "Without Frame" */}
+                {showPersonalizationColors && (
+                  <div className="mb-8">
+                    <label className="mb-3 block text-[15px] text-slate-800">
+                      Select Color
+                    </label>
+
+                    <div className="flex gap-5">
+                      {availablePersonalizationColors.map((color) => {
+                        const isBlack = color.toLowerCase() === "black";
+                        const isWhite = color.toLowerCase() === "white";
+                        return (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() =>
+                              handlePersonalizationColorSelect(color)
+                            }
+                            className="flex flex-col items-center gap-1 text-xs"
+                          >
+                            <span
+                              className={`h-8 w-8 rounded-full border ${
+                                isBlack
+                                  ? "bg-black"
+                                  : isWhite
+                                  ? "bg-white"
+                                  : "bg-slate-300"
+                              } ${
+                                selectedColor === color
+                                  ? "ring-2 ring-[#002B73] ring-offset-2"
+                                  : ""
+                              }`}
+                            />
+                            {color}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )
           ) : (
             <>
