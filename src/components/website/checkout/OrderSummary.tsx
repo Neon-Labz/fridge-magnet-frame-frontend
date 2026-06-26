@@ -118,44 +118,49 @@ export default function OrderSummary({
         </div>
       </div>
 
-      {/* Payment Method */}
-      <div className="flex flex-col gap-6 rounded-xl border border-[#C3C6D4] bg-white px-8 pb-12 pt-8 shadow-sm">
-        <h3 className="font-manrope text-2xl font-semibold leading-8 text-[#002B73]">
-          Payment Method
-        </h3>
+     {/* Payment */}
+<div className="mx-auto mb-6 w-full max-w-[560px] rounded-lg border border-[#C3C6D4] bg-white p-4 md:max-w-[700px] lg:max-w-[560px]">
 
-        <div className="flex flex-col gap-3">
-          <label className="flex h-[58px] cursor-pointer items-center gap-4 rounded-lg border border-[#C3C6D4] px-4 hover:bg-[#F9FAFB]">
-            <input
-              type="radio"
-              name="payment"
-              value="card"
-              checked={paymentMethod === "card"}
-              onChange={() => onPaymentMethodChange?.("card")}
-              className="h-[18px] w-[18px] accent-[#002B73]"
-            />
-            <CreditCard className="h-5 w-5 text-[#747784]" />
-            <span className="text-base font-medium leading-6 text-[#1A1C1F]">
-              Credit or Debit Card
-            </span>
-          </label>
+  <h3 className="mb-3 text-base font-semibold text-[#002B73]">
+    Payment Method
+  </h3>
 
-          <label className="flex h-[58px] cursor-pointer items-center gap-4 rounded-lg border border-[#C3C6D4] px-4 hover:bg-[#F9FAFB]">
-            <input
-              type="radio"
-              name="payment"
-              value="cod"
-              checked={paymentMethod === "cod"}
-              onChange={() => onPaymentMethodChange?.("cod")}
-              className="h-[18px] w-[18px] accent-[#002B73]"
-            />
-            <Banknote className="h-5 w-5 text-[#747784]" />
-            <span className="text-base font-medium leading-6 text-[#1A1C1F]">
-              Cash on Delivery
-            </span>
-          </label>
-        </div>
-      </div>
+  <div className="space-y-3">
+    <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
+      <input
+        type="radio"
+        name="payment"
+        value="card"
+        checked={paymentMethod === "card"}
+        onChange={() => onPaymentMethodChange?.("card")}
+        className="h-4 w-4 accent-[#002B73]"
+      />
+
+      <CreditCard className="h-4 w-4 text-[#747784]" />
+
+      <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
+        Credit or Debit Card
+      </span>
+    </label>
+
+    <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
+      <input
+        type="radio"
+        name="payment"
+        value="cod"
+        checked={paymentMethod === "cod"}
+        onChange={() => onPaymentMethodChange?.("cod")}
+        className="h-4 w-4 accent-[#002B73]"
+      />
+
+      <Lock className="h-4 w-4 text-[#747784]" />
+
+      <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
+        Cash on Delivery
+      </span>
+    </label>
+  </div>
+</div>
 
       {/* Place Order Button */}
       <div className="flex flex-col gap-3">
