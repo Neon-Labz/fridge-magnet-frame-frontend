@@ -49,11 +49,26 @@ const mapProduct = (product: ApiProduct): Product => {
   };
 };
 
-const getProductsFromResponse = (data: any): ApiProduct[] => {
+const getProductsFromResponse = (data: unknown): ApiProduct[] => {
   if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.products)) return data.products;
-  if (Array.isArray(data?.data)) return data.data;
-  if (Array.isArray(data?.data?.products)) return data.data.products;
+
+  if (!data || typeof data !== 'object') return [];
+
+  const payload = data as {
+    products?: ApiProduct[];
+    data?: ApiProduct[] | { products?: ApiProduct[] };
+  };
+
+  if (Array.isArray(payload.products)) return payload.products;
+  if (Array.isArray(payload.data)) return payload.data;
+  if (
+    payload.data &&
+    !Array.isArray(payload.data) &&
+    Array.isArray(payload.data.products)
+  ) {
+    return payload.data.products;
+  }
+
   return [];
 };
 
@@ -63,7 +78,14 @@ export const useProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(apiV1Url('/api/products'));
+      const res = await fetch(apiV1Url('/api/products?page=1&limit=1000'), {
+        cache: 'no-store',
+      });
+
+      if (!res.ok) {
+        setProducts([]);
+        return;
+      }
 
       const data = await res.json();
 
@@ -76,6 +98,7 @@ export const useProducts = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, []);
 

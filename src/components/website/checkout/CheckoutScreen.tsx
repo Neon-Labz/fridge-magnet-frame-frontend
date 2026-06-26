@@ -11,6 +11,7 @@ import OrderSummary, { SummaryItem } from "./OrderSummary";
 import { useCart } from "@/context/CartContext";
 import { useFrameStore } from "@/store/frameStore";
 import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
+import { apiV1Url } from "@/lib/backendUrl";
 import { Truck, UserRound } from "lucide-react";
 import {
   PaymentMethod,
@@ -23,6 +24,7 @@ const generateOrderNumber = () =>
   `MAG-${Math.floor(10000 + Math.random() * 90000)}`;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
 
 const SHIPPING_FEE = 200;
 
@@ -41,6 +43,67 @@ type FormState = {
   zip: string;
   notes?: string;
 };
+
+type PreviousCustomer = {
+  customerName?: string;
+  name?: string;
+  emailAddress?: string;
+  email?: string;
+  phoneNumber?: string;
+  phone?: string;
+  customerAddress?: string;
+  address?: string;
+};
+
+function splitFullName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+
+  return {
+    firstName: parts[0] || "",
+    lastName: parts.slice(1).join(" "),
+  };
+}
+
+function parseSavedAddress(address: string) {
+  const parts = address
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const lastPart = parts.at(-1) || "";
+  const zipMatch = lastPart.match(/\b\d{4,6}\b$/);
+  const zip = zipMatch?.[0] || "";
+  const districtPart = zip ? lastPart.replace(zip, "").trim() : lastPart;
+  const district =
+    SRI_LANKA_DISTRICTS.find(
+      (item) => item.toLowerCase() === districtPart.toLowerCase(),
+    ) || districtPart;
+
+  return {
+    street: parts.length > 2 ? parts.slice(0, -2).join(", ") : parts[0] || "",
+    city: parts.length > 1 ? parts.at(-2) || "" : "",
+    state: district,
+    zip,
+  };
+}
+
+function getCustomerFormPatch(customer: PreviousCustomer): Partial<FormState> {
+  const fullName = String(
+    customer.customerName ?? customer.name ?? "",
+  ).trim();
+  const nameParts = splitFullName(fullName);
+  const address = String(
+    customer.customerAddress ?? customer.address ?? "",
+  ).trim();
+  const parsedAddress = parseSavedAddress(address);
+
+  return {
+    ...nameParts,
+    email: String(customer.emailAddress ?? customer.email ?? "").trim(),
+    phone: String(customer.phoneNumber ?? customer.phone ?? "").trim(),
+    ...parsedAddress,
+  };
+}
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -73,6 +136,7 @@ export default function CheckoutScreen() {
 
     if (!storedUser) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm((prev) => ({
       ...prev,
       firstName:
@@ -98,6 +162,55 @@ export default function CheckoutScreen() {
       zip: storedUser.zip || storedUser.postalCode || storedUser.postal_code || "",
     }));
   }, [user]);
+
+  useEffect(() => {
+    const email = form.email.trim();
+
+    if (!emailRegex.test(email)) return;
+
+    const controller = new AbortController();
+
+    async function hydratePreviousCustomer() {
+      try {
+        const response = await fetch(
+          apiV1Url(`/customers/by-email/${encodeURIComponent(email)}`),
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          },
+        );
+
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        const customer = payload?.data as PreviousCustomer | null;
+
+        if (!customer) return;
+
+        const patch = getCustomerFormPatch(customer);
+
+        setForm((current) => ({
+          ...current,
+          firstName: patch.firstName || current.firstName,
+          lastName: patch.lastName || current.lastName,
+          email: patch.email || current.email,
+          phone: patch.phone || current.phone,
+          street: patch.street || current.street,
+          city: patch.city || current.city,
+          state: patch.state || current.state,
+          zip: patch.zip || current.zip,
+        }));
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    void hydratePreviousCustomer();
+
+    return () => controller.abort();
+  }, [form.email]);
 
   const items = useMemo<SummaryItem[]>(
     () =>
@@ -154,7 +267,15 @@ export default function CheckoutScreen() {
           return "Please enter a valid email address";
         return null;
       case "phone":
-        return form.phone.trim() === "" ? "Phone number is required" : null;
+        if (form.phone.trim() === "") {
+          return "Phone number is required";
+        }
+
+        if (!phoneRegex.test(form.phone.trim().replace(/\s/g, ""))) {
+          return "Please enter a valid phone number";
+        }
+
+        return null;
       case "street":
         return form.street.trim() === "" ? "Street address is required" : null;
       case "city":
@@ -173,7 +294,7 @@ export default function CheckoutScreen() {
       form.firstName.trim() !== "" &&
       form.lastName.trim() !== "" &&
       emailRegex.test(form.email.trim()) &&
-      form.phone.trim() !== "" &&
+      phoneRegex.test(form.phone.trim().replace(/\s/g, "")) &&
       form.street.trim() !== "" &&
       form.city.trim() !== "" &&
       form.state.trim() !== "" &&
@@ -324,7 +445,7 @@ export default function CheckoutScreen() {
                 <Field label="Phone Number" error={getFieldError("phone")}>
                   <Input
                     className={inputClass}
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+94 7XXXXXXXX"
                     value={form.phone}
                     onChange={(e) => setField("phone", e.target.value)}
                     onBlur={() => markTouched("phone")}
