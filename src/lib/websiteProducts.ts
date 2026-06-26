@@ -1,5 +1,3 @@
-import { productCatalog } from '@/lib/productCatalog';
-
 export type WebsiteProduct = {
   id: string;
   title: string;
@@ -12,6 +10,40 @@ export type WebsiteProduct = {
   stock: number;
   status: string;
 };
+
+export type BackendProductRecord = Record<string, unknown>;
+
+const PRODUCT_LIST_LIMIT = 1000;
+
+function normalizeBackendBase(value: string): string {
+  const trimmed = value.trim().replace(/\/+$/, '');
+
+  return trimmed
+    .replace(/\/api\/v1\/api$/i, '')
+    .replace(/\/api\/v1$/i, '');
+}
+
+function getBackendBase(): string {
+  return normalizeBackendBase(
+    process.env.NEXT_BACKEND_URL ||
+      process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      'http://localhost:5000',
+  );
+}
+
+function getProductsApiUrl(): string {
+  const params = new URLSearchParams({
+    page: '1',
+    limit: String(PRODUCT_LIST_LIMIT),
+  });
+
+  return `${getBackendBase()}/api/v1/api/products?${params.toString()}`;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
 
 function normalizeFrameType(value: unknown): WebsiteProduct['frameType'] | null {
   const normalized = String(value ?? '').trim().toLowerCase();
@@ -72,16 +104,16 @@ function inferFrameTypeFromTitle(
   return null;
 }
 
-function extractProducts(payload: unknown): any[] {
+export function extractProducts(payload: unknown): BackendProductRecord[] {
   if (Array.isArray(payload)) return payload;
 
-  if (!payload || typeof payload !== 'object') return [];
+  if (!isRecord(payload)) return [];
 
-  const data = payload as Record<string, any>;
+  const data = isRecord(payload.data) ? payload.data : null;
 
-  if (Array.isArray(data.data?.products)) return data.data.products;
-  if (Array.isArray(data.products)) return data.products;
-  if (Array.isArray(data.data)) return data.data;
+  if (data && Array.isArray(data.products)) return data.products;
+  if (Array.isArray(payload.products)) return payload.products;
+  if (Array.isArray(payload.data)) return payload.data;
 
   return [];
 }
@@ -109,35 +141,38 @@ export function mapBackendProductsToWebsiteProducts(
   return extractProducts(payload).reduce<WebsiteProduct[]>(
     (mappedProducts, item) => {
       const id =
-        toProductId(item?._id) ||
-        toProductId(item?.id) ||
-        toProductId(item?.productId);
+        toProductId(item._id) ||
+        toProductId(item.id) ||
+        toProductId(item.productId);
 
-      const title = String(item?.productName ?? item?.name ?? '').trim();
+      const title = String(item.productName ?? item.name ?? '').trim();
 
       if (!id || !title) {
         return mappedProducts;
       }
 
-      const desc = String(item?.description ?? '').trim();
-      const price = Number(item?.price ?? 0);
+      const desc = String(item.description ?? '').trim();
+      const price = Number(item.price ?? 0);
+      const primaryImage = isRecord(item.primaryImage)
+        ? item.primaryImage
+        : null;
       const image = String(
-        item?.primaryImage?.secure_url ??
-          item?.primaryImageUrl ??
-          item?.image ??
+        primaryImage?.secure_url ??
+          item.primaryImageUrl ??
+          item.image ??
           '',
       ).trim();
 
       const normalizedFrameType = normalizeFrameType(
-        item?.frameType ?? item?.frame,
+        item.frameType ?? item.frame,
       );
 
       const inferredFrameType = inferFrameTypeFromTitle(title);
 
       const fallbackFrameType: WebsiteProduct['frameType'] = 'without-frame';
 
-      const stock = Number(item?.stock ?? 0);
-      const status = String(item?.status ?? 'Out of Stock').trim();
+      const stock = Number(item.stock ?? 0);
+      const status = String(item.status ?? 'Out of Stock').trim();
 
       mappedProducts.push({
         id,
@@ -158,49 +193,28 @@ export function mapBackendProductsToWebsiteProducts(
   );
 }
 
-function getCatalogFallbackProducts(): WebsiteProduct[] {
-  return productCatalog.map((product) => ({
-    id: product.id,
-    title: product.title,
-    desc: product.desc,
-    price: product.price,
-    image: product.img,
-    badge: product.badge,
-    frameType: product.frameOption,
-    colorOption: product.colorOption,
-    stock: 10,
-    status: product.badge || 'In Stock',
-  }));
+export async function fetchBackendProductRecords(): Promise<
+  BackendProductRecord[]
+> {
+  try {
+    const response = await fetch(getProductsApiUrl(), {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const payload = await response.json();
+    return extractProducts(payload);
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchWebsiteProductsFromBackend(): Promise<
   WebsiteProduct[]
 > {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-    process.env.NEXT_BACKEND_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    'http://localhost:3000/api/v1'
-  ).replace(/\/$/, '');
-
-  try {
-    const response = await fetch(`${baseUrl}/products`, {
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      return getCatalogFallbackProducts();
-    }
-
-    const payload = await response.json();
-    const mappedProducts = mapBackendProductsToWebsiteProducts(payload);
-
-    if (mappedProducts.length === 0) {
-      return getCatalogFallbackProducts();
-    }
-
-    return mappedProducts;
-  } catch {
-    return getCatalogFallbackProducts();
-  }
+  const products = await fetchBackendProductRecords();
+  return mapBackendProductsToWebsiteProducts(products);
 }

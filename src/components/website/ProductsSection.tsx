@@ -5,6 +5,7 @@ import { useFrameStore } from "@/store/frameStore";
 import { useCart } from "@/context/CartContext";
 import { useToastStore } from "@/store/toastStore";
 import { useState, useEffect } from "react";
+import { apiV1Url } from "@/lib/backendUrl";
 
 interface Product {
   _id: string;
@@ -27,12 +28,8 @@ export default function ProductsSection() {
 
   useEffect(() => {
     async function fetchProducts() {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-        process.env.NEXT_PUBLIC_API_URL ||
-        '/api/v1';
       try {
-        const res = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
+        const res = await fetch(apiV1Url('/api/products?page=1&limit=1000'), { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           const extractedProducts = Array.isArray(json?.data?.products)
