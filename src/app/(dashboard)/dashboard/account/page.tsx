@@ -1,15 +1,141 @@
 'use client';
 
-export default function AccountPage() {
-  return (
-    <div className="ml-[100px] p-6 sm:p-8">
-      <h1 className="text-3xl font-bold" style={{ color: '#002B73' }}>
-        Account
-      </h1>
+import { useEffect, useState } from 'react';
+import AccountHeader from '@/components/dashboard/account/AccountHeader';
+import ProfileInformationCard from '@/components/dashboard/account/ProfileInformationCard';
+import SecurityCard, {
+  type PasswordFields,
+} from '@/components/dashboard/account/SecurityCard';
+import AccountActions from '@/components/dashboard/account/AccountActions';
+import { useAccount, type AccountProfile } from '@/hooks/useAccount';
+import { useToastStore } from '@/store/toastStore';
 
-      <p className="mt-2 text-sm" style={{ color: '#64748B' }}>
-        Account page is ready for profile and admin account settings.
-      </p>
+const EMPTY_PASSWORDS: PasswordFields = {
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+};
+
+export default function AccountPage() {
+  const { profile, isLoaded, error, updateProfile, uploadAvatar } = useAccount();
+  const { addToast } = useToastStore();
+
+  const [form, setForm] = useState<AccountProfile>(profile);
+  const [passwords, setPasswords] = useState<PasswordFields>(EMPTY_PASSWORDS);
+  const [saving, setSaving] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Hydrate the editable form once the profile has loaded.
+  useEffect(() => {
+    if (isLoaded && !hydrated) {
+      setForm(profile);
+      setHydrated(true);
+    }
+  }, [isLoaded, hydrated, profile]);
+
+  useEffect(() => {
+    if (error) addToast(error, 'info');
+  }, [error, addToast]);
+
+  const updateForm = (patch: Partial<AccountProfile>) =>
+    setForm((prev) => ({ ...prev, ...patch }));
+
+  const updatePasswords = (patch: Partial<PasswordFields>) =>
+    setPasswords((prev) => ({ ...prev, ...patch }));
+
+  const handleUploadAvatar = async (file: File) => {
+    const next = await uploadAvatar(file);
+    // The avatar is persisted immediately; reflect it in the form only.
+    updateForm({ avatar: next.avatar });
+    addToast('Profile photo updated.', 'success');
+  };
+
+  const handleCancel = () => {
+    setForm(profile);
+    setPasswords(EMPTY_PASSWORDS);
+  };
+
+  const handleSave = async () => {
+    if (!form.fullName.trim()) {
+      addToast('Full name is required.', 'error');
+      return;
+    }
+    if (!form.email.trim()) {
+      addToast('Email address is required.', 'error');
+      return;
+    }
+
+    const changingPassword = passwords.newPassword.length > 0;
+    if (changingPassword) {
+      if (!passwords.currentPassword) {
+        addToast('Enter your current password to set a new one.', 'error');
+        return;
+      }
+      if (passwords.newPassword.length < 6) {
+        addToast('New password must be at least 6 characters.', 'error');
+        return;
+      }
+      if (passwords.newPassword !== passwords.confirmPassword) {
+        addToast('New password and confirmation do not match.', 'error');
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      await updateProfile({
+        fullName: form.fullName.trim(),
+        email: form.email.trim(),
+        bio: form.bio,
+        avatar: form.avatar,
+        twoFactorEnabled: form.twoFactorEnabled,
+        ...(changingPassword
+          ? {
+              currentPassword: passwords.currentPassword,
+              newPassword: passwords.newPassword,
+            }
+          : {}),
+      });
+
+      setPasswords(EMPTY_PASSWORDS);
+      addToast('Account settings saved.', 'success');
+    } catch (err) {
+      addToast(
+        err instanceof Error ? err.message : 'Failed to save account settings.',
+        'error',
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="h-full w-full overflow-y-auto bg-white px-6 py-5 sm:px-8">
+      <AccountHeader />
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <ProfileInformationCard
+          profile={form}
+          loading={!isLoaded}
+          onChange={updateForm}
+          onUploadAvatar={handleUploadAvatar}
+          onError={(message) => addToast(message, 'error')}
+        />
+
+        <SecurityCard
+          passwords={passwords}
+          twoFactorEnabled={form.twoFactorEnabled}
+          onPasswordChange={updatePasswords}
+          onToggleTwoFactor={(value) => updateForm({ twoFactorEnabled: value })}
+        />
+      </div>
+
+      <AccountActions
+        saving={saving}
+        loading={!isLoaded}
+        onCancel={handleCancel}
+        onSave={handleSave}
+      />
     </div>
   );
 }

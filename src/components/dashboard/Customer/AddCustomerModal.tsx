@@ -8,6 +8,7 @@ interface AddCustomerModalProps {
   onSuccess?: () => void;
   initialData?: {
     id?: string;
+    recordId?: string;
     name?: string;
     email?: string;
     phone?: string;
@@ -64,12 +65,13 @@ const AddCustomerModal = ({
     setError(null);
 
     try {
-      const url = initialData?.id
-        ? `/api/v1/customers/${initialData.id}`
+      const customerUpdateId = initialData?.recordId || initialData?.id;
+      const url = customerUpdateId
+        ? `/api/v1/customers/${encodeURIComponent(customerUpdateId)}`
         : '/api/v1/customers';
 
       const res = await fetch(url, {
-        method: initialData?.id ? 'PATCH' : 'POST',
+        method: customerUpdateId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });

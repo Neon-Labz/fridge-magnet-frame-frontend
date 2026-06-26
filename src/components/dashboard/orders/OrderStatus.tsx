@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToastStore } from "@/store/toastStore";
 import type { Order, OrderStatus as OrderStatusValue } from "@/types/order";
 import { mapApiOrder, statusToApi } from "@/lib/orders";
 import { apiV1Url } from "@/lib/backendUrl";
@@ -33,6 +34,7 @@ const STATUS_RANK: Record<OrderStatusValue, number> = {
 
 export default function OrderStatus({ order }: OrderStatusProps) {
   const router = useRouter();
+  const { addToast } = useToastStore();
   const [currentOrder, setCurrentOrder] = useState<OrderWithMongoId>(order);
   const [status, setStatus] = useState<OrderStatusValue>(
     order.status || "processing"
@@ -41,6 +43,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [sendEmailNotification, setSendEmailNotification] = useState(true);
 
   const mongoOrderId = currentOrder._id || currentOrder.id;
 
@@ -69,6 +72,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
         body: JSON.stringify({
           status: statusToApi(status),
           adminNote: adminNote.trim() || undefined,
+          sendEmailNotification,
         }),
       });
 
@@ -77,11 +81,27 @@ export default function OrderStatus({ order }: OrderStatusProps) {
         throw new Error(data?.message || `Update failed: ${response.status}`);
       }
 
-      const updatedOrder = mapApiOrder(await response.json());
+      const rawData = await response.json();
+      const emailNotif = rawData.emailNotification as
+        | { attempted: boolean; success: boolean; error?: string }
+        | undefined;
+
+      const updatedOrder = mapApiOrder(rawData);
       setCurrentOrder(updatedOrder);
       setStatus(updatedOrder.status);
       setAdminNote(updatedOrder.adminNote || "");
-      setSuccess("Order status updated");
+
+      if (!sendEmailNotification || !emailNotif?.attempted) {
+        addToast("Order updated successfully.", "success");
+      } else if (emailNotif.success) {
+        addToast("Order updated. Email notification sent.", "success");
+      } else {
+        addToast(
+          "Order updated, but the email notification failed to send. Please check with the customer manually.",
+          "error"
+        );
+      }
+
       router.push("/dashboard/orders");
     } catch (error) {
       console.error(error);
@@ -195,9 +215,19 @@ export default function OrderStatus({ order }: OrderStatusProps) {
               </p>
             )}
 
-            <div className="mt-8 flex items-start gap-4 rounded-[16px] border border-[#EEF1F5] bg-[#F7F7FA] px-6 py-5">
-              <div className="mt-1 flex h-5 w-5 items-center justify-center rounded bg-[#BC0000] text-white">
-                <Check size={14} />
+            <button
+              type="button"
+              onClick={() => setSendEmailNotification((prev) => !prev)}
+              className="mt-8 flex w-full items-start gap-4 rounded-[16px] border border-[#EEF1F5] bg-[#F7F7FA] px-6 py-5 text-left"
+            >
+              <div
+                className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded"
+                style={{
+                  background: sendEmailNotification ? '#BC0000' : '#fff',
+                  border: sendEmailNotification ? 'none' : '2px solid #DDE2EC',
+                }}
+              >
+                {sendEmailNotification && <Check size={14} className="text-white" />}
               </div>
               <div>
                 <p className="text-m font-bold text-[#1A1C1F]">
@@ -210,7 +240,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
                   </span>
                 </p>
               </div>
-            </div>
+            </button>
           </div>
 
           <div className="flex justify-end gap-5 border-t border-[#EEF1F5] bg-[#FAFAFC] px-12 py-8">
@@ -340,12 +370,23 @@ export default function OrderStatus({ order }: OrderStatusProps) {
               )}
             </div>
 
-            <button className="mt-6 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50">
+            <button
+              onClick={() => router.push('/dashboard/orders')}
+              className="mt-6 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50"
+            >
               View Full Order History
               <span className="text-[#6B7280]">→</span>
             </button>
 
-            <button className="mt-3 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50">
+            <button
+              onClick={() => {
+                if (currentOrder.email) {
+                  window.open(`mailto:${currentOrder.email}?subject=Regarding your Magnify order %23${currentOrder.orderId}`);
+                }
+              }}
+              disabled={!currentOrder.email}
+              className="mt-3 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Message Customer
               <span className="text-[#6B7280]">💬</span>
             </button>

@@ -48,7 +48,7 @@ function PriceCard({
         {title}
       </h3>
 
-      <div className="my-4 flex items-baseline gap-2">
+      <div className="my-4 flex items-end gap-2 whitespace-nowrap">
         <span className="text-base text-gray-500">
           from
         </span>
@@ -88,7 +88,8 @@ function OccasionCard({
 
 export default function PricingSection() {
   return (
-    <section className="mx-auto flex flex-col gap-[60px] bg-[#F9F9FE] px-6 py-[70px] md:px-[80px] xl:flex-row xl:items-start xl:justify-between xl:gap-[80px] xl:px-[120px]">
+    <section className="w-full bg-[#F9F9FE] py-[70px]">
+      <div className="mx-auto flex w-full max-w-[1700px] flex-col gap-[60px] px-4 sm:px-6 lg:px-[120px] xl:flex-row xl:items-start xl:justify-between xl:gap-[80px]">
 
       {/* LEFT SIDE */}
       <div className="flex w-full flex-1 flex-col">
@@ -136,7 +137,7 @@ export default function PricingSection() {
           </p>
         </header>
 
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
 
           {occasionItems.map((item) => (
             <OccasionCard
@@ -147,6 +148,7 @@ export default function PricingSection() {
           ))}
 
         </div>
+      </div>
       </div>
     </section>
   );

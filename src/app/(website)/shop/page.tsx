@@ -1,5 +1,6 @@
 import ShopClientWrapper from './ShopClientWrapper';
 import { Metadata } from 'next';
+import { fetchBackendProductRecords } from '@/lib/websiteProducts';
 
 export const metadata: Metadata = {
   title: 'Shop | Magnify',
@@ -15,7 +16,11 @@ type ShopPageProps = {
   }>;
 };
 
-type RawProduct = Record<string, any>;
+type RawProduct = Record<string, unknown>;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
 
 function toComparableId(value: unknown): string {
   if (typeof value === 'string' || typeof value === 'number') {
@@ -34,73 +39,49 @@ function toComparableId(value: unknown): string {
     : '';
 }
 
-function resolveProductId(product: any): string {
-  return toComparableId(product?._id ?? product?.id ?? product?.productId);
-}
-
-function extractProducts(payload: unknown): RawProduct[] {
-  if (Array.isArray(payload)) return payload;
-
-  if (!payload || typeof payload !== 'object') return [];
-
-  const data = payload as Record<string, any>;
-
-  if (Array.isArray(data.data?.products)) return data.data.products;
-  if (Array.isArray(data.products)) return data.products;
-  if (Array.isArray(data.data)) return data.data;
-
-  return [];
+function resolveProductId(product: RawProduct): string {
+  return toComparableId(product._id ?? product.id ?? product.productId);
 }
 
 function normalizeProduct(rawProduct: RawProduct): RawProduct {
   const resolvedId = resolveProductId(rawProduct);
+  const primaryImage = isRecord(rawProduct.primaryImage)
+    ? rawProduct.primaryImage
+    : null;
 
   const imageUrl = String(
-    rawProduct?.primaryImage?.secure_url ??
-      rawProduct?.primaryImageUrl ??
-      rawProduct?.image ??
+    primaryImage?.secure_url ??
+      rawProduct.primaryImageUrl ??
+      rawProduct.image ??
       ''
   ).trim();
 
   return {
     ...rawProduct,
-    _id: resolvedId || rawProduct?._id,
-    productId: toComparableId(rawProduct?.productId) || resolvedId,
+    _id: resolvedId || rawProduct._id,
+    productId: toComparableId(rawProduct.productId) || resolvedId,
     productName: String(
-      rawProduct?.productName ?? rawProduct?.name ?? ''
+      rawProduct.productName ?? rawProduct.name ?? ''
     ).trim(),
-    description: String(rawProduct?.description ?? '').trim(),
-    price: Number(rawProduct?.price ?? 0),
-    status: String(rawProduct?.status ?? 'In Stock').trim() || 'In Stock',
-    stock: Number(rawProduct?.stock ?? 0),
-    category: rawProduct?.category ?? '',
+    description: String(rawProduct.description ?? '').trim(),
+    price: Number(rawProduct.price ?? 0),
+    status: String(rawProduct.status ?? 'In Stock').trim() || 'In Stock',
+    stock: Number(rawProduct.stock ?? 0),
+    category: rawProduct.category ?? '',
     primaryImage: imageUrl
       ? { secure_url: imageUrl }
-      : rawProduct?.primaryImage ?? null,
+      : rawProduct.primaryImage ?? null,
     personalizationInstructions:
-      rawProduct?.personalizationInstructions ?? [],
-    personalization: rawProduct?.personalization ?? [],
-    galleryImages: Array.isArray(rawProduct?.galleryImages) ? rawProduct.galleryImages : [],
-    personalizationEnabled: rawProduct?.personalizationEnabled ?? false,
+      rawProduct.personalizationInstructions ?? [],
+    personalization: rawProduct.personalization ?? [],
+    galleryImages: Array.isArray(rawProduct.galleryImages) ? rawProduct.galleryImages : [],
+    personalizationEnabled: rawProduct.personalizationEnabled ?? false,
   };
 }
 
 async function fetchProductsForShop(): Promise<RawProduct[]> {
-  const backendBase = process.env.NEXT_BACKEND_URL || 'http://localhost:5000';
-
-  try {
-    const response = await fetch(`${backendBase}/api/v1/api/products`, {
-      cache: 'no-store',
-    });
-
-    if (!response.ok) return [];
-
-    const payload = await response.json();
-
-    return extractProducts(payload).map(normalizeProduct);
-  } catch {
-    return [];
-  }
+  const products = await fetchBackendProductRecords();
+  return products.map(normalizeProduct);
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
