@@ -23,8 +23,49 @@ type Action =
   | { type: "updateQuantity"; payload: { id: string; frameType?: string; colorOption?: string; quantity: number } }
   | { type: "clear" };
 
-const CART_KEY = "cart";
+const CART_KEY_PREFIX = "cart";
+const GUEST_CART_KEY = `${CART_KEY_PREFIX}:guest`;
+const AUTH_EVENT_NAME = "auth-changed";
 const initialState: State = { items: [] };
+
+function getCartOwnerKey(): string {
+  if (typeof window === "undefined") return "guest";
+
+  try {
+    const rawUser = localStorage.getItem("user");
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    const userId =
+      user?._id ??
+      user?.id ??
+      user?.userId ??
+      user?.email ??
+      user?.phone ??
+      user?.username;
+
+    return userId ? `user:${String(userId).trim()}` : "guest";
+  } catch {
+    return "guest";
+  }
+}
+
+function getCartStorageKey(): string {
+  const ownerKey = getCartOwnerKey();
+  return ownerKey === "guest" ? GUEST_CART_KEY : `${CART_KEY_PREFIX}:${ownerKey}`;
+}
+
+function readCartItems(storageKey: string): CartItem[] {
+  if (typeof window === "undefined") return [];
+
+  const raw = localStorage.getItem(storageKey);
+  if (!raw) return [];
+
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed)
+    ? parsed
+    : Array.isArray(parsed?.items)
+    ? parsed.items
+    : [];
+}
 
 function getSafeItems(items: unknown): CartItem[] {
   return Array.isArray(items) ? items : [];
@@ -134,20 +175,21 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [cartStorageKey, setCartStorageKey] = useState(GUEST_CART_KEY);
 
   useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem(CART_KEY) : null;
+    const refreshCart = () => {
+      const nextStorageKey = getCartStorageKey();
+      setCartStorageKey(nextStorageKey);
 
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const safeItems = Array.isArray(parsed)
-          ? parsed
-          : Array.isArray(parsed?.items)
-          ? parsed.items
-          : [];
-
+      try {
+        const safeItems = readCartItems(nextStorageKey);
         dispatch({ type: "hydrate", payload: safeItems });
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("cart-updated"));
+        }
+
         void Promise.all(
           safeItems.map(async (item: CartItem) => {
             try {
@@ -168,25 +210,41 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
           }),
         ).then((items) => dispatch({ type: "hydrate", payload: items }));
+      } catch (err) {
+        console.error("Failed to hydrate cart", err);
+        localStorage.removeItem(nextStorageKey);
+        dispatch({ type: "hydrate", payload: [] });
+      } finally {
+        setHasHydrated(true);
       }
-    } catch (err) {
-      console.error("Failed to hydrate cart", err);
-      localStorage.removeItem(CART_KEY);
-    } finally {
-      setHasHydrated(true);
-    }
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (!event.key || event.key === "user" || event.key.startsWith(`${CART_KEY_PREFIX}:`)) {
+        refreshCart();
+      }
+    };
+
+    refreshCart();
+    window.addEventListener(AUTH_EVENT_NAME, refreshCart);
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener(AUTH_EVENT_NAME, refreshCart);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   useEffect(() => {
     if (!hasHydrated) return;
 
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(state.items));
+      localStorage.setItem(cartStorageKey, JSON.stringify(state.items));
       window.dispatchEvent(new Event("cart-updated"));
     } catch (err) {
       console.error("Failed to persist cart", err);
     }
-  }, [state.items, hasHydrated]);
+  }, [state.items, hasHydrated, cartStorageKey]);
 
   const safeItems = Array.isArray(state.items) ? state.items : [];
 

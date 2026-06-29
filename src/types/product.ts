@@ -30,6 +30,15 @@ export interface ProductFormData {
   price: number;
   description: string;
   personalization: boolean;
+  personalizationEnabled?: boolean;
+  personalizationOptions?: PersonalizationFormOption[];
   primaryImage: File | null;
   galleryImages: File[];
+}
+
+export interface PersonalizationFormOption {
+  label: string;
+  price: number;
+  note?: string;
+  imageFile?: File | null;
 }

@@ -38,7 +38,7 @@ export default function OrderSummary({
   shippingEntered = false,
   onPlaceOrder,
   disabled = false,
-  paymentMethod = "card",
+  paymentMethod = "cod",
   onPaymentMethodChange,
 }: OrderSummaryProps) {
   const hasItems = items.length > 0;
@@ -134,6 +134,7 @@ export default function OrderSummary({
         checked={paymentMethod === "card"}
         onChange={() => onPaymentMethodChange?.("card")}
         className="h-4 w-4 accent-[#002B73]"
+        disabled
       />
 
       <CreditCard className="h-4 w-4 text-[#747784]" />

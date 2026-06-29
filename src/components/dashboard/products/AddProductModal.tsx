@@ -1,20 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { ChangeEvent, CSSProperties } from 'react';
-import { X, ImagePlus, Images, Plus, Paperclip } from 'lucide-react';
-import type { ProductFormData } from '@/types/product';
+import { ImagePlus, Images, Plus, Trash2, X } from 'lucide-react';
+import type { PersonalizationFormOption, ProductFormData } from '@/types/product';
 
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: ProductFormData) => boolean | void | Promise<boolean | void>;
-}
-
-interface PersonalizationOption {
-  label: string;
-  imageFile: File | null;
-  imagePreviewUrl?: string;
 }
 
 const CATEGORIES = ['Wooden Frames', 'Metal Frames', 'Shadow Boxes', 'Gallery Frames', 'Heritage Frames'];
@@ -31,180 +25,24 @@ const EMPTY: ProductFormData = {
   galleryImages: [],
 };
 
-const MAX_GALLERY = 5;
-const MAX_PERSONALIZATION_OPTIONS = 10;
+const DEFAULT_PERSONALIZATION_OPTIONS: PersonalizationFormOption[] = [
+  { label: 'Without Frame', price: 1500, note: '' },
+  { label: 'With Frame', price: 2500, note: 'With frame contain White and Black' },
+];
 
-type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price', string>>;
+const getDefaultPersonalizationOptions = () =>
+  DEFAULT_PERSONALIZATION_OPTIONS.map(option => ({ ...option }));
+
+const MAX_GALLERY = 5;
+
+type FieldErrors = Partial<Record<'name' | 'productId' | 'description', string>>;
 
 export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalProps) {
   const [form, setForm] = useState<ProductFormData>(EMPTY);
-  const [tags, setTags] = useState<PersonalizationOption[]>([]);
-  const [tagInput, setTagInput] = useState('');
+  const [personalizationOptions, setPersonalizationOptions] = useState<PersonalizationFormOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
-  const [tagLimitError, setTagLimitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-
-  // Used to know which tag's hidden file input was triggered
-  const pendingTagIndexRef = useRef<number | null>(null);
-  const tagImageInputRef = useRef<HTMLInputElement | null>(null);
-
-  const addTag = (tag: string) => {
-    const parts = tag.split(',');
-    setTags(prev => {
-      let next = [...prev];
-      parts.forEach(part => {
-        const trimmed = part.trim();
-        if (!trimmed) return;
-        if (next.length >= MAX_PERSONALIZATION_OPTIONS) {
-          setTagLimitError(`You can add a maximum of ${MAX_PERSONALIZATION_OPTIONS} personalization options.`);
-          return;
-        }
-        if (!next.some(t => t.label.toLowerCase() === trimmed.toLowerCase())) {
-          next.push({ label: trimmed, imageFile: null });
-          setTagLimitError(null);
-        }
-      });
-      return next;
-    });
-  };
-
-  const removeTag = (idx: number) => {
-    setTags(prev => prev.filter((_, i) => i !== idx));
-    setTagLimitError(null);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTag(tagInput);
-      setTagInput('');
-    }
-  };
-
-  const handleBlur = () => {
-    if (tagInput.trim()) {
-      addTag(tagInput);
-      setTagInput('');
-    }
-  };
-
-  const triggerTagImagePicker = (idx: number) => {
-    pendingTagIndexRef.current = idx;
-    tagImageInputRef.current?.click();
-  };
-
-  const handleTagImageSelected = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    const idx = pendingTagIndexRef.current;
-    if (idx === null || !file) return;
-
-    setTags(prev =>
-      prev.map((t, i) =>
-        i === idx
-          ? { ...t, imageFile: file, imagePreviewUrl: URL.createObjectURL(file) }
-          : t,
-      ),
-    );
-
-    pendingTagIndexRef.current = null;
-    e.target.value = '';
-  };
-
-  const removeTagImage = (idx: number) => {
-    setTags(prev =>
-      prev.map((t, i) => (i === idx ? { ...t, imageFile: null, imagePreviewUrl: undefined } : t)),
-    );
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (name in fieldErrors) {
-      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
-    }
-    setForm(prev => ({
-      ...prev,
-      [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
-    }));
-  };
-
-  const handleFile = (e: ChangeEvent<HTMLInputElement>, type: 'primary' | 'gallery') => {
-    if (!e.target.files) return;
-
-    if (type === 'primary') {
-      setForm(prev => ({ ...prev, primaryImage: e.target.files![0] ?? null }));
-    } else {
-      const files = Array.from(e.target.files!);
-      if (files.length > MAX_GALLERY) {
-        setGalleryError(`You can upload a maximum of ${MAX_GALLERY} gallery images.`);
-        return;
-      }
-      setGalleryError(null);
-      setForm(prev => ({ ...prev, galleryImages: files }));
-    }
-  };
-
-  const handleSubmit = async (e: { preventDefault(): void }) => {
-  e.preventDefault();
-  if (galleryError) return;
-
-  const errors: FieldErrors = {};
-  if (!form.name.trim()) errors.name = 'Product name is required.';
-  if (!form.productId.trim()) errors.productId = 'Product ID is required.';
-  if (!form.description.trim()) errors.description = 'Description is required.';
-  if (!form.price || form.price <= 0) errors.price = 'Price must be greater than 0.';
-  if (Object.keys(errors).length > 0) {
-    setFieldErrors(errors);
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  // Capture final tagInput value if they haven't pressed Enter/comma
-  let finalTags = [...tags];
-  const finalInput = tagInput.trim();
-  if (finalInput) {
-    const parts = finalInput.split(',');
-    parts.forEach(part => {
-      const trimmed = part.trim();
-      if (
-        trimmed &&
-        !finalTags.some(t => t.label.toLowerCase() === trimmed.toLowerCase()) &&
-        finalTags.length < MAX_PERSONALIZATION_OPTIONS
-      ) {
-        finalTags.push({ label: trimmed, imageFile: null });
-      }
-    });
-  }
-
-  try {
-    const submitData = {
-      ...form,
-
-      personalizationEnabled: form.personalization,
-
-      // Array of { label, imageFile } — image upload handled in parent (page.tsx)
-      personalizationOptions: finalTags,
-    };
-
-    const shouldReset = await onSubmit?.(
-      submitData as unknown as ProductFormData
-    );
-
-    if (shouldReset !== false) {
-      setForm(EMPTY);
-      setTags([]);
-      setTagInput('');
-      setGalleryError(null);
-      setTagLimitError(null);
-      setFieldErrors({});
-    }
-  } catch {
-    // Parent submit handler owns the user-facing error message.
-  } finally {
-    setIsSubmitting(false);
-  }
-};
 
   if (!isOpen) return null;
 
@@ -220,21 +58,127 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
     outline: 'none',
   };
 
+  const compactInputStyle: CSSProperties = {
+    ...inputStyle,
+    height: 40,
+    fontSize: 14,
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name in fieldErrors) {
+      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+    setForm(prev => ({
+      ...prev,
+      [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
+    }));
+  };
+
+  const updatePersonalizationOption = (
+    idx: number,
+    field: keyof Pick<PersonalizationFormOption, 'label' | 'price' | 'note'>,
+    value: string,
+  ) => {
+    setPersonalizationOptions(prev =>
+      prev.map((option, optionIdx) =>
+        optionIdx === idx
+          ? { ...option, [field]: field === 'price' ? parseFloat(value) || 0 : value }
+          : option,
+      ),
+    );
+  };
+
+  const addPersonalizationOption = () => {
+    setPersonalizationOptions(prev => {
+      if (prev.length > 0) {
+        return prev;
+      }
+
+      return getDefaultPersonalizationOptions();
+    });
+  };
+
+  const removePersonalizationOption = (idx: number) => {
+    setPersonalizationOptions(prev => prev.filter((_, optionIdx) => optionIdx !== idx));
+  };
+
+  const handleFile = (e: ChangeEvent<HTMLInputElement>, type: 'primary' | 'gallery') => {
+    if (!e.target.files) return;
+
+    if (type === 'primary') {
+      setForm(prev => ({ ...prev, primaryImage: e.target.files![0] ?? null }));
+      return;
+    }
+
+    const files = Array.from(e.target.files);
+    if (files.length > MAX_GALLERY) {
+      setGalleryError(`You can upload a maximum of ${MAX_GALLERY} gallery images.`);
+      return;
+    }
+
+    setGalleryError(null);
+    setForm(prev => ({ ...prev, galleryImages: files }));
+  };
+
+  const getCleanPersonalizationOptions = () =>
+    personalizationOptions
+      .map(option => ({
+        ...option,
+        label: option.label.trim(),
+        note: option.note?.trim() ?? '',
+        price: Number(option.price) || 0,
+      }))
+      .filter(option => option.label);
+
+  const handleSubmit = async (e: { preventDefault(): void }) => {
+    e.preventDefault();
+    if (galleryError) return;
+
+    const finalPersonalizationOptions = getCleanPersonalizationOptions();
+    const productPrice = finalPersonalizationOptions[0]?.price ?? 0;
+
+    const errors: FieldErrors = {};
+    if (!form.name.trim()) errors.name = 'Product name is required.';
+    if (!form.productId.trim()) errors.productId = 'Product ID is required.';
+    if (!form.description.trim()) errors.description = 'Description is required.';
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const submitData: ProductFormData = {
+        ...form,
+        price: productPrice,
+        personalization: finalPersonalizationOptions.length > 0,
+        personalizationEnabled: finalPersonalizationOptions.length > 0,
+        personalizationOptions: finalPersonalizationOptions,
+      };
+
+      const shouldReset = await onSubmit?.(submitData);
+
+      if (shouldReset !== false) {
+        setForm(EMPTY);
+        setPersonalizationOptions([]);
+        setGalleryError(null);
+        setFieldErrors({});
+      }
+    } catch {
+      // Parent submit handler owns the user-facing error message.
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-      {/* Hidden file input shared by all tag image pickers */}
-      <input
-        ref={tagImageInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleTagImageSelected}
-        className="hidden"
-      />
-
       <div
-        className="relative flex flex-col w-full overflow-hidden"
+        className="relative flex w-full flex-col overflow-hidden"
         style={{
           maxWidth: 520,
           maxHeight: '92vh',
@@ -244,20 +188,17 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
         }}
       >
         <div
-          className="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6"
+          className="flex flex-shrink-0 items-start justify-between px-8 pb-6 pt-8"
           style={{ borderBottom: '1px solid #F1F5F9' }}
         >
           <div>
             <h2
-              className="font-bold text-2xl"
-              style={{
-                color: '#002B73',
-                fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
-              }}
+              className="text-2xl font-bold"
+              style={{ color: '#002B73', fontFamily: 'var(--font-manrope, Manrope, sans-serif)' }}
             >
               Add New Product
             </h2>
-            <p className="text-sm mt-1" style={{ color: '#64748B' }}>
+            <p className="mt-1 text-sm" style={{ color: '#64748B' }}>
               Enter details for the new gallery item.
             </p>
           </div>
@@ -265,14 +206,14 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center rounded-full hover:bg-slate-100 flex-shrink-0 ml-4"
+            className="ml-4 flex flex-shrink-0 items-center justify-center rounded-full hover:bg-slate-100"
             style={{ width: 32, height: 32 }}
           >
             <X size={18} color="#94A3B8" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 py-6 space-y-5">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-5 overflow-y-auto px-8 py-6">
           <div className="space-y-2">
             <label className="block text-sm font-semibold" style={{ color: '#1A1C1F' }}>
               Product Name
@@ -317,15 +258,15 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  className="appearance-none cursor-pointer"
+                  className="cursor-pointer appearance-none"
                   style={inputStyle}
                 >
-                  {CATEGORIES.map(c => (
-                    <option key={c}>{c}</option>
+                  {CATEGORIES.map(category => (
+                    <option key={category}>{category}</option>
                   ))}
                 </select>
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                  ▾
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  v
                 </span>
               </div>
             </div>
@@ -346,33 +287,6 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="no-spinner block text-sm font-semibold" style={{ color: '#1A1C1F' }}>
-                Price
-              </label>
-              <div className="relative">
-                <span
-                  className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold"
-                  style={{ color: '#747784' }}
-                >
-                  LKR
-                </span>
-
-                <input
-                  type="number"
-                  className="no-spinner"
-                  name="price"
-                  value={form.price}
-                  min={0}
-                  onChange={handleChange}
-                  placeholder="1200"
-                  style={{ ...inputStyle, paddingLeft: 60, border: fieldErrors.price ? '1px solid #BC0000' : inputStyle.border }}
-                />
-              </div>
-              {fieldErrors.price && (
-                <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{fieldErrors.price}</p>
-              )}
-            </div>
           </div>
 
           <div className="space-y-2">
@@ -385,7 +299,7 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
               onChange={handleChange}
               rows={4}
               placeholder="Provide detailed information about the craftsmanship, materials, and artistic value..."
-              className="w-full resize-none outline-none p-4"
+              className="w-full resize-none p-4 outline-none"
               style={{
                 background: '#F3F3F8',
                 border: fieldErrors.description ? '1px solid #BC0000' : '1px solid #C3C6D4',
@@ -401,115 +315,77 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
           </div>
 
           <div className="pt-2" style={{ borderTop: '1px solid #F1F5F9' }}>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold" style={{ color: '#1A1C1F' }}>
                   Personalization Options
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>
-                  Add options separated by comma. Optionally attach an image to each option.
+                <p className="mt-0.5 text-xs" style={{ color: '#64748B' }}>
+                  Allow customers to add custom text or engravings
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setForm(prev => ({
-                    ...prev,
-                    personalization: !prev.personalization,
-                  }))
-                }
+                onClick={addPersonalizationOption}
                 className="flex items-center justify-center rounded-full transition hover:bg-blue-50"
                 style={{ width: 36, height: 36, color: '#002B73' }}
+                title="Add personalization option"
               >
                 <Plus size={22} />
               </button>
             </div>
 
-            {form.personalization && (
-              <div className="mt-4 space-y-4">
-                {/* Current tags list — each with optional image thumbnail + attach button */}
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1.5 text-sm bg-blue-50 text-[#002B73] px-3 py-1.5 rounded-full font-semibold border border-blue-100 shadow-sm"
-                      >
-                        {tag.imagePreviewUrl && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={tag.imagePreviewUrl}
-                            alt={tag.label}
-                            className="w-5 h-5 rounded-full object-cover"
-                          />
-                        )}
-                        {tag.label}
-                        <button
-                          type="button"
-                          onClick={() => triggerTagImagePicker(idx)}
-                          title="Attach image to this option"
-                          className="text-[#002B73] hover:text-blue-900 focus:outline-none transition"
+            {personalizationOptions.length > 0 && (
+              <div className="mt-4 space-y-3">
+                {personalizationOptions.map((option, idx) => (
+                  <div key={idx}>
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_36px] gap-3">
+                      <input
+                        type="text"
+                        value={option.label}
+                        onChange={(e) => updatePersonalizationOption(idx, 'label', e.target.value)}
+                        placeholder="Without Frame"
+                        style={compactInputStyle}
+                      />
+
+                      <div className="relative">
+                        <span
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold"
+                          style={{ color: '#747784' }}
                         >
-                          <Paperclip size={13} />
-                        </button>
-                        {tag.imagePreviewUrl && (
-                          <button
-                            type="button"
-                            onClick={() => removeTagImage(idx)}
-                            title="Remove image"
-                            className="text-[#94A3B8] hover:text-red-500 focus:outline-none text-xs transition"
-                          >
-                            img&times;
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removeTag(idx)}
-                          title="Remove option"
-                          className="text-[#002B73] hover:text-blue-900 focus:outline-none ml-1 transition"
-                        >
-                          &times;
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+                          Rs
+                        </span>
+                        <input
+                          type="number"
+                          className="no-spinner"
+                          value={option.price}
+                          onChange={(e) => updatePersonalizationOption(idx, 'price', e.target.value)}
+                          min={0}
+                          placeholder="0.00"
+                          style={{ ...compactInputStyle, paddingLeft: 42 }}
+                        />
+                      </div>
 
-                {tagLimitError && (
-                  <p className="text-xs font-semibold" style={{ color: '#BC0000' }}>{tagLimitError}</p>
-                )}
-
-                {/* Input for new tag */}
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Type option and press Enter or comma..."
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={handleBlur}
-                    disabled={tags.length >= MAX_PERSONALIZATION_OPTIONS}
-                    style={inputStyle}
-                  />
-                </div>
-
-                {/* Suggestions */}
-                <div className="space-y-1.5">
-                  <p className="text-xs font-semibold text-slate-500">Suggestions:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['With Frame', 'Without Frame', 'Black', 'White'].map((preset) => (
                       <button
-                        key={preset}
                         type="button"
-                        onClick={() => addTag(preset)}
-                        className="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full font-medium transition active:scale-95"
+                        onClick={() => removePersonalizationOption(idx)}
+                        disabled={personalizationOptions.length <= 1}
+                        className="flex items-center justify-center rounded-lg transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
+                        style={{ height: 40, color: '#BC0000' }}
+                        title="Remove personalization option"
                       >
-                        + {preset}
+                        <Trash2 size={16} />
                       </button>
-                    ))}
+                    </div>
+
+                    {option.note && (
+                      <p className="mt-1 pl-4 text-[11px]" style={{ color: '#747784' }}>
+                        Note: {option.note}
+                      </p>
+                    )}
                   </div>
-                </div>
+                ))}
               </div>
             )}
           </div>
@@ -566,7 +442,7 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                 </div>
               </label>
               {galleryError && (
-                <p className="text-xs font-semibold mt-1" style={{ color: '#BC0000' }}>
+                <p className="mt-1 text-xs font-semibold" style={{ color: '#BC0000' }}>
                   {galleryError}
                 </p>
               )}
@@ -575,13 +451,13 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
         </form>
 
         <div
-          className="flex-shrink-0 flex items-center justify-end gap-3 px-8 py-6"
+          className="flex flex-shrink-0 items-center justify-end gap-3 px-8 py-6"
           style={{ borderTop: '1px solid #F1F5F9', background: '#FAFAFA' }}
         >
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center font-bold text-base transition hover:opacity-80"
+            className="flex items-center justify-center text-base font-bold transition hover:opacity-80"
             style={{
               height: 48,
               padding: '0 24px',
@@ -597,7 +473,7 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex items-center justify-center font-bold text-base text-white transition hover:opacity-90"
+            className="flex items-center justify-center text-base font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
             style={{
               height: 48,
               padding: '0 32px',

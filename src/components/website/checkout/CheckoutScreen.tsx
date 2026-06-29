@@ -245,7 +245,7 @@ export default function CheckoutScreen() {
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
 
   const setField = (k: keyof FormState, v: string) =>
     setForm((s) => ({ ...s, [k]: v }));

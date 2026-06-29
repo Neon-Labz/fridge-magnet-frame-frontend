@@ -13,6 +13,7 @@ interface Product {
   description: string;
   price: number;
   primaryImage?: { secure_url: string } | null;
+  personalization?: Array<string | { label?: string }>;
   status?: string;
 }
 
@@ -67,10 +68,38 @@ export default function ProductsSection() {
     setAddedProduct(product._id);
   };
 
-  const handleImageClick = (productId: string) => {
-    setSelectedFrame('black-frame');
-    setSelectedProductId(productId);
-    router.push('/shop');
+  const getFrameTypeForProduct = (product: Product) => {
+    const name = product.productName.trim().toLowerCase();
+    const personalizationLabels = Array.isArray(product.personalization)
+      ? product.personalization.map((item) =>
+          typeof item === "string" ? item : String(item?.label ?? "")
+        )
+      : [];
+    const hasWithFrame = personalizationLabels.some((label) => {
+      const normalized = label.trim().toLowerCase();
+      return normalized.includes("with frame") && !normalized.includes("without frame");
+    });
+    const hasWithoutFrame = personalizationLabels.some((label) =>
+      label.trim().toLowerCase().includes("without frame")
+    );
+
+    if (name.includes('without frame')) return 'without-frame';
+    if (name.includes('white frame')) return 'white-frame';
+    if (name.includes('with frame') || name.includes('black frame')) return 'black-frame';
+    if (hasWithFrame && !hasWithoutFrame) return 'black-frame';
+    if (hasWithoutFrame && !hasWithFrame) return 'without-frame';
+
+    return 'without-frame';
+  };
+
+  const handleImageClick = (product: Product) => {
+    const frameType = getFrameTypeForProduct(product);
+
+    setSelectedFrame(frameType);
+    setSelectedProductId(product._id);
+    router.push(
+      `/shop?productId=${encodeURIComponent(product._id)}&frameType=${encodeURIComponent(frameType)}`
+    );
   };
 
   if (loading) {
@@ -105,7 +134,7 @@ export default function ProductsSection() {
           {products.map((p) => (
             <div key={p._id} className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white">
 
-              <div className="relative h-[280px] md:h-[450px] w-full cursor-pointer group bg-[#F4F3ED] flex items-center justify-center" onClick={() => handleImageClick(p._id)}>
+              <div className="relative h-[280px] md:h-[450px] w-full cursor-pointer group bg-[#F4F3ED] flex items-center justify-center" onClick={() => handleImageClick(p)}>
                 {p.primaryImage?.secure_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.primaryImage.secure_url} alt={p.productName} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
