@@ -21,14 +21,11 @@ export default function AuthModal() {
 
   useEffect(() => {
     if (!isOpen) return;
-
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleClose();
     };
-
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
-
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
@@ -39,16 +36,11 @@ export default function AuthModal() {
 
   const renderForm = () => {
     switch (view) {
-      case "login":
-        return <LoginForm />;
-      case "register":
-        return <RegisterForm />;
-      case "forgot-password":
-        return <ForgotPasswordForm />;
-      case "reset-password":
-        return <ResetPasswordForm />;
-      default:
-        return <LoginForm />;
+      case "login": return <LoginForm />;
+      case "register": return <RegisterForm />;
+      case "forgot-password": return <ForgotPasswordForm />;
+      case "reset-password": return <ResetPasswordForm />;
+      default: return <LoginForm />;
     }
   };
 
@@ -61,18 +53,24 @@ export default function AuthModal() {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-[388px] h-[550px] mt-[-28px] bg-[#F5F5F5] rounded-[25px] shadow-2xl px-10 py-10 flex flex-col">
-        {/* Close */}
-        <button
-          onClick={handleClose}
-          className="absolute top-[21px] right-[25px] w-8 h-8 flex items-center justify-center"
-          type="button"
-        >
-          <X className="w-8 h-8 text-black" strokeWidth={2} />
-        </button>
+      <div className="relative w-full max-w-[388px] max-h-[90vh] overflow-y-auto bg-[#F5F5F5] rounded-[25px] shadow-2xl px-6 sm:px-10 pb-10 flex flex-col">
+
+        {/* ✅ iPhone SE: pt-2, iPad Air & Nest Hub Max: pt-4 மேலே */}
+        <div className="flex justify-end items-center w-full pt-2 sm:pt-5 pb-0">
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors w-11 h-11 sm:w-9 sm:h-9"
+            type="button"
+          >
+            <X
+              className="text-black w-9 h-9 sm:w-6 sm:h-6"
+              strokeWidth={3}
+            />
+          </button>
+        </div>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 flex flex-col justify-center pt-2">
           {renderForm()}
         </div>
       </div>
