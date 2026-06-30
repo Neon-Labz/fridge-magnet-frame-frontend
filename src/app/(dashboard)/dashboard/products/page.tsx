@@ -96,29 +96,36 @@ export default function ProductsPage() {
 
   const handleAddProduct = async (formData: ProductFormData) => {
   try {
-    const extendedData = formData as any;
     const data = new FormData();
 
     data.append('productName', formData.name);
     data.append('productId', formData.productId);
     data.append('category', formData.category);
     data.append('stock', String(formData.stock));
-    data.append('price', String(formData.price));
     data.append('description', formData.description);
     data.append('status', getProductStatus(formData.stock));
 
     // Append personalization fields
     const personalizationEnabled: boolean =
-      extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
+      formData.personalizationEnabled ?? formData.personalization ?? false;
     data.append('personalizationEnabled', String(personalizationEnabled));
 
-    const personalizationOptions: { label: string; imageFile: File | null }[] =
-      extendedData.personalizationOptions ?? [];
+    const personalizationOptions: {
+      label: string;
+      price?: number;
+      note?: string;
+      imageFile?: File | null;
+    }[] =
+      formData.personalizationOptions ?? [];
+    const productPrice = Number(formData.price || personalizationOptions[0]?.price || 0);
+    data.append('price', String(productPrice));
 
     if (personalizationOptions.length > 0) {
       // Build metadata (label + key reference to its image file, if any)
       const optionsPayload = personalizationOptions.map((opt, index) => ({
         label: opt.label,
+        price: Number(opt.price) || 0,
+        note: opt.note ?? '',
         imageField: opt.imageFile ? `personalizationImage_${index}` : null,
       }));
 

@@ -16,17 +16,114 @@ interface ShopViewProductDetailsSectionProps {
 // Consistent shape we use internally, regardless of legacy string[] or new object[] from backend
 interface PersonalizationEntry {
   label: string;
+  price?: number;
+  note?: string;
+  image?: { secure_url?: string } | null;
+}
+
+interface RawPersonalizationEntry {
+  label?: unknown;
+  price?: unknown;
+  note?: unknown;
   image?: { secure_url?: string } | null;
 }
 
 // Converts whatever the DB/API returns (new {label,image} objects OR legacy plain strings) into a consistent array
-function toPersonalizationEntries(raw: any[] | undefined | null): PersonalizationEntry[] {
+function toPersonalizationEntries(raw: unknown[] | undefined | null): PersonalizationEntry[] {
   if (!raw || !Array.isArray(raw)) return [];
-  return raw.map((item) =>
-    typeof item === "string"
-      ? { label: item, image: null }
-      : { label: item?.label ?? "", image: item?.image ?? null }
+  return raw.map((item) => {
+    if (typeof item === "string") {
+      return { label: item, image: null };
+    }
+
+    const option = item as RawPersonalizationEntry;
+    return {
+      label: typeof option.label === "string" ? option.label : "",
+      price:
+        option.price === undefined || option.price === null
+          ? undefined
+          : Number(option.price) || 0,
+      note: typeof option.note === "string" ? option.note : "",
+      image: option.image ?? null,
+    };
+  });
+}
+
+function getProductKey(product: ShopProduct | undefined): string {
+  return String(product?._id ?? product?.id ?? product?.productId ?? "").trim();
+}
+
+function getPrimaryImageUrl(product: ShopProduct | undefined): string {
+  return product?.primaryImage?.secure_url ?? "";
+}
+
+function isWithFrameLabel(label: string | undefined): boolean {
+  const normalized = (label ?? "").trim().toLowerCase();
+  return normalized.includes("with frame") && !normalized.includes("without frame");
+}
+
+function isWithoutFrameLabel(label: string | undefined): boolean {
+  return (label ?? "").trim().toLowerCase().includes("without frame");
+}
+
+function getProductPersonalizationEntries(product: ShopProduct | undefined): PersonalizationEntry[] {
+  return toPersonalizationEntries(
+    Array.isArray(product?.personalization) ? product.personalization : undefined
   );
+}
+
+function isAvailableProduct(product: ShopProduct): boolean {
+  const status = String(product.status ?? "").trim().toLowerCase();
+  const stock = Number(product.stock ?? 0);
+  return stock > 0 && status !== "out of stock";
+}
+
+function hasWithFrameOption(product: ShopProduct): boolean {
+  const name = product.productName?.trim().toLowerCase() ?? "";
+  return (
+    name.includes("with frame") ||
+    name.includes("black frame") ||
+    name.includes("white frame") ||
+    getProductPersonalizationEntries(product).some((entry) =>
+      isWithFrameLabel(entry.label)
+    )
+  );
+}
+
+function hasWithoutFrameOption(product: ShopProduct): boolean {
+  const name = product.productName?.trim().toLowerCase() ?? "";
+  const personalizationEntries = getProductPersonalizationEntries(product);
+
+  return (
+    name.includes("without frame") ||
+    personalizationEntries.some((entry) => isWithoutFrameLabel(entry.label)) ||
+    (!hasWithFrameOption(product) && personalizationEntries.length === 0)
+  );
+}
+
+function inferFrameTypeFromProduct(
+  product: ShopProduct | undefined,
+  requestedFrameType?: string
+): string | undefined {
+  if (!product) return requestedFrameType;
+
+  const name = product.productName?.trim().toLowerCase() ?? "";
+  const personalizationEntries = getProductPersonalizationEntries(product);
+  const hasExplicitWithFrame =
+    (name.includes("with frame") && !name.includes("without frame")) ||
+    name.includes("black frame") ||
+    name.includes("white frame") ||
+    personalizationEntries.some((entry) => isWithFrameLabel(entry.label));
+  const hasExplicitWithoutFrame =
+    name.includes("without frame") ||
+    personalizationEntries.some((entry) => isWithoutFrameLabel(entry.label));
+
+  if (name.includes("white frame")) return "white-frame";
+  if (name.includes("black frame")) return "black-frame";
+  if (hasExplicitWithFrame && !hasExplicitWithoutFrame) return "black-frame";
+  if (hasExplicitWithoutFrame && !hasExplicitWithFrame) return "without-frame";
+
+  return requestedFrameType;
 }
 
 export default function ShopViewProductDetailsSection({
@@ -49,15 +146,10 @@ export default function ShopViewProductDetailsSection({
       )
     : undefined;
 
-  const initialProductName = initialProduct?.productName?.toLowerCase() ?? "";
-
-  const inferredInitialFrameType = initialProductName.includes("black frame")
-    ? "black-frame"
-    : initialProductName.includes("white frame")
-    ? "white-frame"
-    : initialProductName.includes("without frame")
-    ? "without-frame"
-    : initialFrameType;
+  const inferredInitialFrameType = inferFrameTypeFromProduct(
+    initialProduct,
+    initialFrameType
+  );
 
   const initialHasFrame =
     inferredInitialFrameType === "black-frame" ||
@@ -93,6 +185,51 @@ export default function ShopViewProductDetailsSection({
   const [isImageZoomed, setIsImageZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("center");
 
+  const availableProducts = products.filter(
+    (product) => isAvailableProduct(product) && Boolean(getPrimaryImageUrl(product))
+  );
+
+  const withFrameProducts = availableProducts.filter(hasWithFrameOption);
+  const withoutFrameProducts = availableProducts.filter(hasWithoutFrameOption);
+  const visibleFrameProducts =
+    selectedOption === "With Frame" ? withFrameProducts : withoutFrameProducts;
+  const productSelectedFromRoute = activeProductId
+    ? availableProducts.find((product) => getProductKey(product) === activeProductId.trim())
+    : undefined;
+
+  const selectedProduct =
+    productSelectedFromRoute ??
+    visibleFrameProducts[0] ??
+    availableProducts[0] ??
+    products[0];
+
+  // Normalized personalization entries for the currently selected product
+  const personalizationEntries = toPersonalizationEntries(
+    Array.isArray(selectedProduct?.personalization)
+      ? selectedProduct.personalization
+      : undefined
+  );
+  const isWithFrameSelected = selectedOption === "With Frame";
+  const selectedFrameColor = isWithFrameSelected ? selectedColor || "Black" : "";
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActiveImageIndex(0);
+    setPersonalizationImageOverride(null); // reset — primary image shows first on product change
+    setIsImageZoomed(false); // reset zoom when product changes
+
+    if (personalizationEntries.length > 0) {
+      const nextEntry =
+        selectedOption === "With Frame"
+          ? personalizationEntries.find((entry) => isWithFrameLabel(entry.label))
+          : personalizationEntries.find((entry) => isWithoutFrameLabel(entry.label));
+
+      setSelectedPersonalization(nextEntry ?? null);
+    } else {
+      setSelectedPersonalization(null);
+    }
+  }, [selectedProduct?._id, selectedProduct?.id, selectedOption]);
+
   if (!products || products.length === 0) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -103,65 +240,12 @@ export default function ShopViewProductDetailsSection({
     );
   }
 
-  const findProductByVariant = (variant: "without" | "black" | "white") =>
-    products.find((product) => {
-      const name = product.productName?.trim().toLowerCase() ?? "";
-
-      if (variant === "black") return name.includes("black frame");
-      if (variant === "white") return name.includes("white frame");
-
-      return (
-        name.includes("without frame") ||
-        (!name.includes("with frame") &&
-          !name.includes("black frame") &&
-          !name.includes("white frame"))
-      );
-    });
-
-  const isPersonalizedProduct = products[0]?.personalizationEnabled;
-
-  const productSelectedFromRoute = activeProductId
-    ? products.find((product) =>
-        [product._id, product.id, product.productId]
-          .filter(Boolean)
-          .some((id) => String(id).trim() === activeProductId.trim())
-      )
-    : undefined;
-
-  const selectedProduct =
-    productSelectedFromRoute ??
-    (isPersonalizedProduct
-      ? products[0]
-      : selectedOption === "Without Frame"
-      ? findProductByVariant("without") || products[0]
-      : selectedColor === "Black"
-      ? findProductByVariant("black") || products[0]
-      : selectedColor === "White"
-      ? findProductByVariant("white") || products[0]
-      : products[0]);
-
-  // Normalized personalization entries for the currently selected product
-  const personalizationEntries = toPersonalizationEntries(
-    selectedProduct?.personalization as any[]
-  );
-
-  useEffect(() => {
-    setActiveImageIndex(0);
-    setPersonalizationImageOverride(null); // reset — primary image shows first on product change
-    setIsImageZoomed(false); // reset zoom when product changes
-
-    if (
-      selectedProduct?.personalizationEnabled &&
-      personalizationEntries.length > 0
-    ) {
-      setSelectedPersonalization(personalizationEntries[0]); // dropdown default value (for cart), image NOT switched yet
-    } else {
-      setSelectedPersonalization(null);
-    }
-  }, [selectedProduct?._id, selectedProduct?.id]);
-
   const title = selectedProduct?.productName ?? "";
-  const price = Number(selectedProduct?.price ?? 0);
+  const basePrice = Number(selectedProduct?.price ?? 0);
+  const price =
+    selectedPersonalization?.price !== undefined && selectedPersonalization.price > 0
+      ? selectedPersonalization.price
+      : basePrice;
   const description = selectedProduct?.description ?? "";
   const status = selectedProduct?.status ?? "Out of Stock";
   const availableStock = Math.max(Number(selectedProduct?.stock ?? 0), 0);
@@ -181,15 +265,28 @@ export default function ShopViewProductDetailsSection({
   const activeImage =
     personalizationImageOverride ?? allImages[activeImageIndex] ?? mainImage;
 
-  const handlePersonalizationChange = (label: string) => {
-    const entry = personalizationEntries.find((p) => p.label === label) ?? null;
-    setSelectedPersonalization(entry);
-    // User explicitly selected this option — NOW show its image (if it has one)
-    setPersonalizationImageOverride(entry?.image?.secure_url ?? null);
+  const resetImageSelection = () => {
+    setPersonalizationImageOverride(null);
     setActiveImageIndex(0);
-    setIsImageZoomed(false); // reset zoom when switching personalization option
+    setIsImageZoomed(false);
   };
 
+  const handleFrameModeSelect = (option: "With Frame" | "Without Frame") => {
+    const nextProducts = option === "With Frame" ? withFrameProducts : withoutFrameProducts;
+
+    setSelectedOption(option);
+    setSelectedColor(option === "With Frame" ? selectedColor || "Black" : "");
+    setActiveProductId(getProductKey(nextProducts[0]) || undefined);
+    resetImageSelection();
+  };
+
+  const handleFrameProductSelect = (product: ShopProduct) => {
+    const productId = getProductKey(product);
+    if (!productId) return;
+
+    setActiveProductId(productId);
+    resetImageSelection();
+  };
   // Click on the image: zoom in centered on the click point. Click again to zoom out.
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!activeImage) return;
@@ -212,11 +309,7 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    if (
-      !isPersonalizedProduct &&
-      selectedOption === "With Frame" &&
-      !selectedColor
-    ) {
+    if (isWithFrameSelected && !selectedFrameColor) {
       addToast("Please select frame color.", "error");
       return;
     }
@@ -226,15 +319,9 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    const frameType =
-      isPersonalizedProduct && selectedPersonalization
-        ? selectedPersonalization.label
-        : selectedOption;
+    const frameType = selectedOption;
 
-    const colorOption =
-      !isPersonalizedProduct && selectedOption === "With Frame"
-        ? selectedColor
-        : "";
+    const colorOption = selectedFrameColor;
 
     addToCart({
       id: selectedProduct?._id ?? selectedProduct?.id ?? `shop-${Date.now()}`,
@@ -243,7 +330,7 @@ export default function ShopViewProductDetailsSection({
       frameType,
       colorOption,
       quantity,
-      image: mainImage,
+      image: activeImage || mainImage,
       stock: availableStock,
     });
 
@@ -280,11 +367,7 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    if (
-      !isPersonalizedProduct &&
-      selectedOption === "With Frame" &&
-      !selectedColor
-    ) {
+    if (isWithFrameSelected && !selectedFrameColor) {
       addToast("Please select frame color.", "error");
       return;
     }
@@ -294,15 +377,9 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    const frameType =
-      isPersonalizedProduct && selectedPersonalization
-        ? selectedPersonalization.label
-        : selectedOption;
+    const frameType = selectedOption;
 
-    const colorOption =
-      !isPersonalizedProduct && selectedOption === "With Frame"
-        ? selectedColor
-        : "";
+    const colorOption = selectedFrameColor;
 
     addToCart({
       id: selectedProduct?._id ?? selectedProduct?.id ?? `shop-${Date.now()}`,
@@ -311,7 +388,7 @@ export default function ShopViewProductDetailsSection({
       frameType,
       colorOption,
       quantity,
-      image: mainImage,
+      image: activeImage || mainImage,
       stock: availableStock,
     });
 
@@ -319,11 +396,11 @@ export default function ShopViewProductDetailsSection({
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-25 sm:px-4 lg:px-8">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
-        <div className="flex flex-col gap-6">
+    <section className="mx-auto w-full max-w-[1700px] px-4 pb-20 pt-[104px] sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-[112px]">
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(380px,520px)_minmax(420px,1fr)] lg:gap-16">
+        <div className="flex flex-col gap-5">
           <div
-            className="group relative flex aspect-[4/5] w-full max-h-[575px] max-w-[480px] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED]"
+            className="group relative flex aspect-[4/5] w-full max-h-[560px] max-w-[520px] items-center justify-center overflow-hidden rounded-sm bg-[#F4F3ED] lg:max-h-[520px]"
             onClick={handleImageClick}
             style={{ cursor: activeImage ? (isImageZoomed ? "zoom-out" : "zoom-in") : "default" }}
           >
@@ -332,7 +409,7 @@ export default function ShopViewProductDetailsSection({
                 <img
                   src={activeImage}
                   alt={title}
-                  className="h-full w-full object-cover transition-transform duration-300 ease-out"
+                  className="h-full w-full object-contain transition-transform duration-300 ease-out"
                   style={{
                     transform: isImageZoomed ? "scale(2)" : "scale(1)",
                     transformOrigin: isImageZoomed ? zoomOrigin : "center",
@@ -363,7 +440,7 @@ export default function ShopViewProductDetailsSection({
 
           {/* Gallery thumbnails grid — still works independently when no option-image override is active */}
           {allImages.length > 1 && (
-            <div className="flex flex-wrap gap-2 max-w-[480px]">
+            <div className="grid max-w-[520px] grid-cols-6 gap-2">
               {allImages.map((img, idx) => (
                 <button
                   key={`${img}-${idx}`}
@@ -373,7 +450,7 @@ export default function ShopViewProductDetailsSection({
                     setPersonalizationImageOverride(null); // back to gallery/primary flow
                     setIsImageZoomed(false); // reset zoom when switching image
                   }}
-                  className={`relative h-16 w-16 overflow-hidden rounded-md border-2 bg-slate-100 transition-all ${
+                  className={`relative aspect-square w-full overflow-hidden rounded-md border-2 bg-slate-100 transition-all ${
                     activeImageIndex === idx && !personalizationImageOverride
                       ? "border-[#002B73] opacity-100 ring-2 ring-[#002B73]/20"
                       : "border-transparent opacity-70 hover:opacity-100"
@@ -382,20 +459,50 @@ export default function ShopViewProductDetailsSection({
                   <img
                     src={img}
                     alt={`Gallery ${idx + 1}`}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 </button>
               ))}
             </div>
           )}
+
+          {visibleFrameProducts.length > 0 && (
+            <div className="flex max-w-[520px] gap-3 overflow-x-auto pb-2 sm:grid sm:w-full sm:grid-cols-3 sm:overflow-visible lg:grid-cols-4">
+              {visibleFrameProducts.map((product) => {
+                const productId = getProductKey(product);
+                const imageUrl = getPrimaryImageUrl(product);
+                const isSelected = productId === getProductKey(selectedProduct);
+
+                return (
+                  <button
+                    key={productId || imageUrl}
+                    type="button"
+                    onClick={() => handleFrameProductSelect(product)}
+                    title={product.productName ?? "Frame product"}
+                    className={`relative h-20 w-20 flex-none overflow-hidden rounded-[4px] border-2 bg-white p-1 shadow-sm transition-all sm:h-24 sm:w-full ${
+                      isSelected
+                        ? "border-[#002B73] opacity-100 ring-2 ring-[#002B73]/20"
+                        : "border-transparent opacity-75 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={product.productName ?? "Frame product"}
+                      className="h-full w-full object-contain"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col pt-3">
-          <h1 className="mb-3 text-[22px] font-medium text-slate-800">
+        <div className="flex w-full flex-col pt-0 lg:max-w-[620px] lg:justify-self-end lg:pt-4">
+          <h1 className="mb-5 text-[22px] font-medium leading-tight text-slate-800 md:text-[24px]">
             {title}
           </h1>
 
-          <div className="mb-6 flex items-center gap-4">
+          <div className="mb-7 flex flex-wrap items-center gap-4">
             <div className="text-[#FFB800]">★★★★★</div>
             <div className="mx-1 h-4 w-px bg-slate-300" />
 
@@ -416,130 +523,90 @@ export default function ShopViewProductDetailsSection({
             </span>
           </div>
 
-          <div className="mb-6 text-[24px] md:text-[32px] font-bold text-[#1A2B5E]">
+          <div className="mb-7 text-[28px] font-bold text-[#1A2B5E] md:text-[36px]">
             Rs {price.toFixed(2)}
           </div>
 
-          <p className="mb-8 text-sm md:text-base leading-relaxed text-slate-600">
+          <p className="mb-7 max-w-[560px] text-sm leading-relaxed text-slate-600 md:text-base">
             {description}
           </p>
 
-          <hr className="w-full max-w-[551px] mb-8 border-slate-200" />
+          <hr className="mb-7 w-full border-slate-200" />
 
-          {isPersonalizedProduct ? (
-            personalizationEntries.length > 0 && (
-              <div className="mb-8">
-                <label className="mb-3 block text-[15px] font-semibold text-slate-800">
-                  Personalization Options
-                </label>
+          <div className="mb-6">
+            <label className="mb-3 block text-[15px] text-slate-800">
+              Personalization
+            </label>
 
-                <div className="relative w-full max-w-[260px]">
-                  <select
-                    value={selectedPersonalization?.label ?? ""}
-                    onChange={(e) => handlePersonalizationChange(e.target.value)}
-                    className="h-11 w-full appearance-none rounded-full border-2 border-[#002B73] bg-white pl-4 pr-10 text-sm font-medium outline-none"
+            <div className="flex w-full flex-col gap-4 sm:flex-row">
+              {(["With Frame", "Without Frame"] as const).map((option) => {
+                const isSelected = selectedOption === option;
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => handleFrameModeSelect(option)}
+                    className={`flex h-14 flex-1 items-center justify-center rounded-[4px] border-2 px-6 text-base font-semibold transition ${
+                      isSelected
+                        ? "border-[#002B73] bg-[#002B73] text-white"
+                        : "border-[#002B73] bg-white text-[#1A2B5E]"
+                    }`}
                   >
-                    {personalizationEntries.map((opt, idx) => (
-                      <option key={`${opt.label}-${idx}`} value={opt.label}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
 
-                  {/* Custom arrow with proper spacing from the border */}
-                  <svg
-                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#002B73]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+            {selectedPersonalization?.note && (
+              <p className="mt-2 text-xs text-slate-500">
+                Note: {selectedPersonalization.note}
+              </p>
+            )}
+          </div>
+
+          {isWithFrameSelected && (
+            <div className="mb-7">
+              <label className="mb-3 block text-[15px] text-slate-800">
+                Select Color
+              </label>
+
+              <div className="flex gap-5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedColor("Black")}
+                  className="flex flex-col items-center gap-1 text-xs text-slate-700"
+                >
+                  <span
+                    className={`h-8 w-8 rounded-full border bg-black ${
+                      selectedFrameColor === "Black"
+                        ? "ring-2 ring-[#002B73] ring-offset-2"
+                        : ""
+                    }`}
+                  />
+                  Black
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedColor("White")}
+                  className="flex flex-col items-center gap-1 text-xs text-slate-700"
+                >
+                  <span
+                    className={`h-8 w-8 rounded-full border bg-white ${
+                      selectedFrameColor === "White"
+                        ? "ring-2 ring-[#002B73] ring-offset-2"
+                        : ""
+                    }`}
+                  />
+                  White
+                </button>
               </div>
-            )
-          ) : (
-            <>
-              <div className="mb-8">
-                <label className="mb-3 block text-[15px] text-slate-800">
-                  Personalization
-                </label>
-
-                <div className="relative w-full max-w-[260px]">
-                  <select
-                    value={selectedOption}
-                    onChange={(e) => {
-                      setActiveProductId(undefined);
-                      setSelectedOption(e.target.value);
-                      setSelectedColor("");
-                    }}
-                    className="h-11 w-full appearance-none rounded-full border-2 border-[#002B73] bg-white pl-4 pr-10 text-sm outline-none"
-                  >
-                    <option value="Without Frame">Without Frame</option>
-                    <option value="With Frame">With Frame</option>
-                  </select>
-                  <svg
-                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#002B73]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-
-              {selectedOption === "With Frame" && (
-                <div className="mb-8">
-                  <label className="mb-3 block text-[15px] text-slate-800">
-                    Select Color
-                  </label>
-
-                  <div className="flex gap-5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveProductId(undefined);
-                        setSelectedColor("Black");
-                      }}
-                      className="flex flex-col items-center gap-1 text-xs"
-                    >
-                      <span
-                        className={`h-8 w-8 rounded-full border bg-black ${
-                          selectedColor === "Black"
-                            ? "ring-2 ring-[#002B73] ring-offset-2"
-                            : ""
-                        }`}
-                      />
-                      Black
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveProductId(undefined);
-                        setSelectedColor("White");
-                      }}
-                      className="flex flex-col items-center gap-1 text-xs"
-                    >
-                      <span
-                        className={`h-8 w-8 rounded-full border bg-white ${
-                          selectedColor === "White"
-                            ? "ring-2 ring-[#002B73] ring-offset-2"
-                            : ""
-                        }`}
-                      />
-                      White
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
+            </div>
           )}
 
-          <div className="mb-10">
+          <div className="mb-9">
             <label className="mb-3 block text-[15px] text-slate-800">
               Quantity
             </label>
@@ -568,12 +635,12 @@ export default function ShopViewProductDetailsSection({
             </div>
           </div>
 
-          <div className="flex max-w-[500px] flex-col gap-4 sm:flex-row">
+          <div className="flex w-full flex-col gap-4 sm:flex-row">
             <button
               type="button"
               onClick={handleAddToCart}
               disabled={status === "Out of Stock" || availableStock < 1}
-              className="flex flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 py-3 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-14 flex-1 items-center justify-center rounded-[4px] border-2 border-[#1A2B5E] px-6 font-medium text-[#1A2B5E] disabled:cursor-not-allowed disabled:opacity-50"
             >
               🛒 Add to Cart
             </button>
@@ -582,7 +649,7 @@ export default function ShopViewProductDetailsSection({
               type="button"
               onClick={handleBuyNow}
               disabled={status === "Out of Stock" || availableStock < 1}
-              className={`flex-1 rounded-[4px] px-6 py-3 font-medium text-white ${
+              className={`h-14 flex-1 rounded-[4px] px-6 font-medium text-white ${
                 status !== "Out of Stock" && availableStock >= 1
                   ? "bg-[#E62A24]"
                   : "bg-[#E62A24]/60 cursor-not-allowed opacity-50"

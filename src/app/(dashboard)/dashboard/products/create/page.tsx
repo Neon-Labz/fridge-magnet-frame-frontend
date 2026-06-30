@@ -20,16 +20,11 @@ export default function CreateProductPage() {
 
  const handleSubmit = async (formData: ProductFormData) => {
   try {
-    // The modal casts its extended submitData as ProductFormData;
-    // use `any` to access the extra personalization fields it adds.
-    const extendedData = formData as any;
-
     const data = new FormData();
 
     data.append("productName", formData.name);
     data.append("productId", formData.productId);
     data.append("category", formData.category);
-    data.append("price", String(formData.price));
     data.append("stock", String(formData.stock));
     data.append("description", formData.description);
     data.append("status", getProductStatus(formData.stock));
@@ -38,15 +33,34 @@ export default function CreateProductPage() {
     // Without this, personalizationEnabled and personalization options
     // were silently dropped from the request every time.
     const personalizationEnabled: boolean =
-      extendedData.personalizationEnabled ?? extendedData.personalization ?? false;
+      formData.personalizationEnabled ?? formData.personalization ?? false;
     data.append("personalizationEnabled", String(personalizationEnabled));
 
-    const personalizationOptions: string[] =
-      extendedData.personalizationOptions ?? [];
+    const personalizationOptions: {
+      label: string;
+      price?: number;
+      note?: string;
+      imageFile?: File | null;
+    }[] =
+      formData.personalizationOptions ?? [];
+    const productPrice = Number(formData.price || personalizationOptions[0]?.price || 0);
+    data.append("price", String(productPrice));
+
     if (personalizationOptions.length > 0) {
-      // Send as a JSON array string; the backend normalizePersonalization()
-      // handles JSON-array strings correctly.
-      data.append("personalization", JSON.stringify(personalizationOptions));
+      const optionsPayload = personalizationOptions.map((opt, index) => ({
+        label: opt.label,
+        price: Number(opt.price) || 0,
+        note: opt.note ?? '',
+        imageField: opt.imageFile ? `personalizationImage_${index}` : null,
+      }));
+
+      data.append("personalization", JSON.stringify(optionsPayload));
+
+      personalizationOptions.forEach((opt, index) => {
+        if (opt.imageFile) {
+          data.append(`personalizationImage_${index}`, opt.imageFile);
+        }
+      });
     }
 
     // primary image

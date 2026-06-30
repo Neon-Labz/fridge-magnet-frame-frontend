@@ -33,7 +33,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed left-0 top-0 z-50 h-[85px] w-full border-b border-[#E5E5EA]/80 bg-white/95 shadow-sm backdrop-blur-md">
-      <div className="mx-auto flex h-full w-full max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-[120px]">
+      <div className="mx-auto flex h-full w-full max-w-[1700px] items-center justify-between px-4 sm:px-6 lg:px-[120px]">
           <div className="flex items-center gap-3">
           <button
             className="text-[#475569] md:hidden"
@@ -43,7 +43,7 @@ export default function Navbar() {
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          <Link href="/" onClick={closeMenu}>
+          <Link href="/" onClick={closeMenu} className="lg:-ml-3">
             <Image
               src="/logo.png"
               alt="Logo"
