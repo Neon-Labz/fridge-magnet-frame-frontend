@@ -22,6 +22,7 @@ export default function FeedbackCard({
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [downloadingReceipt, setDownloadingReceipt] = useState(false);
   const { addToast } = useToastStore();
 
   const handleSubmitFeedback = async () => {
@@ -62,18 +63,103 @@ export default function FeedbackCard({
     }
   };
 
+  const handleWhatsAppContact = () => {
+    const whatsappNumber = "94753912534";
+    const message = `Hi Magnify! I'm contacting you about my order ${orderNumber}. I need assistance with:`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!orderNumber || downloadingReceipt) return;
+
+    setDownloadingReceipt(true);
+    try {
+      // Use the API base URL from environment variable
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      const response = await fetch(`${apiUrl}/orders/${orderNumber}/receipt`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate receipt');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `receipt-${orderNumber}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      addToast("Receipt downloaded successfully", "success");
+    } catch (error) {
+      addToast(
+        error instanceof Error ? error.message : "Failed to download receipt",
+        "error"
+      );
+    } finally {
+      setDownloadingReceipt(false);
+    }
+  };
+
   return (
-    <div className="w-full overflow-hidden rounded-2xl bg-[#0040A1] p-5 text-white shadow-lg sm:rounded-3xl sm:p-6 lg:p-8">
+    <div className="w-full overflow-hidden rounded-2xl bg-[#DC2626] p-5 text-white shadow-lg sm:rounded-3xl sm:p-6 lg:p-8">
       <h2 className="mb-2 font-manrope text-lg font-bold sm:mb-3 sm:text-xl lg:text-2xl">
         Your order was successful
       </h2>
 
-      <p className="mb-3 text-xs font-normal leading-relaxed text-[#A8C7FF] sm:mb-4 sm:text-sm">
-        Help us improve the framing experience for everyone.
+      <p className="mb-4 text-xs font-normal leading-relaxed text-red-100 sm:mb-5 sm:text-sm">
+        Next steps to complete your custom magnets:
       </p>
 
+      <ul className="mb-6 space-y-2 text-xs text-white sm:mb-7 sm:text-sm">
+        <li className="flex items-start">
+          <span className="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-white flex-shrink-0"></span>
+          Contact us via WhatsApp
+        </li>
+        <li className="flex items-start">
+          <span className="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-white flex-shrink-0"></span>
+          Send your order confirmation receipt
+        </li>
+        <li className="flex items-start">
+          <span className="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-white flex-shrink-0"></span>
+          Send your HD-quality images for customized magnets
+        </li>
+        <li className="flex items-start">
+          <span className="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-white flex-shrink-0"></span>
+          Discuss the payment process
+        </li>
+      </ul>
+
+      <div className="mb-6 space-y-3 sm:mb-7">
+        <button
+          onClick={handleWhatsAppContact}
+          className="w-full rounded-lg bg-[#25D366] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#22C55E] active:scale-95 sm:text-base"
+          type="button"
+        >
+          💬 Chat on WhatsApp
+        </button>
+        
+        <button
+          onClick={handleDownloadReceipt}
+          disabled={downloadingReceipt}
+          className={`w-full rounded-lg px-4 py-3 text-sm font-bold shadow-md transition-all sm:text-base ${
+            downloadingReceipt
+              ? "cursor-not-allowed bg-gray-400 text-gray-600"
+              : "bg-white text-[#DC2626] hover:bg-gray-50 active:scale-95"
+          }`}
+          type="button"
+        >
+          {downloadingReceipt ? "Generating..." : "📄 Download Receipt"}
+        </button>
+      </div>
+
       <p className="mb-5 text-xs font-semibold text-white sm:mb-6 sm:text-sm">
-        How would you rate your experience?
+        How would you rate your experience? (Optional)
       </p>
 
       <div className="mb-6 grid w-full grid-cols-5 gap-2 sm:mb-8 sm:gap-3">
@@ -83,8 +169,8 @@ export default function FeedbackCard({
             onClick={() => setRating(star)}
             className={`flex aspect-square w-full items-center justify-center rounded-lg border-2 transition-all hover:scale-105 ${
               rating >= star
-                ? "border-[#FFD700] bg-[#0A56D4]"
-                : "border-white/40 bg-[#0A56D4]/70"
+                ? "border-[#FFD700] bg-[#B91C1C]"
+                : "border-white/40 bg-[#B91C1C]/70"
             }`}
             type="button"
           >
@@ -103,7 +189,7 @@ export default function FeedbackCard({
           onChange={(e) => setFeedback(e.target.value)}
           placeholder="Tell us what you liked..."
           rows={4}
-          className="min-h-[120px] w-full resize-none rounded-xl border-2 border-[#0A7FFF]/60 bg-[#003A7F]/50 px-4 py-3 text-xs text-white placeholder-[#A8C7FF]/60 transition-all focus:border-[#FFB800] focus:bg-[#003A7F]/70 focus:outline-none sm:rounded-2xl sm:px-5 sm:py-4 sm:text-sm"
+          className="min-h-[120px] w-full resize-none rounded-xl border-2 border-red-300/60 bg-[#B91C1C]/50 px-4 py-3 text-xs text-white placeholder-red-100/60 transition-all focus:border-[#FFB800] focus:bg-[#B91C1C]/70 focus:outline-none sm:rounded-2xl sm:px-5 sm:py-4 sm:text-sm"
         />
       </div>
 
@@ -113,7 +199,7 @@ export default function FeedbackCard({
         className={`w-full rounded-lg px-5 py-2.5 text-xs font-bold shadow-md transition-all sm:rounded-xl sm:px-6 sm:py-3 sm:text-sm lg:text-base ${
           submitted || submitting
             ? "cursor-not-allowed bg-[#E8E8ED] text-[#434652]"
-            : "bg-white text-[#0040A1] hover:bg-gray-50 active:scale-95"
+            : "bg-white text-[#DC2626] hover:bg-gray-50 active:scale-95"
         }`}
         type="button"
       >
