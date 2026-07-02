@@ -34,7 +34,11 @@ function StatCard({
 
 export default function OrderStats({ orders }: { orders: Order[] }) {
   const totalOrders = orders.length;
-  const pendingOrders = orders.filter((order) => order.status === 'pending').length;
+
+const pendingOrders = orders.filter((order) => {
+  const status = String(order.status || "").trim().toLowerCase();
+  return status === "pending";
+}).length;
 
   return (
     <div className="mb-4 grid max-w-[400px] flex-shrink-0 grid-cols-1 gap-4 sm:grid-cols-2">

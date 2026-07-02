@@ -49,12 +49,12 @@ export default function OrdersPage() {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
-  const filtered =
+  const filteredOrders =
     filterStatus === 'all'
       ? orders
       : orders.filter((order) => order.status === filterStatus);
 
-  const sorted = [...filtered].sort((a, b) => {
+  const tableOrders = [...filteredOrders].sort((a, b) => {
     if (sortBy === 'id-asc') return a.orderId.localeCompare(b.orderId);
     if (sortBy === 'id-desc') return b.orderId.localeCompare(a.orderId);
     if (sortBy === 'name-asc') return a.customerName.localeCompare(b.customerName);
@@ -64,12 +64,12 @@ export default function OrdersPage() {
     return 0;
   });
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(tableOrders.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const paged = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pagedOrders = tableOrders.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const startItem = sorted.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
-  const endItem = Math.min(safePage * PAGE_SIZE, sorted.length);
+  const startItem = tableOrders.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const endItem = Math.min(safePage * PAGE_SIZE, tableOrders.length);
 
   const handleFilterSelect = (nextFilter: OrderFilterStatus) => {
     setFilterStatus(nextFilter);
@@ -124,7 +124,7 @@ export default function OrdersPage() {
 
 <div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
           <OrderHeader />
-        <OrderStats orders={orders} />
+        <OrderStats orders={tableOrders} />
 
         <div
           className="flex flex-1 flex-col overflow-hidden"
@@ -163,7 +163,7 @@ export default function OrdersPage() {
             onSortSelect={handleSortSelect}
             startItem={startItem}
             endItem={endItem}
-            totalItems={sorted.length}
+            totalItems={tableOrders.length}
           />
 
           {loading || error ? (
@@ -171,7 +171,7 @@ export default function OrdersPage() {
               {error || 'Loading orders...'}
             </div>
           ) : (
-            <OrderTable orders={paged} onDelete={setDeleteTarget} />
+            <OrderTable orders={pagedOrders} onDelete={setDeleteTarget} />
           )}
 
           <OrderPagination
@@ -179,7 +179,7 @@ export default function OrdersPage() {
             totalPages={totalPages}
             startItem={startItem}
             endItem={endItem}
-            totalItems={sorted.length}
+            totalItems={tableOrders.length}
             onPageChange={setPage}
           />
         </div>
