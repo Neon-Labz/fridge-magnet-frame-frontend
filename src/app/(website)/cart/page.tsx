@@ -188,7 +188,7 @@ export default function CartPage() {
 
   return (
     <div className="bg-[#F9F9FE]">
-      <main className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-[120px] py-10 lg:py-25">
+      <main className="mx-auto w-full max-w-[1600px] px-4 pb-10 pt-[112px] sm:px-6 sm:pt-[124px] lg:px-[120px] lg:pb-25 lg:pt-[132px]">
         {/* HEADER */}
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">
