@@ -5,24 +5,17 @@ export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('adminToken')?.value
 
+  // If user has a valid admin token and visits /dashboard, send them to products
   if (pathname === '/dashboard') {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = token ? '/dashboard/products' : '/dashboard/login'
+    redirectUrl.pathname = token ? '/dashboard/products' : '/login'
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (pathname === '/dashboard/login') {
-    if (token) {
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/dashboard/products'
-      return NextResponse.redirect(redirectUrl)
-    }
-    return NextResponse.next()
-  }
-
+  // Protect all other /dashboard/* routes — redirect to main login if unauthenticated
   if (!token) {
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/dashboard/login'
+    redirectUrl.pathname = '/login'
     return NextResponse.redirect(redirectUrl)
   }
 
