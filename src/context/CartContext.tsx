@@ -1,7 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
-import { apiV1Url } from "@/lib/backendUrl";
+import {
+  getProductLineTotal,
+  normalizeProductQuantity,
+} from "@/lib/productQuantityRules";
 
 export type CartItem = {
   id: string;
@@ -71,12 +74,8 @@ function getSafeItems(items: unknown): CartItem[] {
   return Array.isArray(items) ? items : [];
 }
 
-function clampQuantity(quantity: number, stock?: number): number {
-  const requested = Math.max(1, Number(quantity) || 1);
-  const available = Number(stock);
-  return Number.isFinite(available) && available >= 0
-    ? Math.min(requested, available)
-    : requested;
+function clampQuantity(quantity: number, stock?: number, title?: string): number {
+  return normalizeProductQuantity(quantity, title, stock);
 }
 
 function reducer(state: State, action: Action): State {
@@ -106,6 +105,7 @@ function reducer(state: State, action: Action): State {
                   quantity: clampQuantity(
                     i.quantity + action.payload.quantity,
                     action.payload.stock ?? i.stock,
+                    i.title,
                   ),
                 }
               : i
@@ -118,7 +118,11 @@ function reducer(state: State, action: Action): State {
           ...currentItems,
           {
             ...action.payload,
-            quantity: clampQuantity(action.payload.quantity, action.payload.stock),
+            quantity: clampQuantity(
+              action.payload.quantity,
+              action.payload.stock,
+              action.payload.title,
+            ),
           },
         ],
       };
@@ -144,10 +148,10 @@ function reducer(state: State, action: Action): State {
             ? i.id === action.payload.id &&
               i.frameType === action.payload.frameType &&
               i.colorOption === action.payload.colorOption
-              ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock) }
+              ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock, i.title) }
               : i
             : i.id === action.payload.id
-            ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock) }
+            ? { ...i, quantity: clampQuantity(action.payload.quantity, i.stock, i.title) }
             : i
         ),
       };
@@ -185,31 +189,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         const safeItems = readCartItems(nextStorageKey);
         dispatch({ type: "hydrate", payload: safeItems });
-
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new Event("cart-updated"));
-        }
-
-        void Promise.all(
-          safeItems.map(async (item: CartItem) => {
-            try {
-              const response = await fetch(apiV1Url(`/api/products/${item.id}`));
-              if (!response.ok) return item;
-
-              const product = await response.json();
-              const stock = Number(product?.stock ?? product?.data?.stock);
-              if (!Number.isFinite(stock)) return item;
-
-              return {
-                ...item,
-                stock,
-                quantity: clampQuantity(item.quantity, stock),
-              };
-            } catch {
-              return item;
-            }
-          }),
-        ).then((items) => dispatch({ type: "hydrate", payload: items }));
       } catch (err) {
         console.error("Failed to hydrate cart", err);
         localStorage.removeItem(nextStorageKey);
@@ -239,8 +218,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!hasHydrated) return;
 
     try {
-      localStorage.setItem(cartStorageKey, JSON.stringify(state.items));
-      window.dispatchEvent(new Event("cart-updated"));
+      const nextCart = JSON.stringify(state.items);
+
+      if (localStorage.getItem(cartStorageKey) !== nextCart) {
+        localStorage.setItem(cartStorageKey, nextCart);
+        window.dispatchEvent(new Event("cart-updated"));
+      }
     } catch (err) {
       console.error("Failed to persist cart", err);
     }
@@ -249,7 +232,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const safeItems = Array.isArray(state.items) ? state.items : [];
 
   const subtotal = useMemo(
-    () => safeItems.reduce((s, it) => s + Number(it.price || 0) * Number(it.quantity || 0), 0),
+    () =>
+      safeItems.reduce(
+        (s, it) => s + getProductLineTotal(Number(it.price || 0), Number(it.quantity || 0), it.title),
+        0,
+      ),
     [safeItems]
   );
 

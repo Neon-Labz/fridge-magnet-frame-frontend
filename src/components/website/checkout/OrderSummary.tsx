@@ -3,6 +3,7 @@
 import { Banknote, CreditCard, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { getProductLineTotal } from "@/lib/productQuantityRules";
 
 export type SummaryItem = {
   id: string | number;
@@ -80,7 +81,7 @@ export default function OrderSummary({
               </div>
 
               <div className="whitespace-nowrap text-right text-base font-bold leading-6 text-[#0040A1]">
-                {formatCurrency(item.price * item.quantity)}
+                {formatCurrency(getProductLineTotal(item.price, item.quantity, item.name))}
               </div>
             </div>
           ))

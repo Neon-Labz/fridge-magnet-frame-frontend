@@ -8,6 +8,7 @@ export interface Customer {
   isActive: boolean;
   source: 'user' | 'customer';
   recordId: string;
+  createdAt?: string;
   [key: string]: unknown; // allow extra fields from backend
 }
 
@@ -40,6 +41,7 @@ export interface CustomerApiResponse {
   message: string;
   data: CustomerApiItem[];
   total: number;
+  activeTotal?: number;
   page: number;
   limit: number;
   totalPages: number;

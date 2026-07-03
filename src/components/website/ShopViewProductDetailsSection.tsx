@@ -6,6 +6,13 @@ import { useToastStore } from "@/store/toastStore";
 import { useWebsiteAuthSession } from "@/hooks/useWebsiteAuthSession";
 import type { ShopProduct } from "@/types/shopProduct";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import {
+  getNextProductQuantity,
+  getPreviousProductQuantity,
+  getProductQuantityRule,
+  normalizeProductQuantity,
+} from "@/lib/productQuantityRules";
 
 interface ShopViewProductDetailsSectionProps {
   products: ShopProduct[];
@@ -204,31 +211,24 @@ export default function ShopViewProductDetailsSection({
     products[0];
 
   // Normalized personalization entries for the currently selected product
-  const personalizationEntries = toPersonalizationEntries(
-    Array.isArray(selectedProduct?.personalization)
-      ? selectedProduct.personalization
-      : undefined
-  );
+ 
   const isWithFrameSelected = selectedOption === "With Frame";
   const selectedFrameColor = isWithFrameSelected ? selectedColor || "Black" : "";
+  const quantityRule = getProductQuantityRule(selectedProduct?.productName);
+  const minimumQuantity = quantityRule.minimum;
+  const availableStockForQuantity = Math.max(Number(selectedProduct?.stock ?? 0), 0);
 
+  
+    
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveImageIndex(0);
-    setPersonalizationImageOverride(null); // reset — primary image shows first on product change
-    setIsImageZoomed(false); // reset zoom when product changes
-
-    if (personalizationEntries.length > 0) {
-      const nextEntry =
-        selectedOption === "With Frame"
-          ? personalizationEntries.find((entry) => isWithFrameLabel(entry.label))
-          : personalizationEntries.find((entry) => isWithoutFrameLabel(entry.label));
-
-      setSelectedPersonalization(nextEntry ?? null);
-    } else {
-      setSelectedPersonalization(null);
-    }
-  }, [selectedProduct?._id, selectedProduct?.id, selectedOption]);
+    setQuantity((current) =>
+      normalizeProductQuantity(
+        current,
+        selectedProduct?.productName,
+        availableStockForQuantity,
+      ),
+    );
+  }, [availableStockForQuantity, selectedProduct?.productName]);
 
   if (!products || products.length === 0) {
     return (
@@ -314,7 +314,9 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    if (quantity > availableStock) {
+    const cartQuantity = normalizeProductQuantity(quantity, title, availableStock);
+
+    if (cartQuantity > availableStock) {
       addToast(`Only ${availableStock} items are available.`, "error");
       return;
     }
@@ -329,7 +331,7 @@ export default function ShopViewProductDetailsSection({
       price,
       frameType,
       colorOption,
-      quantity,
+      quantity: cartQuantity,
       image: activeImage || mainImage,
       stock: availableStock,
     });
@@ -339,21 +341,25 @@ export default function ShopViewProductDetailsSection({
   };
 
   const handleDecreaseQuantity = () => {
-    if (quantity <= 1) {
-      addToast("Quantity cannot be less than 1.", "error");
+    if (quantity <= minimumQuantity) {
+      addToast(`Quantity cannot be less than ${minimumQuantity}.`, "error");
       return;
     }
 
-    setQuantity((current) => current - 1);
+    setQuantity((current) =>
+      getPreviousProductQuantity(current, title, availableStock),
+    );
   };
 
   const handleIncreaseQuantity = () => {
-    if (quantity >= availableStock) {
+    const nextQuantity = getNextProductQuantity(quantity, title, availableStock);
+
+    if (quantity >= availableStock || nextQuantity === quantity) {
       addToast(`Only ${availableStock} items are available.`, "error");
       return;
     }
 
-    setQuantity((current) => current + 1);
+    setQuantity(nextQuantity);
   };
 
   const handleBuyNow = () => {
@@ -372,7 +378,9 @@ export default function ShopViewProductDetailsSection({
       return;
     }
 
-    if (quantity > availableStock) {
+    const cartQuantity = normalizeProductQuantity(quantity, title, availableStock);
+
+    if (cartQuantity > availableStock) {
       addToast(`Only ${availableStock} items are available.`, "error");
       return;
     }
@@ -387,7 +395,7 @@ export default function ShopViewProductDetailsSection({
       price,
       frameType,
       colorOption,
-      quantity,
+      quantity: cartQuantity,
       image: activeImage || mainImage,
       stock: availableStock,
     });
@@ -397,6 +405,15 @@ export default function ShopViewProductDetailsSection({
 
   return (
     <section className="mx-auto w-full max-w-[1700px] px-4 pb-20 pt-[104px] sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-[112px]">
+      <button
+        type="button"
+        onClick={() => router.push("/shop")}
+        className="mb-6 inline-flex h-11 items-center gap-2 rounded-[4px] bg-transparent px-0 text-sm font-semibold text-[#002B73] transition hover:text-[#BC0000]"
+      >
+        <ArrowLeft size={18} />
+        Back
+      </button>
+
       <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(380px,520px)_minmax(420px,1fr)] lg:gap-16">
         <div className="flex flex-col gap-5">
           <div
@@ -438,8 +455,8 @@ export default function ShopViewProductDetailsSection({
             )}
           </div>
 
-          {/* Gallery thumbnails grid — still works independently when no option-image override is active */}
-          {allImages.length > 1 && (
+          {/* Current product thumbnails only */}
+          {allImages.length > 0 && (
             <div className="grid max-w-[520px] grid-cols-6 gap-2">
               {allImages.map((img, idx) => (
                 <button
@@ -466,35 +483,6 @@ export default function ShopViewProductDetailsSection({
             </div>
           )}
 
-          {visibleFrameProducts.length > 0 && (
-            <div className="flex max-w-[520px] gap-3 overflow-x-auto pb-2 sm:grid sm:w-full sm:grid-cols-3 sm:overflow-visible lg:grid-cols-4">
-              {visibleFrameProducts.map((product) => {
-                const productId = getProductKey(product);
-                const imageUrl = getPrimaryImageUrl(product);
-                const isSelected = productId === getProductKey(selectedProduct);
-
-                return (
-                  <button
-                    key={productId || imageUrl}
-                    type="button"
-                    onClick={() => handleFrameProductSelect(product)}
-                    title={product.productName ?? "Frame product"}
-                    className={`relative h-20 w-20 flex-none overflow-hidden rounded-[4px] border-2 bg-white p-1 shadow-sm transition-all sm:h-24 sm:w-full ${
-                      isSelected
-                        ? "border-[#002B73] opacity-100 ring-2 ring-[#002B73]/20"
-                        : "border-transparent opacity-75 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={imageUrl}
-                      alt={product.productName ?? "Frame product"}
-                      className="h-full w-full object-contain"
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         <div className="flex w-full flex-col pt-0 lg:max-w-[620px] lg:justify-self-end lg:pt-4">
@@ -533,79 +521,6 @@ export default function ShopViewProductDetailsSection({
 
           <hr className="mb-7 w-full border-slate-200" />
 
-          <div className="mb-6">
-            <label className="mb-3 block text-[15px] text-slate-800">
-              Personalization
-            </label>
-
-            <div className="flex w-full flex-col gap-4 sm:flex-row">
-              {(["With Frame", "Without Frame"] as const).map((option) => {
-                const isSelected = selectedOption === option;
-
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => handleFrameModeSelect(option)}
-                    className={`flex h-14 flex-1 items-center justify-center rounded-[4px] border-2 px-6 text-base font-semibold transition ${
-                      isSelected
-                        ? "border-[#002B73] bg-[#002B73] text-white"
-                        : "border-[#002B73] bg-white text-[#1A2B5E]"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
-
-            {selectedPersonalization?.note && (
-              <p className="mt-2 text-xs text-slate-500">
-                Note: {selectedPersonalization.note}
-              </p>
-            )}
-          </div>
-
-          {isWithFrameSelected && (
-            <div className="mb-7">
-              <label className="mb-3 block text-[15px] text-slate-800">
-                Select Color
-              </label>
-
-              <div className="flex gap-5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedColor("Black")}
-                  className="flex flex-col items-center gap-1 text-xs text-slate-700"
-                >
-                  <span
-                    className={`h-8 w-8 rounded-full border bg-black ${
-                      selectedFrameColor === "Black"
-                        ? "ring-2 ring-[#002B73] ring-offset-2"
-                        : ""
-                    }`}
-                  />
-                  Black
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedColor("White")}
-                  className="flex flex-col items-center gap-1 text-xs text-slate-700"
-                >
-                  <span
-                    className={`h-8 w-8 rounded-full border bg-white ${
-                      selectedFrameColor === "White"
-                        ? "ring-2 ring-[#002B73] ring-offset-2"
-                        : ""
-                    }`}
-                  />
-                  White
-                </button>
-              </div>
-            </div>
-          )}
-
           <div className="mb-9">
             <label className="mb-3 block text-[15px] text-slate-800">
               Quantity
@@ -615,6 +530,7 @@ export default function ShopViewProductDetailsSection({
               <button
                 type="button"
                 onClick={handleDecreaseQuantity}
+                disabled={quantity <= minimumQuantity}
                 className="flex h-10 w-10 items-center justify-center"
               >
                 −
@@ -627,7 +543,7 @@ export default function ShopViewProductDetailsSection({
               <button
                 type="button"
                 onClick={handleIncreaseQuantity}
-                disabled={quantity >= availableStock}
+                disabled={getNextProductQuantity(quantity, title, availableStock) === quantity}
                 className="flex h-10 w-10 items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +

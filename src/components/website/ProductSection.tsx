@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFrameStore } from "@/store/frameStore";
@@ -13,8 +12,6 @@ interface ProductsSectionProps {
 }
 
 export default function ProductsSection({ products }: ProductsSectionProps) {
-  const [showAll, setShowAll] = useState(false);
-
   const router = useRouter();
 
   const setSelectedFrame = useFrameStore((state) => state.setSelectedFrame);
@@ -25,7 +22,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
   const { addToCart } = useCart();
   const { addToast } = useToastStore();
 
-  const visibleProducts = showAll ? products : products.slice(0, 3);
+  const visibleProducts = products.slice(0, 3);
 
   const handleImageClick = (product: WebsiteProduct) => {
     setSelectedFrame(product.frameType);
@@ -72,16 +69,6 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
               The foundation of every great gallery wall.
             </p>
           </div>
-
-          {products.length > 3 && (
-            <button
-              type="button"
-              onClick={() => setShowAll(!showAll)}
-              className="font-inter text-[14px] font-semibold text-[#002B73] transition hover:underline md:mt-10 md:text-[16px]"
-            >
-              {showAll ? "Show Less 🡠" : "Show All  🡢"}
-            </button>
-          )}
         </div>
 
         {products.length === 0 ? (
@@ -139,7 +126,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                     {p.title}
                   </h3>
 
-                  <p className="mt-2 hidden font-inter text-[13px] leading-[1.45] text-[#434652] md:block md:text-[14px]">
+                  <p className="mt-2 hidden h-[42px] overflow-hidden font-inter text-[13px] leading-[1.5] text-[#434652] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:[display:-webkit-box] md:text-[14px]">
                     {p.desc}
                   </p>
 
@@ -165,6 +152,18 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {products.length > 3 && (
+          <div className="mt-8 flex justify-center md:mt-12">
+            <button
+              type="button"
+              onClick={() => router.push("/shop")}
+              className="rounded-[8px] border border-[#002B73] px-8 py-3 text-[15px] font-semibold text-[#002B73] transition hover:bg-[#F1F7FF] md:px-10 md:text-[16px]"
+            >
+              Show More
+            </button>
           </div>
         )}
       </div>

@@ -6,6 +6,7 @@ import { CheckCircle } from "lucide-react";
 import FeedbackCard from "@/components/website/order-confirmation/FeedbackCard";
 import Link from "next/link";
 import { getSavedOrder, clearSavedOrder } from "@/services/cartService";
+import { getProductLineTotal } from "@/lib/productQuantityRules";
 
 interface OrderItem {
   id: string | number;
@@ -126,7 +127,7 @@ export default function OrderConfirmationScreen() {
                     </div>
 
                     <div className="shrink-0 text-right text-sm font-bold text-[#0040A1] sm:text-base">
-                      Rs{(item.price * item.quantity).toLocaleString()}
+                      Rs{getProductLineTotal(item.price, item.quantity, item.name).toLocaleString()}
                     </div>
                   </div>
                 ))}
