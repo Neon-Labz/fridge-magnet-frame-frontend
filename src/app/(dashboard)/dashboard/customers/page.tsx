@@ -8,8 +8,12 @@ import AddCustomerModal from '@/components/dashboard/Customer/AddCustomerModal';
 export default function CustomersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customerListVersion, setCustomerListVersion] = useState(0);
+  const [customerStatsVersion, setCustomerStatsVersion] = useState(0);
 
   const openAddCustomerForm = () => setIsModalOpen(true);
+  const refreshCustomerStats = () => {
+    setCustomerStatsVersion((version) => version + 1);
+  };
 
   return (
     <div className="h-full w-full overflow-y-auto px-6 py-5 sm:px-8">
@@ -34,12 +38,15 @@ export default function CustomersPage() {
       </div>
 
       <TopCards
-        key={`customer-stats-${customerListVersion}`}
+        key={`customer-stats-${customerStatsVersion}`}
         onAddCustomer={openAddCustomerForm}
       />
 
       <div>
-        <CustomerTable key={`customer-table-${customerListVersion}`} />
+        <CustomerTable
+          key={`customer-table-${customerListVersion}`}
+          onCustomersChanged={refreshCustomerStats}
+        />
       </div>
 
       <AddCustomerModal
@@ -48,6 +55,7 @@ export default function CustomersPage() {
         onSuccess={() => {
           setIsModalOpen(false);
           setCustomerListVersion((version) => version + 1);
+          refreshCustomerStats();
         }}
       />
     </div>
