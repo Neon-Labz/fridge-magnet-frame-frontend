@@ -23,8 +23,8 @@ export default function FeedbackCard({ orderNumber }: FeedbackCardProps) {
 
     setDownloadingReceipt(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-      const response = await fetch(`${apiUrl}/orders/${orderNumber}/receipt`, {
+      // Use relative URL so request goes through Next.js rewrite proxy to backend
+      const response = await fetch(`/api/v1/orders/${orderNumber}/receipt`, {
         method: "GET",
       });
 
