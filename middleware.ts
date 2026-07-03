@@ -12,13 +12,6 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // If already logged in and trying to access the old dashboard login, redirect to products
-  if (pathname === '/dashboard/login') {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = token ? '/dashboard/products' : '/login'
-    return NextResponse.redirect(redirectUrl)
-  }
-
   // Protect all other /dashboard/* routes — redirect to main login if unauthenticated
   if (!token) {
     const redirectUrl = request.nextUrl.clone()
