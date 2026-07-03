@@ -72,7 +72,7 @@ export default function OrderConfirmationScreen() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-[#F9F9FE] to-white">
-      <div className="mx-auto w-full max-w-7xl px-4 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-12 lg:px-12 lg:py-24">
+      <div className="mx-auto w-full max-w-[1400px] px-4 pt-16 pb-8 sm:px-8 sm:pt-20 sm:pb-12 lg:px-16 lg:py-24">
         <div className="mb-8 mt-6 flex flex-col items-center text-center sm:mb-12 sm:mt-8">
           <div className="mb-5 mt-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#0040A1] sm:h-20 sm:w-20">
             <CheckCircle className="h-8 w-8 text-white sm:h-10 sm:w-10" />
@@ -88,7 +88,7 @@ export default function OrderConfirmationScreen() {
           </p>
         </div>
 
-        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(360px,0.85fr)]">
           <div className="min-w-0 space-y-6">
             <div className="overflow-hidden rounded-xl border border-[#C3C6D4] bg-white">
               <div className="flex flex-col gap-3 border-b px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6">
@@ -182,8 +182,6 @@ export default function OrderConfirmationScreen() {
           <div className="min-w-0">
             <FeedbackCard
               orderNumber={order.orderNumber}
-              customerName={`${order.customerDetails.firstName} ${order.customerDetails.lastName}`.trim()}
-              email={order.customerDetails.email}
             />
           </div>
         </div>

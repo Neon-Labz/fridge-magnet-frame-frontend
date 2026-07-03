@@ -127,23 +127,27 @@ export default function OrderSummary({
   </h3>
 
   <div className="space-y-3">
-    <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
-      <input
-        type="radio"
-        name="payment"
-        value="card"
-        checked={paymentMethod === "card"}
-        onChange={() => onPaymentMethodChange?.("card")}
-        className="h-4 w-4 accent-[#002B73]"
-        disabled
-      />
+    <label className="grid w-full cursor-not-allowed grid-cols-[18px_18px_1fr_auto] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 opacity-70">
+  <input
+    type="radio"
+    name="payment"
+    value="card"
+    checked={paymentMethod === "card"}
+    onChange={() => onPaymentMethodChange?.("card")}
+    className="h-4 w-4 accent-[#002B73]"
+    disabled
+  />
 
-      <CreditCard className="h-4 w-4 text-[#747784]" />
+  <CreditCard className="h-4 w-4 text-[#747784]" />
 
-      <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
-        Credit or Debit Card
-      </span>
-    </label>
+  <span className="break-words text-sm font-medium leading-snug text-[#1A1C1F]">
+    Credit or Debit Card
+  </span>
+
+  <span className="whitespace-nowrap rounded-full bg-[#FFF3CD] px-3 py-1 text-xs font-semibold text-[#8A5A00]">
+    Coming Soon
+  </span>
+</label>
 
     <label className="grid w-full cursor-pointer grid-cols-[18px_18px_1fr] items-center gap-3 rounded-lg border border-[#C3C6D4] px-3 py-4 hover:bg-[#F9FAFB]">
       <input
@@ -180,13 +184,13 @@ export default function OrderSummary({
           Place Order
         </Button>
 
-        {isDisabled && (
+        {/* {isDisabled && (
           <p className="text-center text-xs text-[#FF3B30]">
             {!hasItems
               ? "Add items to cart to place order"
               : "Please fill all required fields to place order"}
           </p>
-        )}
+        )} */}
       </div>
 
       {/* SSL note */}
