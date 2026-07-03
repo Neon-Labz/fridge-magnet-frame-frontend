@@ -155,7 +155,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
           </div>
         )}
 
-        {products.length > 3 && (
+        {products.length > 0 && (
           <div className="mt-8 flex justify-center md:mt-12">
             <button
               type="button"
