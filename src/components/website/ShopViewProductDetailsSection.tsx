@@ -426,7 +426,7 @@ export default function ShopViewProductDetailsSection({
                 <img
                   src={activeImage}
                   alt={title}
-                  className="h-full w-full object-contain transition-transform duration-300 ease-out"
+                  className="h-full w-full object-cover transition-transform duration-300 ease-out"
                   style={{
                     transform: isImageZoomed ? "scale(2)" : "scale(1)",
                     transformOrigin: isImageZoomed ? zoomOrigin : "center",
