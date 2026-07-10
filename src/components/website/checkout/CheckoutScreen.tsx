@@ -526,7 +526,7 @@ export default function CheckoutScreen() {
             shipping={shipping}
             shippingEntered={shippingDetailsEntered}
             onPlaceOrder={handlePlaceOrder}
-            disabled={!isFormValid || isSubmitting}
+            disabled={items.length === 0 || isSubmitting}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
           />

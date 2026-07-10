@@ -83,8 +83,12 @@ export default function DeleteProductModal({
               className="flex-shrink-0 overflow-hidden rounded-lg"
               style={{ width: 64, height: 64, border: '1px solid #E2E8F0', background: '#F1F5F9' }}
             >
-              <div className={`w-full h-full bg-gradient-to-br ${product.gradient} rounded-lg`} />
-            </div>
+            <img
+              src={product.image || product.primaryImageUrl || product.imageUrl}
+              alt={product.name}
+              className="h-full w-full object-cover"
+            />   
+           </div>
             <div className="flex flex-col min-w-0">
               <span className="text-base font-semibold leading-6" style={{ color: '#1A1C1F' }}>
                 {product.name}

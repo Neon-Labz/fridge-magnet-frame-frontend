@@ -27,8 +27,15 @@ type ApiOrder = {
   }[];
 };
 
-const statusFromApi = (status: string): OrderStatus => {
-  const normalized = status.toLowerCase();
+type ApiOrdersResponse =
+  | ApiOrder[]
+  | {
+      orders?: ApiOrder[];
+      data?: ApiOrder[];
+    };
+
+const statusFromApi = (status?: string): OrderStatus => {
+  const normalized = status?.trim().toLowerCase();
 
   if (normalized === "cancelled") return "canceled";
 
@@ -42,7 +49,7 @@ const statusFromApi = (status: string): OrderStatus => {
     return normalized;
   }
 
-  return "pending";
+  return "processing";
 };
 
 export const statusToApi = (status: OrderStatus) => status.toUpperCase();
@@ -83,7 +90,9 @@ export const fetchOrders = async (): Promise<Order[]> => {
     const response = await fetch(apiV1Url("/orders"), { cache: "no-store" });
 
     if (response.ok) {
-      const backendOrders = (await response.json()) as ApiOrder[];
+      const data = (await response.json()) as ApiOrdersResponse;
+      const backendOrders = Array.isArray(data) ? data : data.orders || data.data || [];
+
       return backendOrders.map(mapApiOrder);
     }
   } catch {

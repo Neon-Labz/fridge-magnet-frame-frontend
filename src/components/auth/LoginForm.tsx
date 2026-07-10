@@ -8,7 +8,10 @@ import { z } from "zod";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuthModal } from "@/hooks/useAuthModal";
 import { apiClient } from "@/lib/api";
-import { dispatchWebsiteAuthChanged } from "@/hooks/useWebsiteAuthSession";
+import {
+  dispatchWebsiteAuthChanged,
+  saveWebsiteAuthSession,
+} from "@/hooks/useWebsiteAuthSession";
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -83,16 +86,22 @@ export default function LoginForm({
         const isAdmin = role === "admin";
 
         if (token) {
-          localStorage.setItem(tokenKey, token);
-          localStorage.setItem("user", JSON.stringify(payload?.user));
-          document.cookie = `${tokenKey}=${encodeURIComponent(token)}; path=/; samesite=lax`;
+          if (tokenKey === "token" && !isAdmin && payload?.user) {
+            saveWebsiteAuthSession(token, payload.user);
+          } else {
+            localStorage.setItem(tokenKey, token);
+            localStorage.setItem("user", JSON.stringify(payload?.user));
+            document.cookie = `${tokenKey}=${encodeURIComponent(token)}; path=/; samesite=lax`;
+          }
 
           if (isAdmin) {
             localStorage.setItem("adminToken", token);
             document.cookie = `adminToken=${encodeURIComponent(token)}; path=/; samesite=lax`;
           }
 
-          dispatchWebsiteAuthChanged();
+          if (tokenKey !== "token" || isAdmin) {
+            dispatchWebsiteAuthChanged();
+          }
 
           const finalRedirect =
             redirectTo ||

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import ShopProductGrid from '@/components/website/ShopProductGrid';
 import ShopViewProductDetailsSection from '@/components/website/ShopViewProductDetailsSection';
 import type { ShopProduct } from '@/types/shopProduct';
 import { useFrameStore } from '../../../store/frameStore';
@@ -44,6 +45,10 @@ export default function ShopClientWrapper({ products, selectedProductIdFromRoute
           ...products.filter((_, index) => index !== selectedProductIndex),
         ]
       : products;
+
+  if (!selectedProductIdFromRoute) {
+    return <ShopProductGrid products={products} />;
+  }
 
   return (
     <ShopViewProductDetailsSection

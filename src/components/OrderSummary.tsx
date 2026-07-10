@@ -56,10 +56,7 @@ export default function OrderSummary({
         </button>
       </div>
 
-      <div className={styles.secure}>
-        <Lock size={14} />
-        Secure 256-bit SSL checkout
-      </div>
+      
     </aside>
   );
 }

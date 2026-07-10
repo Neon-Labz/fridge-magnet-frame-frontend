@@ -6,6 +6,7 @@ import { useToastStore } from "@/store/toastStore";
 import type { Order, OrderStatus as OrderStatusValue } from "@/types/order";
 import { mapApiOrder, statusToApi } from "@/lib/orders";
 import { apiV1Url } from "@/lib/backendUrl";
+import { getProductLineTotal } from "@/lib/productQuantityRules";
 import {
   CircleEllipsis,
   RefreshCw,
@@ -351,7 +352,7 @@ export default function OrderStatus({ order }: OrderStatusProps) {
 
                         <div className="text-right">
                           <p className="text-[17px] font-extrabold text-[#1A1C1F]">
-                            LKR {(item.price * item.quantity).toFixed(2)}
+                            LKR {getProductLineTotal(item.price, item.quantity, item.name).toFixed(2)}
                           </p>
                           <p className="text-[13px] font-bold text-[#434652]">
                             LKR {item.price.toFixed(2)} 

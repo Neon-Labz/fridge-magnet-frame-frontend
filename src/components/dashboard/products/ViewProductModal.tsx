@@ -318,7 +318,9 @@ export default function ViewProductModal({
                     <span className="font-bold text-[#1A1C1F]">
                       {product.lastUpdatedBy || 'Admin'}
                     </span>{' '}
-                    on {product.lastUpdatedDate || new Date().toISOString()}
+                   on {product.lastUpdatedDate
+                      ? new Date(product.lastUpdatedDate).toLocaleDateString()
+                      : 'Today'}
                   </p>
                 </div>
 

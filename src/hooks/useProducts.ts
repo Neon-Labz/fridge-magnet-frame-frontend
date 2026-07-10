@@ -36,7 +36,7 @@ const mapProduct = (product: ApiProduct): Product => {
     id: product._id || product.id || product.productId || '',
     sku: product.productId || '',
     name: product.productName || 'Untitled product',
-    series: product.category || 'Uncategorized',
+    series: product.category?.trim() || '',
     price: Number(product.price ?? 0),
     stockCount,
     stockStatus: toStockStatus(product.status, stockCount),

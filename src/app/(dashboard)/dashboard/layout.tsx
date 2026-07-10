@@ -10,15 +10,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    if (pathname === '/dashboard/login') {
-      return
-    }
-
     const token =
       localStorage.getItem('adminToken') || localStorage.getItem('token')
 
     if (!token) {
-      router.replace('/dashboard/login')
+      router.replace('/login')
       return
     }
 
@@ -30,10 +26,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       document.cookie = `adminToken=${token}; path=/; samesite=lax`
     }
   }, [pathname, router])
-
-  if (pathname === '/dashboard/login') {
-    return <>{children}</>
-  }
 
   return <LayoutWrapper>{children}</LayoutWrapper>
 }
