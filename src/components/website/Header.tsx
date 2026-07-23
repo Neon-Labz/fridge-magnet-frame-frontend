@@ -25,7 +25,7 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
     { name: "Contact", href: "/contact" },
-    { name: "Price", href: "/price" },
+    //{ name: "Price", href: "/price" },
   ];
 
   const isActive = (href: string) => pathname === href;
@@ -45,7 +45,7 @@ export default function Navbar() {
 
           <Link href="/" onClick={closeMenu} className="lg:-ml-3">
             <Image
-              src="/logo.png"
+              src="/new_logo.png"
               alt="Logo"
               width={140}
               height={50}

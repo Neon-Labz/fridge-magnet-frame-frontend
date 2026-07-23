@@ -10,7 +10,11 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
-export default function AuthModal() {
+interface AuthModalProps {
+  redirectTo?: string;
+}
+
+export default function AuthModal({ redirectTo }: AuthModalProps = {}) {
   const router = useRouter();
   const { isOpen, view, closeModal } = useAuthModal();
 
@@ -36,11 +40,11 @@ export default function AuthModal() {
 
   const renderForm = () => {
     switch (view) {
-      case "login": return <LoginForm />;
+      case "login": return <LoginForm redirectTo={redirectTo} />;
       case "register": return <RegisterForm />;
       case "forgot-password": return <ForgotPasswordForm />;
       case "reset-password": return <ResetPasswordForm />;
-      default: return <LoginForm />;
+      default: return <LoginForm redirectTo={redirectTo} />;
     }
   };
 

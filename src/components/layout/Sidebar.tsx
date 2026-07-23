@@ -39,7 +39,7 @@ export default function Sidebar({
     document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
     document.cookie = 'token=; path=/; max-age=0; samesite=lax';
 
-    router.replace('/dashboard/login');
+    router.replace('/login');
   };
 
   return (
@@ -64,7 +64,7 @@ export default function Sidebar({
       >
         <Link href="/dashboard/products">
           <Image
-            src="/logo.png"
+            src="/new_logo.png"
             alt="Magnify"
             width={140}
             height={48}
