@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
-      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" }
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
+      { protocol: "https", hostname: "pub-57b44696f3e243acb6e5fdb88145606e.r2.dev", pathname: "/**" }
     ]
   },
   devIndicators: false,
