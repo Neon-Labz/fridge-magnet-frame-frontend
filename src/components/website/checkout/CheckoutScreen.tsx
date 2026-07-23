@@ -304,7 +304,7 @@ export default function CheckoutScreen() {
 
   const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
-      router.push("/login");
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
       return;
     }
 
