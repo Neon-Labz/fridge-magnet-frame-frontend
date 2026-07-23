@@ -200,8 +200,17 @@ export default function ShopViewProductDetailsSection({
   const withoutFrameProducts = availableProducts.filter(hasWithoutFrameOption);
   const visibleFrameProducts =
     selectedOption === "With Frame" ? withFrameProducts : withoutFrameProducts;
+
+  // BUG FIX: this used to search `availableProducts`, which excludes
+  // out-of-stock products entirely. That meant clicking an out-of-stock
+  // product's card would set activeProductId correctly, but the lookup here
+  // would fail to find it (since it isn't in availableProducts), silently
+  // falling through to visibleFrameProducts[0] — a different, in-stock
+  // product. Searching the full `products` list lets the originally
+  // requested product show its own page (with its Out of Stock badge and
+  // disabled buttons) instead of substituting a random other product.
   const productSelectedFromRoute = activeProductId
-    ? availableProducts.find((product) => getProductKey(product) === activeProductId.trim())
+    ? products.find((product) => getProductKey(product) === activeProductId.trim())
     : undefined;
 
   const selectedProduct =
