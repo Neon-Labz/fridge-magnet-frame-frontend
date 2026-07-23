@@ -11,15 +11,14 @@ export default function VideoSection() {
           <div className="w-full lg:w-1/2 flex flex-col justify-center text-center lg:text-left">
 
             <h2 className="font-manrope text-[30px] sm:text-[34px] lg:text-[40px] font-bold leading-[44px] lg:leading-[50px] text-[#002B73]">
-              What is a Magnet Frame?
+              Turn Moments Into Lasting Memories
             </h2>
 
             <div className="mt-[14px] mx-auto lg:mx-0 h-[3px] w-[90px] bg-[#BC0000]" />
 
-            <p className="mt-[24px] sm:mt-[30px] lg:mt-[40px] font-inter text-[16px] sm:text-[18px] lg:text-[23px] leading-[28px] sm:leading-[32px] lg:leading-[37px] text-[#4B5563] max-w-[600px] mx-auto lg:mx-0">
-              Your memories - printed, magnetised & displayed on premium tiles
-              that stick straight to your fridge. Turn every moment into a
-              lasting fridge-worthy memory.
+            <p className="mt-4 md:mt-[34px] text-[14px] md:text-[20px] leading-[1.5] md:leading-[36px] text-black/80">
+              Transform your favorite photos into premium custom fridge magnets. Beautifully crafted with vibrant printing and lasting quality, they're the perfect way to preserve and display your cherished memories every day.
+
             </p>
 
           </div>

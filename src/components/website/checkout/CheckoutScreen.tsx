@@ -414,7 +414,7 @@ export default function CheckoutScreen() {
                   <Field label="First Name" error={getFieldError("firstName")}>
                     <Input
                       className={inputClass}
-                      placeholder="John"
+                      placeholder="Enter first name"
                       value={form.firstName}
                       onChange={(e) => setField("firstName", e.target.value)}
                       onBlur={() => markTouched("firstName")}
@@ -424,7 +424,7 @@ export default function CheckoutScreen() {
                   <Field label="Last Name" error={getFieldError("lastName")}>
                     <Input
                       className={inputClass}
-                      placeholder="Doe"
+                      placeholder="Enter last name"
                       value={form.lastName}
                       onChange={(e) => setField("lastName", e.target.value)}
                       onBlur={() => markTouched("lastName")}
@@ -435,7 +435,7 @@ export default function CheckoutScreen() {
                 <Field label="Email Address" error={getFieldError("email")}>
                   <Input
                     className={inputClass}
-                    placeholder="john.doe@example.com"
+                    placeholder="Enter email address"
                     value={form.email}
                     onChange={(e) => setField("email", e.target.value)}
                     onBlur={() => markTouched("email")}
@@ -468,7 +468,7 @@ export default function CheckoutScreen() {
                 <Field label="Street Address" error={getFieldError("street")}>
                   <Input
                     className={inputClass}
-                    placeholder="123 Gallery Street"
+                    placeholder="Enter street address"
                     value={form.street}
                     onChange={(e) => setField("street", e.target.value)}
                     onBlur={() => markTouched("street")}
@@ -479,7 +479,7 @@ export default function CheckoutScreen() {
                   <Field label="City" error={getFieldError("city")}>
                     <Input
                       className={inputClass}
-                      placeholder="Manhattan"
+                      placeholder="Enter city"
                       value={form.city}
                       onChange={(e) => setField("city", e.target.value)}
                       onBlur={() => markTouched("city")}
@@ -501,7 +501,7 @@ export default function CheckoutScreen() {
                   <Field label="ZIP" error={getFieldError("zip")}>
                     <Input
                       className={inputClass}
-                      placeholder="10001"
+                      placeholder="Enter ZIP code"
                       value={form.zip}
                       onChange={(e) => setField("zip", e.target.value)}
                       onBlur={() => markTouched("zip")}
@@ -511,7 +511,7 @@ export default function CheckoutScreen() {
 
                 <Field label="Delivery Notes (Optional)">
                   <Textarea
-                    placeholder="Leave at front desk"
+                    placeholder="Enter delivery notes (optional)"
                     value={form.notes}
                     onChange={(e) => setField("notes", e.target.value)}
                   />
