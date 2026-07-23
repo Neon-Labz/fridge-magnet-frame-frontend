@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ProductFormData } from '@/types/product';
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
@@ -13,56 +13,103 @@ const getProductStatus = (stock: number) => {
   return 'Out of Stock';
 };
 
+// BUG fix: Product ID should auto-generate as "MG-XXX", not be typed by the
+// admin. We look at existing products' productId values, find the highest
+// "MG-<number>" so far, and generate the next one. IDs that don't match the
+// MG-### pattern (e.g. legacy "W002") are ignored when computing the max.
+const ID_PREFIX = 'MG-';
+const ID_PAD_LENGTH = 3;
+
+const extractApiProducts = (data: unknown): Array<{ productId?: string }> => {
+  if (!data || typeof data !== 'object') return [];
+  const payload = data as { data?: unknown; products?: unknown };
+  const list = payload.data ?? payload.products ?? data;
+  return Array.isArray(list) ? (list as Array<{ productId?: string }>) : [];
+};
+
+const computeNextProductId = (products: Array<{ productId?: string }>): string => {
+  const pattern = new RegExp(`^${ID_PREFIX}(\\d+)$`, 'i');
+
+  const numbers = products
+    .map((p) => p.productId?.match(pattern))
+    .filter((match): match is RegExpMatchArray => match !== null)
+    .map((match) => parseInt(match[1], 10));
+
+  const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+  return `${ID_PREFIX}${String(nextNumber).padStart(ID_PAD_LENGTH, '0')}`;
+};
+
 export default function CreateProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [autoProductId, setAutoProductId] = useState('');
+  const [isIdReady, setIsIdReady] = useState(false);
   const router = useRouter();
   const { addToast } = useToastStore();
 
- const handleSubmit = async (formData: ProductFormData) => {
-  try {
-    const data = new FormData();
-
-    data.append("productName", formData.name);
-    data.append("productId", formData.productId);
-    data.append("stock", String(formData.stock));
-    data.append("description", formData.description);
-    data.append("status", getProductStatus(formData.stock));
-    data.append("price", String(formData.price));
-
-    // primary image
-    if (formData.primaryImage) {
-      data.append("primaryImage", formData.primaryImage);
-    }
-
-    // gallery images
-    formData.galleryImages.forEach((file) => {
-      data.append("galleryImages", file);
-    });
-
-    const response = await fetch(
-      apiV1Url('/api/products'),
-      {
-        method: "POST",
-        body: data,
+  useEffect(() => {
+    const loadNextId = async () => {
+      try {
+        const response = await fetch(apiV1Url('/api/products'), { cache: 'no-store' });
+        const data = await response.json();
+        const products = extractApiProducts(data);
+        setAutoProductId(computeNextProductId(products));
+      } catch (error) {
+        console.error('Failed to compute next Product ID:', error);
+        // Fall back to MG-001 rather than blocking product creation entirely.
+        setAutoProductId(`${ID_PREFIX}${'1'.padStart(ID_PAD_LENGTH, '0')}`);
+      } finally {
+        setIsIdReady(true);
       }
-    );
+    };
 
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      const errorMessage = body?.message || 'Failed to create product. Please try again.';
-      addToast(errorMessage, 'error');
+    loadNextId();
+  }, []);
+
+  const handleSubmit = async (formData: ProductFormData) => {
+    try {
+      const data = new FormData();
+
+      data.append("productName", formData.name);
+      data.append("productId", formData.productId);
+      data.append("stock", String(formData.stock));
+      data.append("description", formData.description);
+      data.append("status", getProductStatus(formData.stock));
+      data.append("price", String(formData.price));
+
+      // primary image
+      if (formData.primaryImage) {
+        data.append("primaryImage", formData.primaryImage);
+      }
+
+      // gallery images
+      formData.galleryImages.forEach((file) => {
+        data.append("galleryImages", file);
+      });
+
+      const response = await fetch(
+        apiV1Url('/api/products'),
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        const errorMessage = body?.message || 'Failed to create product. Please try again.';
+        addToast(errorMessage, 'error');
+        return false;
+      }
+
+      setIsModalOpen(false);
+      router.push('/dashboard/products');
+
+    } catch (error) {
+      console.error('Error creating product:', error);
+      addToast('Failed to create product. Please try again.', 'error');
       return false;
     }
-
-    setIsModalOpen(false);
-    router.push('/dashboard/products');
-
-  } catch (error) {
-    console.error('Error creating product:', error);
-    addToast('Failed to create product. Please try again.', 'error');
-    return false;
-  }
-};
+  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -71,11 +118,14 @@ export default function CreateProductPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <AddProductModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmit}
-      />
+      {isIdReady && (
+        <AddProductModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmit}
+          autoProductId={autoProductId}
+        />
+      )}
     </div>
   );
 }

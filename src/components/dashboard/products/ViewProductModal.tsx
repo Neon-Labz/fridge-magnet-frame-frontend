@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Package, MapPin, History } from 'lucide-react';
+import { X, Package, MapPin, History, Images } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { apiV1Url } from '@/lib/backendUrl';
 
@@ -35,12 +35,17 @@ export default function ViewProductModal({
   const [isLoadingLog, setIsLoadingLog] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
 
+  // BUG-013 fix: gallery images are shown independently of the primary
+  // image, so they need their own "which one is active" state.
+  const [activeGalleryImage, setActiveGalleryImage] = useState<string | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       setExtraStock(0);
       setShowLog(false);
       setStockLog([]);
       setLogError(null);
+      setActiveGalleryImage(null);
     }
   }, [isOpen, product?.id]);
 
@@ -48,6 +53,11 @@ export default function ViewProductModal({
 
   const currentStock = Number(product.stockCount ?? 0);
   const updatedStock = currentStock + extraStock;
+
+  // BUG-013 fix: gallery images render regardless of whether a primary
+  // image exists — the two are independent, not a fallback chain.
+  const galleryImages = product.galleryImageUrls ?? [];
+  const hasGallery = galleryImages.length > 0;
 
   const getStatus = (stock: number) => {
     if (stock > 10) return 'In Stock';
@@ -81,6 +91,20 @@ export default function ViewProductModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+
+      {/* Full-size preview overlay for a clicked gallery image */}
+      {activeGalleryImage && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-8"
+          onClick={() => setActiveGalleryImage(null)}
+        >
+          <img
+            src={activeGalleryImage}
+            alt="Gallery preview"
+            className="max-h-full max-w-full rounded-xl object-contain"
+          />
+        </div>
+      )}
 
       <div
         className="relative flex flex-col w-full overflow-y-auto"
@@ -125,57 +149,96 @@ export default function ViewProductModal({
           <div className="grid grid-cols-[650px_350px] gap-[22px]">
             {/* LEFT PRODUCT BOX */}
             <div
-              className="flex flex-col md:flex-row items-center gap-8 p-8 md:p-10"
+              className="flex flex-col p-8 md:p-10"
               style={{
                 border: '1.2px solid #E2E4ED',
                 borderRadius: cardRadius,
                 background: '#fff',
               }}
             >
-              <div
-                className="flex-shrink-0 flex items-center justify-center bg-[#F8F8FB] rounded-2xl p-4"
-                style={{
-                  width: 200,
-                  height: 200,
-                  border: '1px solid #EDEDF2',
-                }}
-              >
-                {product.primaryImageUrl ? (
-                  <img
-                    src={product.primaryImageUrl}
-                    alt={product.name}
-                    className="h-full w-full rounded-2xl object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-white border-[12px] border-[#A67C52]" />
-                )}
-              </div>
-
-              <div className="flex flex-col gap-3 min-w-0">
-                <p
-                  className="text-xs font-bold uppercase tracking-[0.15em]"
-                  style={{ color: '#0040A1' }}
-                >
-                  SKU: {product.sku}
-                </p>
-
-                <h2
-                  className="font-bold leading-tight"
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div
+                  className="flex-shrink-0 flex items-center justify-center bg-[#F8F8FB] rounded-2xl p-4"
                   style={{
-                    fontSize: 32,
-                    color: '#002B73',
+                    width: 200,
+                    height: 200,
+                    border: '1px solid #EDEDF2',
                   }}
                 >
-                  {product.name}
-                </h2>
+                  {product.primaryImageUrl ? (
+                    <img
+                      src={product.primaryImageUrl}
+                      alt={product.name}
+                      className="h-full w-full rounded-2xl object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-white border-[12px] border-[#A67C52]" />
+                  )}
+                </div>
 
-                <p
-                  className="text-base leading-relaxed font-medium"
-                  style={{ color: '#5C5F6C' }}
-                >
-                  {product.description}
-                </p>
+                <div className="flex flex-col gap-3 min-w-0">
+                  <p
+                    className="text-xs font-bold uppercase tracking-[0.15em]"
+                    style={{ color: '#0040A1' }}
+                  >
+                    SKU: {product.sku}
+                  </p>
+
+                  <h2
+                    className="font-bold leading-tight"
+                    style={{
+                      fontSize: 32,
+                      color: '#002B73',
+                    }}
+                  >
+                    {product.name}
+                  </h2>
+
+                  <p
+                    className="text-base leading-relaxed font-medium"
+                    style={{ color: '#5C5F6C' }}
+                  >
+                    {product.description}
+                  </p>
+                </div>
               </div>
+
+              {/* BUG-013 fix: Gallery Images — independent of Primary Image.
+                  Renders whenever gallery images exist, whether or not a
+                  primary image is set. */}
+              {hasGallery && (
+                <div className="mt-8 pt-6" style={{ borderTop: '1px solid #F1F5F9' }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Images size={18} color="#0040A1" />
+                    <h4 className="text-sm font-bold uppercase tracking-wide" style={{ color: '#002B73' }}>
+                      Product Gallery ({galleryImages.length})
+                    </h4>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    {galleryImages.map((url, idx) => (
+                      <button
+                        key={`${url}-${idx}`}
+                        type="button"
+                        onClick={() => setActiveGalleryImage(url)}
+                        className="flex-shrink-0 overflow-hidden rounded-xl transition hover:opacity-80"
+                        style={{
+                          width: 84,
+                          height: 84,
+                          border: '1px solid #E2E4ED',
+                          background: '#F8F8FB',
+                        }}
+                      >
+                        <img
+                          src={url}
+                          alt={`${product.name} gallery ${idx + 1}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* BLUE BOX */}
