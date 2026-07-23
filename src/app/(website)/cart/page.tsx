@@ -5,6 +5,13 @@ import Link from "next/link";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import OrderSummary from "@/components/OrderSummary";
 import { useCart } from "@/context/CartContext";
+import {
+  getNextProductQuantity,
+  getPreviousProductQuantity,
+  getProductLineTotal,
+  getProductQuantityRule,
+  normalizeProductQuantity,
+} from "@/lib/productQuantityRules";
 
 type CartItemData = {
   id: string;
@@ -36,6 +43,8 @@ function CartItem({
     colorOption: string | undefined
   ) => void;
 }) {
+  const quantityRule = getProductQuantityRule(item.title);
+
   const handleInput = (value: string) => {
     const qty = Number(value);
 
@@ -44,7 +53,7 @@ function CartItem({
         item.id,
         item.frameType,
         item.colorOption,
-        Math.min(Math.max(1, qty), item.stock ?? Number.POSITIVE_INFINITY)
+        normalizeProductQuantity(qty, item.title, item.stock)
       );
     }
   };
@@ -101,9 +110,10 @@ function CartItem({
                   item.id,
                   item.frameType,
                   item.colorOption,
-                  Math.max(1, item.quantity - 1)
+                  getPreviousProductQuantity(item.quantity, item.title, item.stock)
                 )
               }
+              disabled={item.quantity <= quantityRule.minimum}
               className="flex h-full items-center justify-center hover:bg-gray-100"
             >
               -
@@ -125,10 +135,10 @@ function CartItem({
                   item.id,
                   item.frameType,
                   item.colorOption,
-                  Math.min(item.quantity + 1, item.stock ?? Number.POSITIVE_INFINITY)
+                  getNextProductQuantity(item.quantity, item.title, item.stock)
                 )
               }
-              disabled={item.stock !== undefined && item.quantity >= item.stock}
+              disabled={getNextProductQuantity(item.quantity, item.title, item.stock) === item.quantity}
               className="flex h-full items-center justify-center hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               +
@@ -137,7 +147,7 @@ function CartItem({
 
           {/* PRICE */}
           <div className="font-semibold text-[#1A1C1F]">
-            Rs {(item.price * item.quantity).toFixed(2)}
+            Rs {getProductLineTotal(item.price, item.quantity, item.title).toFixed(2)}
           </div>
         </div>
       </div>
@@ -164,7 +174,7 @@ export default function CartPage() {
       id,
       frameType,
       colorOption,
-      Math.max(1, quantity)
+      quantity
     );
   };
 
@@ -178,7 +188,7 @@ export default function CartPage() {
 
   return (
     <div className="bg-[#F9F9FE]">
-      <main className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-[120px] py-10 lg:py-25">
+      <main className="mx-auto w-full max-w-[1600px] px-4 pb-10 pt-[112px] sm:px-6 sm:pt-[124px] lg:px-[120px] lg:pb-25 lg:pt-[132px]">
         {/* HEADER */}
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">

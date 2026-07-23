@@ -41,7 +41,7 @@ const contactCards: ContactCard[] = [
   {
     id: "address",
     label: "ADDRESS",
-    value: "Kokuvil West, Jaffna",
+    value: "125A, KKS Road, Kokuvil, Jaffna",
     subtext: "Find us here",
     icon: MapPin,
   },

@@ -256,7 +256,11 @@ const extractCustomers = (data: any): any[] => {
   return [];
 };
 
-const CustomerTable = () => {
+type CustomerTableProps = {
+  onCustomersChanged?: () => void;
+};
+
+const CustomerTable = ({ onCustomersChanged }: CustomerTableProps) => {
   const {
     customers,
     stats,
@@ -433,6 +437,7 @@ const CustomerTable = () => {
 
       await refresh();
       await fetchAllCustomers();
+      onCustomersChanged?.();
     } catch (err) {
       setStatusError(
         err instanceof Error ? err.message : 'Unable to update customer status',
@@ -492,7 +497,15 @@ const CustomerTable = () => {
               type="button"
               style={styles.iconBtn}
               aria-label="Filter customers"
-              onClick={() => setShowFilter((prev) => !prev)}
+              onClick={() => {
+                setShowFilter((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    void fetchAllCustomers();
+                  }
+                  return next;
+                });
+              }}
             >
               <svg
                 width="16"
@@ -571,11 +584,12 @@ const CustomerTable = () => {
 
             <select
               value={statusFilter}
-              onChange={(e) =>
+              onChange={(e) => {
                 setStatusFilter(
                   e.target.value as 'all' | 'Enable' | 'Disable',
-                )
-              }
+                );
+                void fetchAllCustomers();
+              }}
               style={{
                 width: 160,
                 height: 38,
@@ -828,6 +842,7 @@ const CustomerTable = () => {
         onSuccess={async () => {
           await refresh();
           await fetchAllCustomers();
+          onCustomersChanged?.();
         }}
         initialData={editingCustomer}
       />

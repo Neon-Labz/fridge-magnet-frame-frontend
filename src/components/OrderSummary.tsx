@@ -17,7 +17,11 @@ export default function OrderSummary({
 
   const handleCheckout = () => {
     try {
-      router.push(isAuthenticated ? "/checkout" : "/login");
+      router.push(
+        isAuthenticated
+          ? "/checkout"
+          : `/login?redirect=${encodeURIComponent("/checkout")}`,
+      );
     } catch (err) {
       console.error("Navigation to /checkout failed", err);
     }
@@ -56,10 +60,7 @@ export default function OrderSummary({
         </button>
       </div>
 
-      <div className={styles.secure}>
-        <Lock size={14} />
-        Secure 256-bit SSL checkout
-      </div>
+      
     </aside>
   );
 }
