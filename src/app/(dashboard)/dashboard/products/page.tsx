@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import DeleteProductModal from '@/components/dashboard/products/DeleteProductModal';
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
 import ViewProductModal from '@/components/dashboard/products/ViewProductModal';
@@ -15,6 +15,7 @@ import { apiV1Url } from '@/lib/backendUrl';
 import { useToastStore } from '@/store/toastStore';
 
 const PAGE_SIZE = 4;
+const ID_PREFIX = 'MG-';
 
 const getProductStatus = (stock: number) => {
   if (stock > 10) return 'In Stock';
@@ -29,6 +30,27 @@ const getErrorMessage = (responseText: string) => {
   } catch {
     return responseText || 'Something went wrong';
   }
+};
+
+// Product ID auto-generation: scans existing products for the highest
+// "MG-XX" number and returns the next one, e.g. MG-10 -> MG-11.
+const computeNextProductId = (products: Product[]): string => {
+  let maxNumber = 0;
+  let padLength = 2;
+
+  products.forEach((product) => {
+    const match = /^MG-(\d+)$/i.exec(product.sku ?? '');
+    if (!match) return;
+
+    const num = parseInt(match[1], 10);
+    if (num > maxNumber) {
+      maxNumber = num;
+      padLength = match[1].length;
+    }
+  });
+
+  const nextNumber = maxNumber + 1;
+  return `${ID_PREFIX}${String(nextNumber).padStart(padLength, '0')}`;
 };
 
 export default function ProductsPage() {
@@ -59,6 +81,8 @@ export default function ProductsPage() {
   const [sortOpen, setSortOpen] = useState(false);
 
   const safeProducts = Array.isArray(products) ? products : [];
+
+  const autoProductId = useMemo(() => computeNextProductId(safeProducts), [safeProducts]);
 
   const filtered =
     filterStatus === 'all'
@@ -96,51 +120,56 @@ export default function ProductsPage() {
   };
 
   const handleAddProduct = async (formData: ProductFormData) => {
-  try {
-    const data = new FormData();
+    try {
+      const data = new FormData();
 
-    data.append('productName', formData.name);
-    data.append('productId', formData.productId);
-    data.append('stock', String(formData.stock));
-    data.append('description', formData.description);
-    data.append('status', getProductStatus(formData.stock));
+      data.append('productName', formData.name);
+      data.append('productId', formData.productId);
+      data.append('stock', String(formData.stock));
+      data.append('description', formData.description);
+      data.append('status', getProductStatus(formData.stock));
 
-    data.append('price', String(formData.price));
+      data.append('price', String(formData.price));
 
-    if (formData.primaryImage) {
-      data.append('primaryImage', formData.primaryImage);
-    }
-
-    formData.galleryImages.forEach((file) => {
-      data.append('galleryImages', file);
-    });
-
-    const res = await fetch(
-      apiV1Url('/api/products'),
-      {
-        method: 'POST',
-        body: data,
+      if (formData.primaryImage) {
+        data.append('primaryImage', formData.primaryImage);
       }
-    );
 
-    const result = await res.text();
-    console.log(result);
+      formData.galleryImages.forEach((file) => {
+        data.append('galleryImages', file);
+      });
 
-    if (!res.ok) {
-      throw new Error(getErrorMessage(result));
+      const res = await fetch(
+        apiV1Url('/api/products'),
+        {
+          method: 'POST',
+          body: data,
+        }
+      );
+
+      const result = await res.text();
+
+      if (!res.ok) {
+        throw new Error(getErrorMessage(result));
+      }
+
+      addToast('Product added successfully', 'success');
+      setProductMessage('Product added successfully');
+
+      await refreshProducts();
+      setAddOpen(false);
+
+      setPage(1);
+      setFilterStatus('all');
+      setSortBy('default');
+
+      return true;
+
+    } catch (error) {
+      addToast(error instanceof Error ? error.message : 'Something went wrong', 'error');
+      return false;
     }
-
-    setProductMessage('Product added successfully');
-
-    await refreshProducts();
-    setAddOpen(false);
-    return true;
-
-  } catch (error) {
-    addToast(error instanceof Error ? error.message : 'Something went wrong', 'error');
-    return false;
-  }
-};
+  };
 
   const handleEditProduct = async (formData: ProductFormData) => {
     if (!editTarget) return false;
@@ -170,6 +199,57 @@ export default function ProductsPage() {
         throw new Error(getErrorMessage(result));
       }
 
+      // BUG fix: gallery changes were computed by the modal (existingGalleryUrls,
+      // removedGalleryUrls, galleryImages) but never sent anywhere. The backend
+      // handles gallery removal and addition through two separate endpoints
+      // (not the PUT above), so we call them here.
+
+      // 1) Delete any existing gallery images the admin removed.
+      const removedUrls = formData.removedGalleryUrls ?? [];
+      if (removedUrls.length > 0 && editTarget.galleryImagesRaw) {
+        const toDelete = editTarget.galleryImagesRaw.filter((img) =>
+          removedUrls.includes(img.secure_url),
+        );
+
+        await Promise.all(
+          toDelete.map(async (img) => {
+            const encodedPublicId = encodeURIComponent(img.public_id);
+            const deleteRes = await fetch(
+              apiV1Url(`/api/products/${editTarget.id}/image/${encodedPublicId}`),
+              { method: 'DELETE' },
+            );
+            if (!deleteRes.ok) {
+              const text = await deleteRes.text();
+              throw new Error(getErrorMessage(text));
+            }
+          }),
+        );
+      }
+
+      // 2) Upload any newly picked gallery files (additive on the backend).
+      if (formData.galleryImages.length > 0) {
+        const galleryData = new FormData();
+        formData.galleryImages.forEach((file) => {
+          galleryData.append('galleryImages', file);
+        });
+
+        const galleryRes = await fetch(
+          apiV1Url(`/api/products/${editTarget.id}/gallery`),
+          {
+            method: 'POST',
+            body: galleryData,
+          },
+        );
+
+        if (!galleryRes.ok) {
+          const text = await galleryRes.text();
+          throw new Error(getErrorMessage(text));
+        }
+      }
+
+      // BUG fix: no clear confirmation was shown after a successful update.
+      // addToast renders a visible popup toast; the inline banner is kept too.
+      addToast('Product updated successfully', 'success');
       setProductMessage('Product updated successfully');
       await refreshProducts();
       setEditTarget(null);
@@ -181,57 +261,56 @@ export default function ProductsPage() {
   };
 
   const handleUpdateProduct = async (
-  product: Product,
-  newStock: string,
-) => {
-  try {
-    const updatedStock = Number(newStock);
+    product: Product,
+    newStock: string,
+  ) => {
+    try {
+      const updatedStock = Number(newStock);
 
-    let status = 'Out of Stock';
+      let status = 'Out of Stock';
 
-    if (updatedStock > 10) {
-      status = 'In Stock';
-    } else if (updatedStock > 4) {
-      status = 'Low Stock';
-    }
+      if (updatedStock > 10) {
+        status = 'In Stock';
+      } else if (updatedStock > 4) {
+        status = 'Low Stock';
+      }
 
-    const res = await fetch(
-      apiV1Url(`/api/products/${product.id}`),
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const res = await fetch(
+        apiV1Url(`/api/products/${product.id}`),
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            stock: updatedStock,
+            status,
+          }),
         },
-        body: JSON.stringify({
-          stock: updatedStock,
-          status,
-        }),
-      },
-    );
+      );
 
-    const result = await res.text();
+      const result = await res.text();
 
-    if (!res.ok) {
-      throw new Error(getErrorMessage(result));
+      if (!res.ok) {
+        throw new Error(getErrorMessage(result));
+      }
+
+      addToast('Stock updated successfully', 'success');
+      setProductMessage('Stock updated successfully');
+
+      await refreshProducts();
+
+      setViewTarget(null);
+
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update stock';
+      addToast(message, 'error');
+      setProductMessage(message);
+
+      return false;
     }
-
-    setProductMessage('Stock updated successfully');
-
-    await refreshProducts();
-
-    setViewTarget(null);
-
-    return true;
-  } catch (error) {
-    setProductMessage(
-      error instanceof Error
-        ? error.message
-        : 'Failed to update stock',
-    );
-
-    return false;
-  }
-};
+  };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -250,6 +329,7 @@ export default function ProductsPage() {
         throw new Error(getErrorMessage(result));
       }
 
+      addToast('Product deleted successfully', 'success');
       setProductMessage('Product deleted successfully');
       await refreshProducts();
       setDeleteTarget(null);
@@ -266,9 +346,8 @@ export default function ProductsPage() {
 
   return (
     <>
-<div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
-            <ProductHeader onAddClick={() => setAddOpen(true)} />
-
+      <div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
+        <ProductHeader onAddClick={() => setAddOpen(true)} />
 
         <section
           className="mb-0 flex flex-1 flex-col overflow-hidden"
@@ -300,21 +379,23 @@ export default function ProductsPage() {
             onEdit={setEditTarget}
           />
 
-<Pagination
-  currentPage={safePage}
-  totalPages={totalPages}
-  startItem={startItem}
-  endItem={endItem}
-  totalItems={sorted.length}
-  label="products"
-  onPageChange={setPage}
-/>        </section>
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            startItem={startItem}
+            endItem={endItem}
+            totalItems={sorted.length}
+            label="products"
+            onPageChange={setPage}
+          />
+        </section>
       </div>
 
       <AddProductModal
         isOpen={addOpen}
         onClose={() => setAddOpen(false)}
         onSubmit={handleAddProduct}
+        autoProductId={autoProductId}
       />
 
       <AddProductModal
