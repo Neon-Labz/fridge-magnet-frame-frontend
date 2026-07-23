@@ -3,14 +3,35 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
-      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
-      { protocol: "https", hostname: "pub-57b44696f3e243acb6e5fdb88145606e.r2.dev", pathname: "/**" }
-    ]
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname:
+          "3557411483e1c743ec899c045c89e64c.r2.cloudflarestorage.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "pub-57b44696f3e243acb6e5fdb88145606e.r2.dev",
+        pathname: "/**",
+      },
+    ],
   },
+
   devIndicators: false,
+
   async rewrites() {
-    const backendUrl = process.env.NEXT_BACKEND_URL || "http://localhost:5000";
+    const backendUrl =
+      process.env.NEXT_BACKEND_URL || "http://localhost:5000";
 
     return [
       {

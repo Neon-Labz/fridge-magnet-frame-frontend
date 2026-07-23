@@ -372,11 +372,6 @@ export default function ShopViewProductDetailsSection({
   };
 
   const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
     if (status === "Out of Stock") {
       addToast("This product is out of stock!", "error");
       return;
@@ -408,6 +403,11 @@ export default function ShopViewProductDetailsSection({
       image: activeImage || mainImage,
       stock: availableStock,
     });
+
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
+      return;
+    }
 
     router.push("/checkout");
   };
