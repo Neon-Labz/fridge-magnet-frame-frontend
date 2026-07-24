@@ -35,7 +35,28 @@ export default function CounterSection() {
             return (
               <article key={product.id} className="overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white p-3 shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
                 <div className="relative h-[170px] overflow-hidden rounded-[10px] bg-[#f5f5f7] sm:h-[220px] md:h-[250px]">
-                  {imageUrl ? <Image src={imageUrl} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className={`h-full w-full bg-gradient-to-br ${product.gradient}`} />}
+                  {imageUrl ? (
+                    <>
+                      <Image
+                        src={imageUrl}
+                        alt=""
+                        fill
+                        aria-hidden="true"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="scale-110 object-cover blur-xl"
+                      />
+                      <div className="absolute inset-0 bg-black/10" />
+                      <Image
+                        src={imageUrl}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="relative object-contain"
+                      />
+                    </>
+                  ) : (
+                    <div className={`h-full w-full bg-gradient-to-br ${product.gradient}`} />
+                  )}
                 </div>
                 <div className="relative px-2 pb-2 pt-6 text-center">
                   
