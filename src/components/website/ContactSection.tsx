@@ -94,7 +94,7 @@ export default function ContactSection() {
                   id="fullName"
                   type="text"
                   required
-                  placeholder="John Doe"
+                  placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={handleChange}
                   className="h-[40px] w-full rounded-[8px] border border-[#C3C6D4] bg-white px-4 text-[16px] outline-none placeholder:text-[#C3C6D4] focus:border-[#0040A1]"
