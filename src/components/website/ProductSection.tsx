@@ -92,13 +92,13 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                 className="flex h-full cursor-pointer flex-col overflow-hidden rounded-[8px] border border-[#E5E5EA] bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#002B73] focus-visible:ring-offset-2"
                 aria-label={`View ${p.title} in shop`}
               >
-                <div className="relative h-[170px] w-full bg-[#F4F3ED] sm:h-[220px] md:h-[330px]">
+                <div className="relative block h-[170px] w-full overflow-hidden bg-[#F4F3ED] sm:h-[220px] md:h-[350px]">
                   {p.image ? (
                     <Image
                       src={p.image}
                       alt={p.title}
                       fill
-                      className="object-contain"
+                      className="object-contain p-3"
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     />
                   ) : (
