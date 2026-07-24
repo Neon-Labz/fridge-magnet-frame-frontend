@@ -137,7 +137,7 @@ export default function ProductsSection() {
               <div className="relative h-[280px] md:h-[450px] w-full cursor-pointer group bg-[#F4F3ED] flex items-center justify-center" onClick={() => handleImageClick(p)}>
                 {p.primaryImage?.secure_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.primaryImage.secure_url} alt={p.productName} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
+                  <img src={p.primaryImage.secure_url} alt={p.productName} className="w-full h-full object-contain p-3 group-hover:opacity-90 transition-opacity" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
                     <p className="text-slate-400 text-center px-4">
