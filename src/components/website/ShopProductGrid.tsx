@@ -79,6 +79,7 @@ export default function ShopProductGrid({ products }: ShopProductGridProps) {
                 const title = product.productName ?? "Product";
                 const status = getProductStatus(product);
                 const disabled = isOutOfStock(product);
+                const imageUrl = getProductImage(product);
 
                 return (
                   <article
@@ -95,12 +96,20 @@ export default function ShopProductGrid({ products }: ShopProductGridProps) {
                     aria-label={`View ${title}`}
                     className="flex h-full cursor-pointer flex-col overflow-hidden rounded-[8px] border border-[#E5E5EA] bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#002B73] focus-visible:ring-offset-2"
                   >
-                    <div className="relative h-[260px] w-full bg-[#F4F3ED] md:h-[330px]">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
                       <Image
-                        src={getProductImage(product)}
+                        src={imageUrl}
+                        alt=""
+                        fill
+                        aria-hidden="true"
+                        className="scale-125 object-cover blur-2xl"
+                      />
+                      <div className="absolute inset-0 bg-black/10" />
+                      <Image
+                        src={imageUrl}
                         alt={title}
                         fill
-                        className="object-contain"
+                        className="relative object-contain"
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       />
 

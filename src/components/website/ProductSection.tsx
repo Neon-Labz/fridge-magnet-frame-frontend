@@ -89,17 +89,28 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                     handleImageClick(p);
                   }
                 }}
-                className="flex h-full cursor-pointer flex-col overflow-hidden rounded-[13px] border border-[#E5E5EA] bg-white transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#002B73] focus-visible:ring-offset-2"
+                className="flex h-full cursor-pointer flex-col overflow-hidden rounded-[8px] border border-[#E5E5EA] bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#002B73] focus-visible:ring-offset-2"
                 aria-label={`View ${p.title} in shop`}
               >
-                <div className="relative block h-[170px] w-full overflow-hidden bg-[#F4F3ED] sm:h-[220px] md:h-[350px]">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
                   {p.image ? (
-                    <Image
-                      src={p.image}
-                      alt={p.title}
-                      fill
-                      className="object-contain p-3"
-                    />
+                    <>
+                      <Image
+                        src={p.image}
+                        alt=""
+                        fill
+                        aria-hidden="true"
+                        className="scale-125 object-cover blur-2xl"
+                      />
+                      <div className="absolute inset-0 bg-black/10" />
+                      <Image
+                        src={p.image}
+                        alt={p.title}
+                        fill
+                        className="relative object-contain"
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    </>
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-medium text-slate-400">
                       No image available

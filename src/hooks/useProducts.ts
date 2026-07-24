@@ -6,6 +6,7 @@ import { apiV1Url } from '@/lib/backendUrl';
 
 type ApiImage = {
   secure_url?: string;
+  public_id?: string;
 };
 
 type ApiProduct = {
@@ -44,6 +45,13 @@ const mapProduct = (product: ApiProduct): Product => {
     primaryImageUrl: product.primaryImage?.secure_url,
     galleryImageUrls:
       product.galleryImages?.map((image) => image.secure_url || '').filter(Boolean) || [],
+    galleryImagesRaw:
+      product.galleryImages
+        ?.filter((image) => image.secure_url && image.public_id)
+        .map((image) => ({
+          secure_url: image.secure_url as string,
+          public_id: image.public_id as string,
+        })) || [],
     description: product.description,
     lastUpdatedDate: product.updatedAt,
   };
@@ -98,7 +106,6 @@ export const useProducts = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, []);
 

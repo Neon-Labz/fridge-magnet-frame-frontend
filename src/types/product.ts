@@ -1,5 +1,10 @@
 export type StockStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 
+export interface GalleryImageItem {
+  secure_url: string;
+  public_id: string;
+}
+
 export interface Product {
   id: string;
   sku: string;
@@ -11,6 +16,7 @@ export interface Product {
   gradient: string;
   primaryImageUrl?: string;
   galleryImageUrls?: string[];
+  galleryImagesRaw?: GalleryImageItem[];
   previewVariant?: 'updated-1' | 'updated-2' | 'gradient';
   description?: string;
   size?: string;
@@ -36,6 +42,8 @@ export interface ProductFormData {
   personalizationOptions?: PersonalizationFormOption[];
   primaryImage: File | null;
   galleryImages: File[];
+  existingGalleryUrls?: string[];
+  removedGalleryUrls?: string[];
 }
 
 export interface PersonalizationFormOption {
