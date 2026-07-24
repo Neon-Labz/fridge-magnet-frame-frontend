@@ -104,11 +104,8 @@ export const TwitterIcon = () => (
 // Instagram Icon Component
 export const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-    {/* Rounded square border - outline bold */}
     <rect x="2" y="2" width="20" height="20" rx="4.5" stroke="#000000" strokeWidth="1.5" fill="none"/>
-    {/* Center circle (camera lens) - outline bold */}
     <circle cx="12" cy="12" r="3.5" stroke="#000000" strokeWidth="1.5" fill="none"/>
-    {/* Flash dot (top-right) - filled */}
     <circle cx="17" cy="7" r="1" fill="#000000"/>
   </svg>
 );

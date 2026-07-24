@@ -23,7 +23,6 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
 
   return (
     <article style={{ position: 'relative', boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', padding: '24px', gap: '24px', width: '794.67px', height: '210px', background: '#FFFFFF', border: '1px solid #C3C6D4', boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)', borderRadius: '12px', flex: 'none', order: 0, alignSelf: 'stretch', flexGrow: 0 }}>
-      {/* Delete Button - Absolute Top Right */}
       <button
         type="button"
         onClick={() => onDelete(id)}
@@ -35,7 +34,6 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
         </div>
       </button>
 
-      {/* Image Container */}
       <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', padding: 0, width: '160px', height: '160px', background: '#F3F3F8', border: '1px solid #EDEDF2', borderRadius: '8px', flex: 'none', order: 0, flexGrow: 0 }}>
         <Image
           src={image || 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22158%22 height=%22158%22><rect width=%22158%22 height=%22158%22 fill=%22%23e5e7eb%22 /></svg>'}
@@ -46,19 +44,14 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
         />
       </div>
 
-      {/* Content Container */}
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', padding: 0, gap: '32px', width: '560.67px', height: '160px', flex: 'none', order: 1, alignSelf: 'stretch', flexGrow: 1 }}>
-        {/* Title & Subtitle Row */}
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', padding: 0, width: '560.67px', height: '56px', flex: 'none', order: 0, alignSelf: 'stretch', flexGrow: 0 }}>
-          {/* Title/Subtitle Container */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, gap: '4px', width: '235.41px', height: '56px', flex: 'none', order: 0, flexGrow: 0 }}>
-            {/* Title */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, width: '235.41px', height: '32px', flex: 'none', order: 0, alignSelf: 'stretch', flexGrow: 0 }}>
               <h3 style={{ width: '235.41px', height: '32px', fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', letterSpacing: '0px', verticalAlign: 'middle', display: 'flex', alignItems: 'center', color: '#002B73', flex: 'none', order: 0, flexGrow: 0, margin: 0 }}>
                 {name}
               </h3>
             </div>
-            {/* Subtitle */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 0, width: '235.41px', height: '20px', flex: 'none', order: 1, alignSelf: 'stretch', flexGrow: 0 }}>
               {subtitle ? (
                 <p style={{ width: '115.2px', height: '20px', fontFamily: 'Inter', fontStyle: 'normal', fontWeight: 600, fontSize: '14px', lineHeight: '20px', display: 'flex', alignItems: 'center', color: '#747784', flex: 'none', order: 0, flexGrow: 0, margin: 0 }}>
@@ -69,9 +62,7 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
           </div>
         </div>
 
-        {/* Quantity & Price Row */}
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: '323.17px', width: '560.67px', height: '34px', flex: 'none', order: 1, alignSelf: 'stretch', flexGrow: 0 }}>
-            {/* Quantity Control */}
             <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 0, width: '126.49px', height: '34px', border: '1px solid #C3C6D4', borderRadius: '8px', flex: 'none', order: 0, flexGrow: 0 }}>
               <button
                 onClick={() => onChangeQty(id, Math.max(0, qty - 1))}
@@ -95,7 +86,6 @@ export default function CartItem({ id, name, subtitle, qty, price, image, onChan
               </button>
             </div>
 
-            {/* Price */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', padding: 0, width: '111px', height: '34px', flex: 'none', order: 1, flexGrow: 0 }}>
               <div style={{ fontFamily: 'Manrope', fontStyle: 'normal', fontWeight: 600, fontSize: '24px', lineHeight: '32px', textAlign: 'right', color: '#1D2128' }}>
                 Rs{(price * qty).toFixed(2)}

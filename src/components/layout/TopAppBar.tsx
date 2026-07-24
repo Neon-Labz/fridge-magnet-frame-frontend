@@ -253,7 +253,6 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
       )}
 
       <header className="topappbar fixed top-0 right-0 z-40 flex items-center justify-between px-4 sm:px-6 left-0 lg:left-[252px]">
-        {/* Hamburger — mobile only */}
         <button
           onClick={onMenuClick}
           className="flex items-center justify-center rounded-lg transition hover:bg-slate-100 lg:hidden"
@@ -263,10 +262,8 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
           <Menu size={22} color="#475569" />
         </button>
 
-        {/* Right controls */}
         <div className="flex items-center gap-3 sm:gap-6 ml-auto">
 
-          {/* Bell with dropdown */}
           <div className="relative">
             <button
               onClick={handleBellClick}
@@ -305,7 +302,6 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
                   maxHeight: 480,
                 }}
               >
-                {/* Header */}
                 <div
                   className="flex items-center justify-between px-5 py-4 flex-shrink-0"
                   style={{ borderBottom: '1px solid #F1F5F9' }}
@@ -323,7 +319,6 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
                   )}
                 </div>
 
-                {/* Body */}
                 <div className="overflow-y-auto flex-1">
                   {loading ? (
                     <div className="flex items-center justify-center py-10">
@@ -381,7 +376,6 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
                   )}
                 </div>
 
-                {/* Footer */}
                 {notifs.length > 0 && (
                   <div
                     className="flex-shrink-0 px-5 py-3 text-center"
@@ -401,7 +395,6 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
             )}
           </div>
 
-          {/* User profile */}
           <button className="profile-button flex items-center gap-3 rounded-full bg-white transition hover:shadow-md">
             <div className="profile-avatar flex items-center justify-center rounded-full">
               <UserCircle2 size={20} color="#002B73" />
