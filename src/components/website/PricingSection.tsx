@@ -547,7 +547,6 @@ function FeatureQualityCard({ icon, title, description }: FeatureCard) {
 }
 
 function OccasionImageCard({
-  icon,
   title,
   image,
   imageAlt,
@@ -564,10 +563,6 @@ function OccasionImageCard({
       />
 
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#07102F]/85 via-[#07102F]/38 to-transparent" />
-
-      <div className="absolute left-1/2 top-3 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-white text-[#002B73] shadow-[0_8px_18px_rgba(12,28,61,0.16)]">
-        <FigmaIcon name={icon} className="h-7 w-7" />
-      </div>
 
       <h3 className="absolute bottom-4 left-3 right-3 text-center font-manrope text-[15px] font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
         {title}

@@ -24,7 +24,7 @@ export default function Hero() {
             xl:bg-center
           "
           style={{
-            backgroundImage: "url('/bg-hero.png')",
+            backgroundImage: "url('https://pub-57b44696f3e243acb6e5fdb88145606e.r2.dev/images/public/bg-hero.png')",
           }}
         />
 
