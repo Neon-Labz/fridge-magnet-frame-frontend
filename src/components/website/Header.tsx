@@ -45,7 +45,7 @@ export default function Navbar() {
 
           <Link href="/" onClick={closeMenu} className="lg:-ml-3">
             <Image
-              src="/logo.png"
+              src="/new_logo.png"
               alt="Logo"
               width={140}
               height={50}
