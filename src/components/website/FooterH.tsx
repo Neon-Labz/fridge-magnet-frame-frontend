@@ -28,7 +28,7 @@ export default function Footer() {
           <div>
             <div className="relative mb-[-50px] mt-[-55px] ml-[-12px] h-[150px] w-[250px]">
               <Image
-                src="/logo.png"
+                src="/new_logo.png"
                 alt="Magnify Logo"
                 fill
                 priority

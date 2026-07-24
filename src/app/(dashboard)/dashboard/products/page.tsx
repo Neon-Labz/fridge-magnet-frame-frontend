@@ -38,6 +38,7 @@ export default function ProductsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewTarget, setViewTarget] = useState<Product | null>(null);
+  const [editTarget, setEditTarget] = useState<Product | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [productMessage, setProductMessage] = useState<string | null>(null);
@@ -100,44 +101,11 @@ export default function ProductsPage() {
 
     data.append('productName', formData.name);
     data.append('productId', formData.productId);
-    data.append('category', formData.category);
     data.append('stock', String(formData.stock));
     data.append('description', formData.description);
     data.append('status', getProductStatus(formData.stock));
 
-    // Append personalization fields
-    const personalizationEnabled: boolean =
-      formData.personalizationEnabled ?? formData.personalization ?? false;
-    data.append('personalizationEnabled', String(personalizationEnabled));
-
-    const personalizationOptions: {
-      label: string;
-      price?: number;
-      note?: string;
-      imageFile?: File | null;
-    }[] =
-      formData.personalizationOptions ?? [];
-    const productPrice = Number(formData.price || personalizationOptions[0]?.price || 0);
-    data.append('price', String(productPrice));
-
-    if (personalizationOptions.length > 0) {
-      // Build metadata (label + key reference to its image file, if any)
-      const optionsPayload = personalizationOptions.map((opt, index) => ({
-        label: opt.label,
-        price: Number(opt.price) || 0,
-        note: opt.note ?? '',
-        imageField: opt.imageFile ? `personalizationImage_${index}` : null,
-      }));
-
-      data.append('personalization', JSON.stringify(optionsPayload));
-
-      // Append each option's image file under its own unique key
-      personalizationOptions.forEach((opt, index) => {
-        if (opt.imageFile) {
-          data.append(`personalizationImage_${index}`, opt.imageFile);
-        }
-      });
-    }
+    data.append('price', String(formData.price));
 
     if (formData.primaryImage) {
       data.append('primaryImage', formData.primaryImage);
@@ -173,6 +141,44 @@ export default function ProductsPage() {
     return false;
   }
 };
+
+  const handleEditProduct = async (formData: ProductFormData) => {
+    if (!editTarget) return false;
+
+    try {
+      const data = new FormData();
+
+      data.append('productName', formData.name);
+      data.append('productId', formData.productId);
+      data.append('stock', String(formData.stock));
+      data.append('price', String(formData.price));
+      data.append('description', formData.description);
+      data.append('status', getProductStatus(formData.stock));
+
+      if (formData.primaryImage) {
+        data.append('primaryImage', formData.primaryImage);
+      }
+
+      const res = await fetch(apiV1Url(`/api/products/${editTarget.id}`), {
+        method: 'PUT',
+        body: data,
+      });
+
+      const result = await res.text();
+
+      if (!res.ok) {
+        throw new Error(getErrorMessage(result));
+      }
+
+      setProductMessage('Product updated successfully');
+      await refreshProducts();
+      setEditTarget(null);
+      return true;
+    } catch (error) {
+      addToast(error instanceof Error ? error.message : 'Failed to update product', 'error');
+      return false;
+    }
+  };
 
   const handleUpdateProduct = async (
   product: Product,
@@ -291,6 +297,7 @@ export default function ProductsPage() {
               setDeleteTarget(product);
             }}
             onView={setViewTarget}
+            onEdit={setEditTarget}
           />
 
 <Pagination
@@ -308,6 +315,13 @@ export default function ProductsPage() {
         isOpen={addOpen}
         onClose={() => setAddOpen(false)}
         onSubmit={handleAddProduct}
+      />
+
+      <AddProductModal
+        isOpen={Boolean(editTarget)}
+        onClose={() => setEditTarget(null)}
+        onSubmit={handleEditProduct}
+        editingProduct={editTarget}
       />
 
       <ViewProductModal

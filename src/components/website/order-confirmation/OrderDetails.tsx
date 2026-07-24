@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import { getProductLineTotal } from "@/lib/productQuantityRules";
 
 export type OrderItem = {
   id: string | number;
@@ -67,7 +68,7 @@ export default function OrderDetails({
               </div>
 
               <div className="text-lg font-semibold text-[#1A1C1F]">
-                Rs{(item.price * item.quantity).toFixed(2)}
+                Rs{getProductLineTotal(item.price, item.quantity, item.name).toFixed(2)}
               </div>
             </div>
           ))}

@@ -80,8 +80,26 @@ export const useCustomers = () => {
       const json: CustomerApiResponse = await res.json();
 
       const enriched = (json.data || []).map(mapCustomer);
+      let activeTotal =
+        typeof json.activeTotal === 'number'
+          ? json.activeTotal
+          : enriched.filter((customer) => customer.isActive).length;
+
+      if (typeof json.activeTotal !== 'number') {
+        const allRes = await fetch(`${API_BASE}/customers?page=1&limit=10000`, {
+          signal: AbortSignal.timeout(3000),
+        });
+
+        if (allRes.ok) {
+          const allJson: CustomerApiResponse = await allRes.json();
+          activeTotal = (allJson.data || [])
+            .map(mapCustomer)
+            .filter((customer) => customer.isActive).length;
+        }
+      }
+
       const today = new Date().toDateString();
-      const newToday = (json.data || []).filter((customer) => {
+      const newToday = enriched.filter((customer) => {
         if (!customer.createdAt) return false;
         return new Date(customer.createdAt).toDateString() === today;
       }).length;
@@ -90,7 +108,7 @@ export const useCustomers = () => {
       setTotal(json.total);
       setTotalPages(json.totalPages);
       setStats({
-        totalActiveCustomers: json.total,
+        totalActiveCustomers: activeTotal,
         satisfactionRate: json.total > 0 ? 100 : 0,
         newToday,
       });

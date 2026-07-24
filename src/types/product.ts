@@ -20,6 +20,8 @@ export interface Product {
   lastUpdatedBy?: string;
   lastUpdatedDate?: string;
   isPopular?: boolean;
+  image?: string;
+  imageUrl?: string;
 }
 
 export interface ProductFormData {
