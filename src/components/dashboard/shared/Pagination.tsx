@@ -58,7 +58,6 @@ export default function Pagination({
         background: '#FFFFFF',
       }}
     >
-      {/* Left Text */}
       <p
         className="text-[15px] font-medium"
         style={{ color: '#434652' }}
@@ -66,7 +65,6 @@ export default function Pagination({
 Showing {startItem}–{endItem} of {totalItems} {label}    
   </p>
 
-      {/* Right Pagination */}
       <div className="flex items-center gap-2">
         
         <PageBtn

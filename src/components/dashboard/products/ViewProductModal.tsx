@@ -123,7 +123,6 @@ export default function ViewProductModal({
 
         <div className="flex-1 overflow-y-auto px-20 py-6">
           <div className="grid grid-cols-[650px_350px] gap-[22px]">
-            {/* LEFT PRODUCT BOX */}
             <div
               className="flex flex-col md:flex-row items-center gap-8 p-8 md:p-10"
               style={{
@@ -178,7 +177,6 @@ export default function ViewProductModal({
               </div>
             </div>
 
-            {/* BLUE BOX */}
             <div
               className="flex flex-col justify-between p-8 md:p-10"
               style={{
@@ -250,9 +248,7 @@ export default function ViewProductModal({
               </div>
             </div>
 
-            {/* BOTTOM BOXES */}
             <div className="col-span-2 mt-[12px] grid grid-cols-[350px_650px] gap-[25px]">
-              {/* WAREHOUSE */}
               <div
                 className="flex items-center gap-4"
                 style={{
@@ -291,7 +287,6 @@ export default function ViewProductModal({
                 </div>
               </div>
 
-              {/* LAST UPDATED */}
               <div
                 className="flex items-center justify-between"
                 style={{
@@ -339,7 +334,6 @@ export default function ViewProductModal({
               </div>
             </div>
 
-            {/* STOCK LOG PANEL */}
             {showLog && (
               <div className="col-span-2 mt-2">
                 <h3
@@ -421,7 +415,6 @@ export default function ViewProductModal({
           </div>
         </div>
 
-        {/* BUTTONS */}
         <div
           className="flex-shrink-0 flex items-center justify-end gap-4 px-8 py-6"
           style={{

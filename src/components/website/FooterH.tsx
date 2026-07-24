@@ -1,16 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 const navigationLinks = [
-  { title: "Privacy Policy", href: "/privacy" },
-  { title: "Terms of Service", href: "/terms" },
-  { title: "Shipping Policy", href: "/shipping" },
+  { title: "Privacy Policy", href: "/privacy-policy" },
+  { title: "Terms of Service", href: "/terms-of-service" },
+  { title: "Shipping Policy", href: "/shipping-policy" },
 ];
 
 const connectLinks = [
   { title: "Contact Us", href: "/contact" },
-  { title: "About Our Craft", href: "/about" },
+  { title: "About Our Craft", href: "/gallery" },
   { title: "Sustainability", href: "/sustainability" },
 ];
 
@@ -18,13 +18,10 @@ export default function Footer() {
   return (
     <footer className="w-full border-t border-[#E2E8F0] bg-[#F9F9FE]">
 
-      {/* MAIN FOOTER */}
       <div className="mx-auto w-full max-w-[1700px] px-4 py-6 sm:px-6 lg:px-[120px]">
 
-        {/* ✅ RESPONSIVE GRID (Mobile → Tablet → Desktop) */}
         <div className="grid grid-cols-2 gap-15 sm:grid-cols-4 xl:grid-cols-4">
 
-          {/* LOGO + DESCRIPTION */}
           <div>
             <div className="relative mb-[-50px] mt-[-55px] ml-[-12px] h-[150px] w-[250px]">
               <Image
@@ -43,7 +40,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* NAVIGATION */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Navigation
@@ -63,7 +59,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* CONNECT */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
               Connect
@@ -83,36 +78,32 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* NEWSLETTER */}
           <div>
             <h4 className="font-manrope text-[15px] font-bold uppercase tracking-[0.12em] text-[#1E3A8A]">
-              Newsletter
+              Our Location
             </h4>
 
-            <p className="mt-4 max-w-[300px] font-inter text-[15px] leading-6 text-[#64748B]">
-              Join our list for exclusive gallery updates and styling tips.
-            </p>
-
-            <div className="mt-4 flex h-[42px] w-full max-w-[300px] overflow-hidden rounded-xl border border-[#CBD5E1] bg-white">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full bg-transparent px-2 text-[15px] outline-none placeholder:text-[#94A3B8]"
+            <div className="mt-4 flex items-start gap-2 max-w-[260px]">
+              <MapPin
+                size={18}
+                className="mt-0.5 shrink-0 text-[#64748B]"
+                aria-hidden="true"
               />
-
-              <button className="flex w-[56px] items-center justify-center bg-[#002B73] text-white hover:bg-[#001F5C]">
-                <ArrowRight size={18} />
-              </button>
+              <p className="font-inter text-[15px] leading-6 text-[#64748B]">
+                125A, KKS Road, Kokuvil, Jaffna, Sri Lanka
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* BOTTOM FOOTER */}
       <div className="border-t border-[#D7DBE4]">
-        <div className="mx-auto w-full max-w-[1700px] px-4 py-3 sm:px-6 lg:px-[120px]">
+        <div className="mx-auto flex w-full max-w-[1700px] flex-col items-center gap-1 px-4 py-3 sm:px-6 lg:px-[120px]">
           <p className="text-center font-inter text-[13px] text-[#64748B]">
             © 2026 Magnify Photo Frames. Curated Memories.
+          </p>
+          <p className="text-center font-inter text-[12px] text-[#94A3B8]">
+            Developed by NeonLabz (Pvt) Ltd.
           </p>
         </div>
       </div>

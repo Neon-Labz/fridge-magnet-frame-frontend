@@ -7,7 +7,6 @@ export default function VideoSection() {
 
         <div className="flex flex-col lg:flex-row md:flex-row items-stretch gap-10 lg:gap-[60px]">
 
-          {/* LEFT TEXT BOX */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center text-center lg:text-left">
 
             <h2 className="font-manrope text-[30px] sm:text-[34px] lg:text-[40px] font-bold leading-[44px] lg:leading-[50px] text-[#002B73]">
@@ -23,7 +22,6 @@ export default function VideoSection() {
 
           </div>
 
-          {/* RIGHT VIDEO BOX */}
           <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
 
             <div className="w-full max-w-[500px] aspect-[3/2] flex items-center justify-center">

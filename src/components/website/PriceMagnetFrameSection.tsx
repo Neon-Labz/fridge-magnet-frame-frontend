@@ -33,9 +33,7 @@ export default function PriceMagnetFrameSection() {
           </p>
         </div>
 
-        {/* GRID */}
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* LEFT CARD */}
           <div className="rounded-[32px] border border-[#E2E8F0] border-t-[6px] border-t-[#E41A0F] bg-white shadow-sm">
             <div className="p-5 sm:p-7 md:p-10">
               <div className="mb-6 flex items-center gap-2">
@@ -45,7 +43,6 @@ export default function PriceMagnetFrameSection() {
                 </h3>
               </div>
 
-              {/* MAGNETS GRID (2 + 2 + 1) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {magnetsPricing.slice(0, 4).map((item, index) => (
                   <div
@@ -57,26 +54,22 @@ export default function PriceMagnetFrameSection() {
           : "border-[#E2E8F0] bg-[#F8FAFC]"
       }`}
                   >
-                    {/* POPULAR BADGE */}
                     {item.isPopular && (
                       <span className="absolute top-3 right-3 rounded-full bg-[#002B73] px-3 py-1 text-[10px] font-bold uppercase text-white">
                         Popular
                       </span>
                     )}
 
-                    {/* QUANTITY */}
                     <span className="text-xs sm:text-sm font-bold uppercase tracking-wide text-[#64748B]">
                       {item.quantity}
                     </span>
 
-                    {/* PRICE */}
                     <span className="mt-2 text-2xl sm:text-3xl font-black text-[#0F172A]">
                       {item.price}
                     </span>
                   </div>
                 ))}
 
-                {/* LAST ITEM FULL WIDTH */}
                 {magnetsPricing.slice(4, 5).map((item, index) => (
                   <div
                     key={index}
@@ -95,7 +88,6 @@ export default function PriceMagnetFrameSection() {
             </div>
           </div>
 
-          {/* RIGHT CARD */}
           <div className="rounded-[32px] border border-[#E2E8F0] border-t-[6px] border-t-[#002B73] bg-white shadow-sm">
             <div className="p-5 sm:p-7 md:p-10">
               <div className="mb-6">
