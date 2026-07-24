@@ -53,7 +53,6 @@ export default function Sidebar({
         borderRight: '1px solid #F1F5F9',
       }}
     >
-      {/* Logo section */}
       <div
         className="flex flex-shrink-0 items-center justify-center"
         style={{
@@ -74,7 +73,6 @@ export default function Sidebar({
         </Link>
       </div>
 
-      {/* Nav items */}
       <nav className="flex flex-1 flex-col gap-1 pt-[25px]">
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
           const isActive =
@@ -113,7 +111,6 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Logout */}
       <div className="px-4 py-4">
         <button
           onClick={handleLogout}

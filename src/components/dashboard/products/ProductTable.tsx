@@ -1,4 +1,4 @@
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 import type { Product } from '@/types/product';
 import ProductThumb from './ProductThumb';
 import StockBadge from './StockBadge';
@@ -62,15 +62,30 @@ export default function ProductTable({ products, onDelete, onView, onEdit }: Pro
 
               <td className="pr-8">
                 <div className="flex items-center justify-end gap-2">
-                 <button
-  onClick={() => onEdit(product)}
-  className="flex items-center justify-center rounded-xl transition hover:bg-blue-50"
-  style={{ width: 36, height: 38 }}
->
-  <Eye size={18} color="#002B73" />
-</button>
+                  <button
+                    onClick={() => onView(product)}
+                    title="View"
+                    className="flex items-center justify-center rounded-xl transition hover:bg-blue-50"
+                    style={{ width: 36, height: 38 }}
+                  >
+                    <Eye size={18} color="#002B73" />
+                  </button>
 
-                  <button onClick={() => onDelete(product)} className="flex items-center justify-center rounded-xl transition hover:bg-red-50" style={{ width: 36, height: 38 }}>
+                  <button
+                    onClick={() => onEdit(product)}
+                    title="Edit"
+                    className="flex items-center justify-center rounded-xl transition hover:bg-slate-100"
+                    style={{ width: 36, height: 38 }}
+                  >
+                    <Pencil size={16} color="#434652" />
+                  </button>
+
+                  <button
+                    onClick={() => onDelete(product)}
+                    title="Delete"
+                    className="flex items-center justify-center rounded-xl transition hover:bg-red-50"
+                    style={{ width: 36, height: 38 }}
+                  >
                     <Trash2 size={16} color="#BC0000" />
                   </button>
                 </div>

@@ -29,7 +29,6 @@ export default function SpecialPackages() {
   return (
     <section className="bg-white md:py-10 px-3 sm:px-6 lg:px-7">
       <div className="mx-auto max-w-[1275px] rounded-[32px] border border-[#E5E7EB] bg-white px-5 pb-10 py-6 shadow-sm sm:px-6 sm:py-8 md:px-10 md:py-10">
-        {/* TITLE */}
         <div className="mb-6 flex items-center gap-2">
           <span className="text-xl sm:text-2xl">👑</span>
 
@@ -38,7 +37,6 @@ export default function SpecialPackages() {
           </h2>
         </div>
 
-        {/* GRID 2 + 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {packages.map((item, index) => (
             <div
@@ -63,7 +61,6 @@ export default function SpecialPackages() {
           ))}
         </div>
 
-        {/* CORPORATE FULL WIDTH */}
         <div className="mt-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-[24px] border border-[#F1D87A] bg-[#FFFCF5] px-5 py-5 sm:px-7 sm:py-6">
           <div>
             <h3 className="text-base sm:text-lg font-bold text-[#172033] flex items-center gap-2">

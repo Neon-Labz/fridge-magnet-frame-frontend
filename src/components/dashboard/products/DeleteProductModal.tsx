@@ -24,10 +24,8 @@ export default function DeleteProductModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
 
-      {/* Modal */}
       <div
         className="relative flex flex-col items-center overflow-hidden"
         style={{
@@ -38,7 +36,6 @@ export default function DeleteProductModal({
           borderRadius: 16,
         }}
       >
-        {/* Visual header */}
         <div className="flex flex-col items-center w-full pt-10 pb-6 px-8">
           <div
             className="flex items-center justify-center rounded-full mb-6"
@@ -58,7 +55,6 @@ export default function DeleteProductModal({
           </h2>
         </div>
 
-        {/* Body */}
         <div className="flex flex-col items-center w-full px-12 pb-8 gap-6">
           <p
             className="text-lg text-center leading-[29px]"
@@ -68,7 +64,6 @@ export default function DeleteProductModal({
             associated gallery metadata from the catalog.
           </p>
 
-          {/* Product context card */}
           <div
             className="flex items-center gap-5 w-full"
             style={{
@@ -112,7 +107,6 @@ export default function DeleteProductModal({
           )}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-center gap-4 w-full px-12 pb-10">
           <button
             onClick={onCancel}
@@ -138,7 +132,6 @@ export default function DeleteProductModal({
           </button>
         </div>
 
-        {/* Accent footer bar */}
         <div
           className="w-full flex-shrink-0"
           style={{ height: 6, background: 'rgba(186, 26, 26, 0.1)' }}

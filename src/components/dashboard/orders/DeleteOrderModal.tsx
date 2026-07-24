@@ -24,7 +24,6 @@ export default function DeleteOrderModal({ isOpen, order, onCancel, onConfirm }:
         style={{ width: 480, borderRadius: 16, boxShadow: '0px 20px 40px rgba(0,0,0,0.18)', padding: '40px 40px 32px' }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Close */}
         <button
           onClick={onCancel}
           className="absolute flex items-center justify-center transition hover:bg-slate-100 rounded-lg"
@@ -33,7 +32,6 @@ export default function DeleteOrderModal({ isOpen, order, onCancel, onConfirm }:
           <X size={18} color="#64748B" />
         </button>
 
-        {/* Icon */}
         <div
           className="flex items-center justify-center flex-shrink-0 mb-6"
           style={{ width: 64, height: 64, background: '#FEF2F2', borderRadius: 16 }}
@@ -41,7 +39,6 @@ export default function DeleteOrderModal({ isOpen, order, onCancel, onConfirm }:
           <Trash2 size={28} color="#BC0000" />
         </div>
 
-        {/* Heading */}
         <h2
           className="font-bold mb-2"
           style={{ fontFamily: 'var(--font-manrope, Manrope, sans-serif)', fontSize: 24, color: '#002B73', lineHeight: '32px' }}
@@ -54,7 +51,6 @@ export default function DeleteOrderModal({ isOpen, order, onCancel, onConfirm }:
           This action cannot be undone.
         </p>
 
-        {/* Order preview card */}
         <div
           className="flex items-center gap-4 mb-8 p-4"
           style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12 }}
@@ -73,7 +69,6 @@ export default function DeleteOrderModal({ isOpen, order, onCancel, onConfirm }:
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={onCancel}
