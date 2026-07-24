@@ -12,11 +12,6 @@ const getProductStatus = (stock: number) => {
   if (stock > 0) return 'Low Stock';
   return 'Out of Stock';
 };
-
-// BUG fix: Product ID should auto-generate as "MG-XXX", not be typed by the
-// admin. We look at existing products' productId values, find the highest
-// "MG-<number>" so far, and generate the next one. IDs that don't match the
-// MG-### pattern (e.g. legacy "W002") are ignored when computing the max.
 const ID_PREFIX = 'MG-';
 const ID_PAD_LENGTH = 3;
 
@@ -76,12 +71,9 @@ export default function CreateProductPage() {
       data.append("status", getProductStatus(formData.stock));
       data.append("price", String(formData.price));
 
-      // primary image
       if (formData.primaryImage) {
         data.append("primaryImage", formData.primaryImage);
       }
-
-      // gallery images
       formData.galleryImages.forEach((file) => {
         data.append("galleryImages", file);
       });

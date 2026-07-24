@@ -20,7 +20,6 @@ interface ShopViewProductDetailsSectionProps {
   initialFrameType?: string;
 }
 
-// Consistent shape we use internally, regardless of legacy string[] or new object[] from backend
 interface PersonalizationEntry {
   label: string;
   price?: number;
@@ -35,7 +34,6 @@ interface RawPersonalizationEntry {
   image?: { secure_url?: string } | null;
 }
 
-// Converts whatever the DB/API returns (new {label,image} objects OR legacy plain strings) into a consistent array
 function toPersonalizationEntries(raw: unknown[] | undefined | null): PersonalizationEntry[] {
   if (!raw || !Array.isArray(raw)) return [];
   return raw.map((item) => {
@@ -183,12 +181,9 @@ export default function ShopViewProductDetailsSection({
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  // Only set when the user explicitly clicks a personalization option in the dropdown.
-  // Primary image always shows by default until this is set.
   const [personalizationImageOverride, setPersonalizationImageOverride] =
     useState<string | null>(null);
 
-  // Click-to-zoom: only the image scales up in place. Page itself is untouched.
   const [isImageZoomed, setIsImageZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("center");
 
@@ -201,14 +196,6 @@ export default function ShopViewProductDetailsSection({
   const visibleFrameProducts =
     selectedOption === "With Frame" ? withFrameProducts : withoutFrameProducts;
 
-  // BUG FIX: this used to search `availableProducts`, which excludes
-  // out-of-stock products entirely. That meant clicking an out-of-stock
-  // product's card would set activeProductId correctly, but the lookup here
-  // would fail to find it (since it isn't in availableProducts), silently
-  // falling through to visibleFrameProducts[0] — a different, in-stock
-  // product. Searching the full `products` list lets the originally
-  // requested product show its own page (with its Out of Stock badge and
-  // disabled buttons) instead of substituting a random other product.
   const productSelectedFromRoute = activeProductId
     ? products.find((product) => getProductKey(product) === activeProductId.trim())
     : undefined;
@@ -219,16 +206,12 @@ export default function ShopViewProductDetailsSection({
     availableProducts[0] ??
     products[0];
 
-  // Normalized personalization entries for the currently selected product
- 
   const isWithFrameSelected = selectedOption === "With Frame";
   const selectedFrameColor = isWithFrameSelected ? selectedColor || "Black" : "";
   const quantityRule = getProductQuantityRule(selectedProduct?.productName);
   const minimumQuantity = quantityRule.minimum;
   const availableStockForQuantity = Math.max(Number(selectedProduct?.stock ?? 0), 0);
 
-  
-    
   useEffect(() => {
     setQuantity((current) =>
       normalizeProductQuantity(
@@ -269,8 +252,6 @@ export default function ShopViewProductDetailsSection({
     ...galleryImages.map((img) => img.secure_url).filter(Boolean),
   ];
 
-  // Primary image (allImages[0]) shows by default.
-  // Only switches when user explicitly selects a personalization option with its own image.
   const activeImage =
     personalizationImageOverride ?? allImages[activeImageIndex] ?? mainImage;
 
@@ -296,7 +277,7 @@ export default function ShopViewProductDetailsSection({
     setActiveProductId(productId);
     resetImageSelection();
   };
-  // Click on the image: zoom in centered on the click point. Click again to zoom out.
+
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!activeImage) return;
 
@@ -441,7 +422,6 @@ export default function ShopViewProductDetailsSection({
                     transformOrigin: isImageZoomed ? zoomOrigin : "center",
                   }}
                 />
-                {/* Zoom indicator icon — hides while zoomed in */}
                 {!isImageZoomed && (
                   <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-md transition-transform duration-150 group-hover:scale-110">
                     <svg
@@ -464,7 +444,6 @@ export default function ShopViewProductDetailsSection({
             )}
           </div>
 
-          {/* Current product thumbnails only */}
           {allImages.length > 0 && (
             <div className="grid max-w-[520px] grid-cols-6 gap-2">
               {allImages.map((img, idx) => (
@@ -473,8 +452,8 @@ export default function ShopViewProductDetailsSection({
                   type="button"
                   onClick={() => {
                     setActiveImageIndex(idx);
-                    setPersonalizationImageOverride(null); // back to gallery/primary flow
-                    setIsImageZoomed(false); // reset zoom when switching image
+                    setPersonalizationImageOverride(null);
+                    setIsImageZoomed(false);
                   }}
                   className={`relative aspect-square w-full overflow-hidden rounded-md border-2 bg-slate-100 transition-all ${
                     activeImageIndex === idx && !personalizationImageOverride

@@ -10,9 +10,6 @@ interface AddProductModalProps {
   onClose: () => void;
   onSubmit?: (data: ProductFormData) => boolean | void | Promise<boolean | void>;
   editingProduct?: Product | null;
-  // Auto-generated Product ID for CREATE mode (e.g. "MG-011"), computed by
-  // the parent page. Ignored when editingProduct is set, since edit mode
-  // always locks to the product's existing sku.
   autoProductId?: string;
 }
 
@@ -45,9 +42,6 @@ export default function AddProductModal({
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  // BUG-FIX (gallery not showing in edit mode): saved gallery URLs live on
-  // editingProduct.galleryImageUrls, separate from any newly-picked Files.
-  // We track them here, plus which of them the user has removed.
   const [existingGalleryUrls, setExistingGalleryUrls] = useState<string[]>([]);
   const [removedGalleryUrls, setRemovedGalleryUrls] = useState<string[]>([]);
 
@@ -68,8 +62,6 @@ export default function AddProductModal({
       });
       setExistingGalleryUrls(editingProduct.galleryImageUrls ?? []);
     } else {
-      // BUG fix: Product ID is auto-generated (e.g. "MG-011"), not typed by
-      // the admin. The parent page computes this and passes it in.
       setForm({ ...EMPTY, productId: autoProductId });
       setExistingGalleryUrls([]);
     }
@@ -80,9 +72,6 @@ export default function AddProductModal({
     setFieldErrors({});
   }, [isOpen, editingProduct, autoProductId]);
 
-  // BUG-013 fix: build an actual preview URL for the primary image —
-  // a freshly picked file gets an object URL, otherwise fall back to the
-  // product's already-saved image when editing.
   const primaryImagePreviewUrl = useMemo(() => {
     if (form.primaryImage) {
       return URL.createObjectURL(form.primaryImage);
@@ -98,8 +87,6 @@ export default function AddProductModal({
     };
   }, [form.primaryImage, primaryImagePreviewUrl]);
 
-  // BUG-013 fix: same idea for gallery thumbnails (newly picked files only —
-  // saved gallery URLs are already plain URLs and need no object URL).
   const galleryPreviewUrls = useMemo(
     () => form.galleryImages.map((file) => URL.createObjectURL(file)),
     [form.galleryImages],
@@ -111,7 +98,6 @@ export default function AddProductModal({
     };
   }, [galleryPreviewUrls]);
 
-  // Existing (saved) gallery images still kept, i.e. not marked for removal.
   const visibleExistingGalleryUrls = useMemo(
     () => existingGalleryUrls.filter((url) => !removedGalleryUrls.includes(url)),
     [existingGalleryUrls, removedGalleryUrls],
@@ -169,8 +155,6 @@ export default function AddProductModal({
     }
 
     const newFiles = Array.from(e.target.files);
-    // Append to whatever new files are already picked, so adding more via the
-    // "+" tile doesn't wipe out earlier picks.
     const combinedNewFiles = [...form.galleryImages, ...newFiles];
     const totalAfterAdd = visibleExistingGalleryUrls.length + combinedNewFiles.length;
 
@@ -294,8 +278,7 @@ export default function AddProductModal({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-semibold">Product ID</label>
-              {/* BUG fix: Product ID is auto-generated on create and fixed on
-                  edit — never manually typed, so it's always read-only. */}
+
               <input
                 type="text"
                 name="productId"
@@ -357,7 +340,6 @@ export default function AddProductModal({
             <div className="space-y-2">
               <label className="block text-sm font-semibold">Primary Product Image</label>
 
-              {/* BUG-013 fix: show the actual image (new pick or saved one) instead of just text */}
               {primaryImagePreviewUrl ? (
                 <div
                   className="relative overflow-hidden rounded-xl"
@@ -397,9 +379,6 @@ export default function AddProductModal({
             <div className="space-y-2">
               <label className="block text-sm font-semibold">Product Gallery</label>
 
-              {/* BUG fix: show saved gallery images (visibleExistingGalleryUrls)
-                  alongside any newly-picked files (galleryPreviewUrls). Each
-                  thumbnail — saved or new — has its own remove button. */}
               {totalGalleryCount > 0 ? (
                 <div
                   className="flex min-h-[120px] flex-wrap content-start gap-2 rounded-xl border-2 border-dashed p-3"

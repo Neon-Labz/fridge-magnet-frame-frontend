@@ -31,9 +31,6 @@ const getErrorMessage = (responseText: string) => {
     return responseText || 'Something went wrong';
   }
 };
-
-// Product ID auto-generation: scans existing products for the highest
-// "MG-XX" number and returns the next one, e.g. MG-10 -> MG-11.
 const computeNextProductId = (products: Product[]): string => {
   let maxNumber = 0;
   let padLength = 2;
@@ -198,13 +195,6 @@ export default function ProductsPage() {
       if (!res.ok) {
         throw new Error(getErrorMessage(result));
       }
-
-      // BUG fix: gallery changes were computed by the modal (existingGalleryUrls,
-      // removedGalleryUrls, galleryImages) but never sent anywhere. The backend
-      // handles gallery removal and addition through two separate endpoints
-      // (not the PUT above), so we call them here.
-
-      // 1) Delete any existing gallery images the admin removed.
       const removedUrls = formData.removedGalleryUrls ?? [];
       if (removedUrls.length > 0 && editTarget.galleryImagesRaw) {
         const toDelete = editTarget.galleryImagesRaw.filter((img) =>
@@ -226,7 +216,6 @@ export default function ProductsPage() {
         );
       }
 
-      // 2) Upload any newly picked gallery files (additive on the backend).
       if (formData.galleryImages.length > 0) {
         const galleryData = new FormData();
         formData.galleryImages.forEach((file) => {
@@ -246,9 +235,6 @@ export default function ProductsPage() {
           throw new Error(getErrorMessage(text));
         }
       }
-
-      // BUG fix: no clear confirmation was shown after a successful update.
-      // addToast renders a visible popup toast; the inline banner is kept too.
       addToast('Product updated successfully', 'success');
       setProductMessage('Product updated successfully');
       await refreshProducts();

@@ -16,8 +16,6 @@ export interface Product {
   gradient: string;
   primaryImageUrl?: string;
   galleryImageUrls?: string[];
-  // NEW: raw gallery items (url + public_id) so removed images can be
-  // deleted from Cloudinary/DB via DELETE /api/products/:id/image/:publicId
   galleryImagesRaw?: GalleryImageItem[];
   previewVariant?: 'updated-1' | 'updated-2' | 'gradient';
   description?: string;

@@ -45,8 +45,6 @@ const mapProduct = (product: ApiProduct): Product => {
     primaryImageUrl: product.primaryImage?.secure_url,
     galleryImageUrls:
       product.galleryImages?.map((image) => image.secure_url || '').filter(Boolean) || [],
-    // NEW: keep public_id alongside each url so removed gallery images can
-    // be deleted from the backend via DELETE /api/products/:id/image/:publicId
     galleryImagesRaw:
       product.galleryImages
         ?.filter((image) => image.secure_url && image.public_id)
@@ -108,7 +106,6 @@ export const useProducts = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, []);
 
