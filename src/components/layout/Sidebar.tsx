@@ -64,7 +64,7 @@ export default function Sidebar({
       >
         <Link href="/dashboard/products">
           <Image
-            src="/logo.png"
+            src="/new_logo.png"
             alt="Magnify"
             width={140}
             height={48}
