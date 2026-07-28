@@ -140,7 +140,6 @@ export default function LoginForm({
         Login
       </h2>
 
-      {/* EMAIL */}
       <div className="relative border-b-2 border-gray-700 py-2 pl-5">
         <Mail className="absolute left-0 top-1/2 -translate-y-1/2  w-5 h-5 text-gray-950" />
         <input
@@ -150,7 +149,6 @@ export default function LoginForm({
         />
       </div>
 
-      {/* PASSWORD */}
       <div className="relative border-b-2 border-gray-700 py-2 pl-5">
         <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-950" />
         <input

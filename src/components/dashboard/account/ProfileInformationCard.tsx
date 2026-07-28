@@ -60,7 +60,6 @@ export default function ProfileInformationCard({
         </h2>
       </div>
 
-      {/* Your Photo */}
       <div className="flex flex-col gap-6 border-b border-[#E8E8ED] pb-8 sm:flex-row sm:items-center">
         <div className="relative h-[109px] w-[109px] shrink-0">
           <div
@@ -129,7 +128,6 @@ export default function ProfileInformationCard({
         </div>
       </div>
 
-      {/* Name + Email */}
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="fullName" className="text-[15px] font-semibold text-[#1A1C1F]">
@@ -162,7 +160,6 @@ export default function ProfileInformationCard({
         </div>
       </div>
 
-      {/* Bio */}
       <div className="mt-6 flex flex-col gap-2">
         <label htmlFor="bio" className="text-[15px] font-semibold text-[#1A1C1F]">
           Bio

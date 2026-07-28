@@ -110,3 +110,17 @@ input {
 .no-spinner {
   -moz-appearance: textfield;
 }
+
+.occasion-scroll-track {
+  animation: occasion-scroll 30s linear infinite;
+}
+
+@keyframes occasion-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-50% - 10px), 0, 0);
+  }
+}

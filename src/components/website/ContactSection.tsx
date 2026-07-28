@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Send } from "lucide-react";
 
 const subjectOptions = [
   "General Inquiry",
-  "Photo Restoration",
-  "Custom Album",
   "Order Support",
+  "Custom Order",
+  "Feedback",
+  "Other",
 ];
 
 export default function ContactSection() {
@@ -74,15 +76,13 @@ export default function ContactSection() {
 
   return (
     <div className="w-full">
-      <div className="relative w-full max-w-[760px] rounded-[12px] px-3 sm:px-5 lg:px-0">
-        <div className="relative z-10">
-          <h2 className="text-[30px] font-bold leading-[36px] text-[#1A1C1F]">
-            Send a Message
-          </h2>
+      <h2 className="font-manrope text-[24px] font-bold leading-[1.2] text-[#001E50]">
+        Send a Message
+      </h2>
 
-          <p className="mt-2 text-[16px] leading-[24px] text-[#434652]">
-            Fill out the form and we&apos;ll get back to you soon.
-          </p>
+      <p className="mb-6 mt-2 font-inter text-[14px] text-[#6B7280]">
+        Fill out the form and we&apos;ll get back to you soon.
+      </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
@@ -94,7 +94,7 @@ export default function ContactSection() {
                   id="fullName"
                   type="text"
                   required
-                  placeholder="John Doe"
+                  placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={handleChange}
                   className="h-[40px] w-full rounded-[8px] border border-[#C3C6D4] bg-white px-4 text-[16px] outline-none placeholder:text-[#C3C6D4] focus:border-[#0040A1]"
@@ -109,7 +109,7 @@ export default function ContactSection() {
                   id="email"
                   type="email"
                   required
-                  placeholder="john@example.com"
+                  placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
                   className="h-[40px] w-full rounded-[8px] border border-[#C3C6D4] bg-white px-4 text-[16px] outline-none placeholder:text-[#C3C6D4] focus:border-[#0040A1]"
@@ -189,8 +189,7 @@ export default function ContactSection() {
               </span>
             </button>
           </form>
-        </div>
-      </div>
+      
     </div>
   );
 }
