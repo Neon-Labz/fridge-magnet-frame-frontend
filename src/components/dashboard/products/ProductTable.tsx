@@ -16,11 +16,18 @@ export default function ProductTable({ products, onDelete, onView, onEdit }: Pro
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-slate-100" style={{ borderBottom: '2px solid #F1F5F9' }}>
-            {['Product ID', 'Product Details', 'Price', 'Stock Status', 'Actions'].map((h, i) => (
-              <th key={h} className="py-5 text-sm font-semibold uppercase" style={{
+              {[
+                'Product ID',
+                'Product Details',
+                'Price',
+                'Image Count',
+                'Stock Status',
+                'Actions',
+              ].map((h, i) => (     
+               <th key={h} className="py-5 text-sm font-semibold uppercase" style={{
                 paddingLeft: 32,
                 paddingRight: i === 4 ? 32 : 0,
-                textAlign: i === 4 ? 'right' : 'left',
+                textAlign: i === 3 ? 'center' : i === 4 ? 'right' : 'left',
                 color: '#002B73',
                 letterSpacing: '0.07em',
                 borderBottom: '2px solid #F1F5F9',
@@ -52,6 +59,13 @@ export default function ProductTable({ products, onDelete, onView, onEdit }: Pro
 
               <td className="pl-8 text-base font-bold" style={{ color: '#1A1C1F', whiteSpace: 'nowrap' }}>
                 LKR {Number(product.price ?? 0).toFixed(2)}
+              </td>
+
+              <td
+                className="text-center text-base font-semibold"
+                style={{ color: '#1A1C1F', whiteSpace: 'nowrap' }}
+              >
+                {product.imagecount ?? 0}
               </td>
 
               <td className="pl-8">

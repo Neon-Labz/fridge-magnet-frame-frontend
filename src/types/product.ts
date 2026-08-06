@@ -11,6 +11,7 @@ export interface Product {
   name: string;
   series: string;
   price: number;
+  imagecount:number;
   stockCount: number;
   stockStatus: StockStatus;
   gradient: string;
@@ -36,6 +37,7 @@ export interface ProductFormData {
   category: string;
   stock: number;
   price: number;
+  imagecount:number;
   description: string;
   personalization: boolean;
   personalizationEnabled?: boolean;

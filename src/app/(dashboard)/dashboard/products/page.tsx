@@ -127,6 +127,8 @@ export default function ProductsPage() {
       data.append('status', getProductStatus(formData.stock));
 
       data.append('price', String(formData.price));
+      data.append('imagecount', String(formData.imagecount));
+
 
       if (formData.primaryImage) {
         data.append('primaryImage', formData.primaryImage);
@@ -178,6 +180,7 @@ export default function ProductsPage() {
       data.append('productId', formData.productId);
       data.append('stock', String(formData.stock));
       data.append('price', String(formData.price));
+      data.append('imagecount', String(formData.imagecount));
       data.append('description', formData.description);
       data.append('status', getProductStatus(formData.stock));
 
