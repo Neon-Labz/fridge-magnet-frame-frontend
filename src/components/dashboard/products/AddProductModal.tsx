@@ -19,6 +19,7 @@ const EMPTY: ProductFormData = {
   category: 'Wooden Frames',
   stock: 0,
   price: 0,
+  imagecount:0,
   description: '',
   personalization: false,
   primaryImage: null,
@@ -27,7 +28,7 @@ const EMPTY: ProductFormData = {
 
 const MAX_GALLERY = 5;
 
-type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price' | 'primaryImage', string>>;
+type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price' | 'primaryImage' | 'imagecount', string>>;
 
 export default function AddProductModal({
   isOpen,
@@ -55,6 +56,7 @@ export default function AddProductModal({
         category: editingProduct.series ?? 'Wooden Frames',
         stock: Number(editingProduct.stockCount ?? 0),
         price: Number(editingProduct.price ?? 0),
+        imagecount:Number(editingProduct.imagecount ?? 0),
         description: editingProduct.description ?? '',
         personalization: false,
         primaryImage: null,
@@ -119,18 +121,25 @@ export default function AddProductModal({
     outline: 'none',
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (
+  e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
 
-    if (name in fieldErrors) {
-      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
-    }
+  if (name in fieldErrors) {
+    setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+  }
 
-    setForm(prev => ({
-      ...prev,
-      [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
-    }));
-  };
+  setForm(prev => ({
+    ...prev,
+    [name]:
+      name === 'stock' ||
+      name === 'price' ||
+      name === 'imagecount'
+        ? Number(value) || 0
+        : value,
+  }));
+};
 
   const handleNumberWheel = (e: WheelEvent<HTMLInputElement>) => {
     e.currentTarget.blur();
@@ -199,6 +208,7 @@ export default function AddProductModal({
       errors.price = 'Price is required.';
     }
 
+
     if (!form.primaryImage && !editingProduct?.primaryImageUrl) {
       errors.primaryImage = 'Primary image is required.';
     }
@@ -215,6 +225,7 @@ export default function AddProductModal({
         ...form,
         price: Number(form.price) || 0,
         stock: Number(form.stock) || 0,
+        imagecount:Number(form.imagecount) || 0,
         personalization: false,
         personalizationEnabled: false,
         personalizationOptions: [],
@@ -293,7 +304,18 @@ export default function AddProductModal({
 
             <div className="space-y-2">
               <label className="block text-sm font-semibold">Stock</label>
-              <input type="number" name="stock" value={form.stock === 0 ? '' : form.stock} placeholder="Enter stock" onChange={handleChange} onWheel={handleNumberWheel} onKeyDown={handleNumberKeyDown} min={0} step={1} inputMode="numeric" style={inputStyle} />
+              <input 
+              type="number" 
+              name="stock" 
+              value={form.stock === 0 ? '' : form.stock} 
+              placeholder="Enter stock" 
+              onChange={handleChange} 
+              onWheel={handleNumberWheel} 
+              onKeyDown={handleNumberKeyDown} 
+              min={0} 
+              step={1} 
+              inputMode="numeric" 
+              style={inputStyle} />
             </div>
 
             <div className="space-y-2">
@@ -307,11 +329,29 @@ export default function AddProductModal({
                 onWheel={handleNumberWheel}
                 onKeyDown={handleNumberKeyDown}
                 min={0}
-                step="0.01"
+                step="1"
                 inputMode="decimal"
                 style={{ ...inputStyle, border: fieldErrors.price ? '1px solid #BC0000' : inputStyle.border }}
               />
               {fieldErrors.price && <p className="text-xs font-semibold text-red-700">{fieldErrors.price}</p>}
+            </div>
+
+             <div className="space-y-2">
+              <label className="block text-sm font-semibold">Image Count</label>
+              <input
+                type="number"
+                name="imagecount"
+                value={form.imagecount === 0 ? '' : form.imagecount}
+                placeholder="Enter Max image"
+                onChange={handleChange}
+                onWheel={handleNumberWheel}
+                onKeyDown={handleNumberKeyDown}
+                min={0}
+                step="0.01"
+                inputMode="numeric"
+                style={{ ...inputStyle, border: fieldErrors.imagecount ? '1px solid #BC0000' : inputStyle.border }}
+              />
+              {fieldErrors.imagecount && <p className="text-xs font-semibold text-red-700">{fieldErrors.price}</p>}
             </div>
           </div>
 
