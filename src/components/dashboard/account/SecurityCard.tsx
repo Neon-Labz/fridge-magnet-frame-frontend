@@ -50,7 +50,7 @@ export default function SecurityCard({
         />
       </div>
 
-      <div className="mt-6 flex items-center justify-between border-t border-[#E8E8ED] pt-5">
+      {/* <div className="mt-6 flex items-center justify-between border-t border-[#E8E8ED] pt-5">
         <div>
           <p className="text-[15px] font-semibold text-[#1A1C1F]">Two-Factor Auth</p>
           <p className="text-[13px] text-[#434652]">Secure your account via SMS</p>
@@ -68,7 +68,7 @@ export default function SecurityCard({
             style={{ left: twoFactorEnabled ? '25px' : '3px' }}
           />
         </button>
-      </div>
+      </div> */}
     </section>
   );
 }
