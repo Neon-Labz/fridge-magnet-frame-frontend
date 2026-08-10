@@ -347,11 +347,11 @@ export default function AddProductModal({
                 onWheel={handleNumberWheel}
                 onKeyDown={handleNumberKeyDown}
                 min={0}
-                step="0.01"
+                step={1}
                 inputMode="numeric"
                 style={{ ...inputStyle, border: fieldErrors.imagecount ? '1px solid #BC0000' : inputStyle.border }}
               />
-              {fieldErrors.imagecount && <p className="text-xs font-semibold text-red-700">{fieldErrors.price}</p>}
+              {fieldErrors.imagecount && <p className="text-xs font-semibold text-red-700">{fieldErrors.imagecount}</p>}
             </div>
           </div>
 
