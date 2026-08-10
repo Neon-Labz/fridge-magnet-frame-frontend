@@ -14,7 +14,7 @@ import { fetchOrders } from '@/lib/orders';
 import { apiV1Url } from '@/lib/backendUrl';
 import type { Order } from '@/types/order';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -127,7 +127,7 @@ export default function OrdersPage() {
         <OrderStats orders={tableOrders} />
 
         <div
-          className="flex flex-1 flex-col overflow-hidden"
+          className="flex flex-1 flex-col min-h-0"
           style={{
             background: '#fff',
             border: '1px solid #C3C6D4',
@@ -138,7 +138,7 @@ export default function OrdersPage() {
         >
           {(filterOpen || sortOpen) && (
             <div
-              className="fixed inset-0 z-10"
+              className="fixed inset-0 z-20"
               onClick={() => {
                 setFilterOpen(false);
                 setSortOpen(false);
@@ -146,6 +146,7 @@ export default function OrdersPage() {
             />
           )}
 
+        <div className="relative z-50">
           <OrderFilters
             filterStatus={filterStatus}
             sortBy={sortBy}
@@ -165,6 +166,7 @@ export default function OrdersPage() {
             endItem={endItem}
             totalItems={tableOrders.length}
           />
+        </div>
 
           {loading || error ? (
             <div className="flex flex-1 items-center justify-center p-10 text-sm font-medium" style={{ color: error ? '#BC0000' : '#434652' }}>

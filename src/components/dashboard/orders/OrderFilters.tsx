@@ -51,7 +51,7 @@ export default function OrderFilters({
   totalItems,
 }: OrderFiltersProps) {
   return (
-    <div className="flex-shrink-0 flex items-center justify-between px-6 " style={{ height: 53, borderBottom: '1px solid #C3C6D4', background: 'rgba(248,250,252,0.5)', position: 'relative', zIndex: 20 }}>
+    <div className="flex-shrink-0 flex items-center justify-between px-6 " style={{ height: 53, borderBottom: '1px solid #C3C6D4', background: 'rgba(248,250,252,0.5)', position: 'relative'}}>
       <div className="flex items-center gap-4">
         <div className="relative">
           <button onClick={onFilterToggle}
@@ -100,7 +100,7 @@ export default function OrderFilters({
           )}
         </div>
       </div>
-      <p className="text-sm font-medium" style={{ color: '#434652' }}>Showing {startItem}–{endItem} of {totalItems} orders</p>
+      {/* <p className="text-sm font-medium" style={{ color: '#434652' }}>Showing {startItem}–{endItem} of {totalItems} orders</p> */}
     </div>
   );
 }
