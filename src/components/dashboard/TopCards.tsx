@@ -44,12 +44,8 @@ const TopCards = ({ onAddCustomer }: TopCardsProps) => {
             <div className="priorityTitle">Priority Support</div>
             <div className="priorityValue">Dedicated Desk</div>
 
-            <button
-              type="button"
-              className="connectBtn"
-              onClick={onAddCustomer}
-            >
-              Connect Now
+            <button type="button" className="connectBtn" onClick={onAddCustomer}>
+              + Add Customer
             </button>
           </div>
 

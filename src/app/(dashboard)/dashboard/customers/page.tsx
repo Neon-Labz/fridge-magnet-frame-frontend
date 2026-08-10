@@ -28,13 +28,13 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <button
+        {/* <button
           type="button"
           onClick={openAddCustomerForm}
           className="rounded-md bg-[#b91c1c] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#991b1b]"
         >
           + Add Customer
-        </button>
+        </button> */}
       </div>
 
       <TopCards

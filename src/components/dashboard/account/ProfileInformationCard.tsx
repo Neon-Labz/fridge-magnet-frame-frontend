@@ -128,7 +128,7 @@ export default function ProfileInformationCard({
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="mt-3 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="fullName" className="text-[15px] font-semibold text-[#1A1C1F]">
             Full Name
@@ -160,7 +160,7 @@ export default function ProfileInformationCard({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-2">
+      {/* <div className="mt-6 flex flex-col gap-2">
         <label htmlFor="bio" className="text-[15px] font-semibold text-[#1A1C1F]">
           Bio
         </label>
@@ -173,7 +173,7 @@ export default function ProfileInformationCard({
           placeholder="Tell us a little about yourself."
           className="resize-none rounded-lg border border-[#C3C6D4] px-4 py-3 text-[17px] leading-7 text-[#1A1C1F] outline-none focus:border-[#0040A1]"
         />
-      </div>
+      </div> */}
     </section>
   );
 }
