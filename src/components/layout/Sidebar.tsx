@@ -44,7 +44,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-100 flex flex-col bg-white transition-transform duration-300 ${
         open ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}
       style={{

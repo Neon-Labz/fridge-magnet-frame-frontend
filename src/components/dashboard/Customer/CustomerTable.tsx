@@ -1147,7 +1147,7 @@ const CustomerTable = ({
               <col
                 style={{
                   width:
-                    '13%',
+                    '15%',
                 }}
               />
             </colgroup>
@@ -1421,12 +1421,11 @@ const CustomerTable = ({
                                 customer.isActive
                                   ? '#b91c1c'
                                   : '#166534',
-                              border:
-                                `1px solid ${
-                                  customer.isActive
+                              borderWidth: 1,
+                              borderStyle: 'solid',
+                              borderColor:  customer.isActive
                                     ? '#fecaca'
-                                    : '#bbf7d0'
-                                }`,
+                                    : '#bbf7d0',
                               background:
                                 customer.isActive
                                   ? '#fef2f2'

@@ -23,9 +23,9 @@ export default function CustomersPage() {
             Customer Management
           </h1>
 
-          <p className="mt-1 text-sm text-[#64748B]">
+          {/* <p className="mt-1 text-sm text-[#64748B]">
             Oversee and track all customer interactions and delivery status.
-          </p>
+          </p> */}
         </div>
 
         {/* <button

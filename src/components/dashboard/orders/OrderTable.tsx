@@ -256,7 +256,7 @@ export default function OrderTable({
                   </Link>
                 </div>
 
-                <div className="px-4 py-4 sm:px-5">
+                <div className="px-4 py-4 sm:px-5 lg:px-5">
                   <div className="flex items-center gap-3">
                     <div
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
@@ -284,7 +284,7 @@ export default function OrderTable({
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="mt-4 grid grid-cols-3 gap-3">
                     <OrderInfo
                       label="QTY"
                       value={String(order.qty)}
@@ -300,7 +300,7 @@ export default function OrderTable({
                         Status
                       </p>
 
-                      <div className="relative z-10 mt-1">
+                      <div className="relative z-10 mt-1 col-span-2">
                         <Link
                           href={`/dashboard/orders/${order.id}`}
                           onClick={(event) => {
