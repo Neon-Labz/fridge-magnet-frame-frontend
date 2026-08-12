@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 import { useEffect, useMemo, useState } from "react";
 import DeleteProductModal from "@/components/dashboard/products/DeleteProductModal";
 import AddProductModal from "@/components/dashboard/products/AddProductModal";
@@ -17,10 +16,8 @@ import type { Product, ProductFormData } from "@/types/product";
 import { apiV1Url } from "@/lib/backendUrl";
 import { useToastStore } from "@/store/toastStore";
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
 const ID_PREFIX = "MG-";
-
-type MessageType = "success" | "error";
 
 const getProductStatus = (stock: number) => {
   if (stock > 10) return "In Stock";
@@ -55,60 +52,6 @@ const computeNextProductId = (products: Product[]): string => {
   return `${ID_PREFIX}${String(nextNumber).padStart(padLength, "0")}`;
 };
 
-// Small inline icons so this file has no new dependencies.
-const CheckIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 20 20"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M16.6 5.6 8.25 14 3.4 9.15"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const AlertIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 20 20"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M10 6.5v4.25M10 13.75h.008M10 2.5c-.53 0-1.02.28-1.29.75L2.9 13.9c-.55.94.12 2.1 1.2 2.1h11.8c1.08 0 1.75-1.16 1.2-2.1L11.29 3.25A1.48 1.48 0 0 0 10 2.5Z"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 20 20"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M5 5l10 10M15 5 5 15"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 export default function ProductsPage() {
   const { products, isLoaded, refreshProducts } = useProducts();
   const { addToast } = useToastStore();
@@ -120,12 +63,6 @@ export default function ProductsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [productMessage, setProductMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<MessageType>("success");
-
-  const showMessage = (text: string, type: MessageType = "success") => {
-    setMessageType(type);
-    setProductMessage(text);
-  };
 
   useEffect(() => {
     if (!productMessage) return;
@@ -217,7 +154,7 @@ export default function ProductsPage() {
       }
 
       addToast("Product added successfully", "success");
-      showMessage("Product added successfully", "success");
+      setProductMessage("Product added successfully");
 
       await refreshProducts();
       setAddOpen(false);
@@ -228,10 +165,10 @@ export default function ProductsPage() {
 
       return true;
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Something went wrong";
-      addToast(message, "error");
-      showMessage(message, "error");
+      addToast(
+        error instanceof Error ? error.message : "Something went wrong",
+        "error",
+      );
       return false;
     }
   };
@@ -307,15 +244,15 @@ export default function ProductsPage() {
         }
       }
       addToast("Product updated successfully", "success");
-      showMessage("Product updated successfully", "success");
+      setProductMessage("Product updated successfully");
       await refreshProducts();
       setEditTarget(null);
       return true;
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to update product";
-      addToast(message, "error");
-      showMessage(message, "error");
+      addToast(
+        error instanceof Error ? error.message : "Failed to update product",
+        "error",
+      );
       return false;
     }
   };
@@ -350,7 +287,7 @@ export default function ProductsPage() {
       }
 
       addToast("Stock updated successfully", "success");
-      showMessage("Stock updated successfully", "success");
+      setProductMessage("Stock updated successfully");
 
       await refreshProducts();
 
@@ -358,9 +295,10 @@ export default function ProductsPage() {
 
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to update stock";
+      const message =
+        error instanceof Error ? error.message : "Failed to update stock";
       addToast(message, "error");
-      showMessage(message, "error");
+      setProductMessage(message);
 
       return false;
     }
@@ -384,7 +322,7 @@ export default function ProductsPage() {
       }
 
       addToast("Product deleted successfully", "success");
-      showMessage("Product deleted successfully", "success");
+      setProductMessage("Product deleted successfully");
       await refreshProducts();
       setDeleteTarget(null);
     } catch (error) {
@@ -397,60 +335,34 @@ export default function ProductsPage() {
   };
 
   if (!isLoaded) {
-    return (
-      <div className="flex h-full items-center justify-center p-8">
-        <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
-          <span
-            className="h-4 w-4 animate-spin rounded-full border-2 border-[#C3C6D4] border-t-[#002B73]"
-            aria-hidden="true"
-          />
-          Loading products…
-        </div>
-      </div>
-    );
+    return <div className="p-8">Loading products...</div>;
   }
 
   return (
     <>
-      <div className="flex h-full flex-col bg-[#F7F8FB] px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
+      <div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
         <ProductHeader onAddClick={() => setAddOpen(true)} />
 
-        <section className="mb-0 flex flex-1 flex-col overflow-hidden rounded-xl border border-[#C3C6D4] bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
-          {/* Brand accent rail ties the panel back to the #002B73 identity without competing with row content */}
-          <div className="h-1 w-full shrink-0 bg-gradient-to-r from-[#002B73] via-[#0A3E96] to-[#002B73]" />
-
+        <section
+          className="mb-0 flex flex-col overflow-hidden"
+          style={{
+            background: "#fff",
+            border: "1px solid #C3C6D4",
+            borderRadius: 12,
+            boxShadow:
+              "0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)",
+          }}
+        >
           {productMessage && (
             <div
-              role="status"
-              className={[
-                "mx-8 mt-5 flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm font-semibold",
-                "animate-in fade-in slide-in-from-top-1 duration-200",
-                messageType === "success"
-                  ? "border-[#002B73]/15 bg-[#F1F7FF] text-[#002B73]"
-                  : "border-[#B3261E]/20 bg-[#FDECEC] text-[#8C1D18]",
-              ].join(" ")}
+              className="mx-8 mt-5 rounded-lg px-4 py-3 text-sm font-semibold"
+              style={{
+                background: "#F1F7FF",
+                color: "#002B73",
+                border: "1px solid rgba(0, 43, 115, 0.14)",
+              }}
             >
-              <span className="flex items-center gap-2">
-                <span
-                  className={[
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
-                    messageType === "success"
-                      ? "bg-[#002B73] text-white"
-                      : "bg-[#B3261E] text-white",
-                  ].join(" ")}
-                >
-                  {messageType === "success" ? <CheckIcon /> : <AlertIcon />}
-                </span>
-                {productMessage}
-              </span>
-              <button
-                type="button"
-                onClick={() => setProductMessage(null)}
-                aria-label="Dismiss message"
-                className="shrink-0 rounded-md p-1 text-current/70 transition hover:bg-black/5 hover:text-current"
-              >
-                <CloseIcon />
-              </button>
+              {productMessage}
             </div>
           )}
 
@@ -464,15 +376,17 @@ export default function ProductsPage() {
             onEdit={setEditTarget}
           />
 
-          <Pagination
-            currentPage={safePage}
-            totalPages={totalPages}
-            startItem={startItem}
-            endItem={endItem}
-            totalItems={sorted.length}
-            label="products"
-            onPageChange={setPage}
-          />
+          <div className="sticky bottom-0 z-10 border-t border-[#E5E7EB] bg-white">
+            <Pagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              startItem={startItem}
+              endItem={endItem}
+              totalItems={sorted.length}
+              label="products"
+              onPageChange={setPage}
+            />
+          </div>
         </section>
       </div>
 

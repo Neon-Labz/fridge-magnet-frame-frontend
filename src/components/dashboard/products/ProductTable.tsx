@@ -25,7 +25,9 @@ export default function ProductTable({
   onView,
   onEdit,
 }: ProductTableProps) {
-  if (products.length === 0) {
+  const safeProducts = Array.isArray(products) ? products : [];
+
+  if (safeProducts.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-16">
         <div className="text-center">
@@ -47,153 +49,145 @@ export default function ProductTable({
 
   return (
     <div className="min-h-0 flex-1 overflow-hidden">
-      <div className="hidden h-full min-h-0 overflow-hidden lg:block">
-        <table className="w-full table-fixed border-collapse">
+      {/* DESKTOP TABLE */}
+      <div className="hidden h-full min-h-0 overflow-x-auto overflow-y-auto lg:block">
+        <table className="w-full min-w-[1000px] table-fixed border-collapse">
+          <colgroup>
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "31%" }} />
+            <col style={{ width: "15%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "16%" }} />
+            <col style={{ width: "14%" }} />
+          </colgroup>
+
           <thead>
-            <tr
-              className="bg-slate-100"
-              style={{
-                borderBottom: "2px solid #F1F5F9",
-              }}
-            >
-              {columns.map((column, index) => (
-                <th
-                  key={column.label}
-                  className={[
-                    column.className,
-                    "px-4 py-5 text-xs font-bold uppercase xl:px-6",
-                    index === 1 ? "text-left" : "text-center",
-                  ].join(" ")}
-                  style={{
-                    color: "#002B73",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  {column.label}
-                </th>
-              ))}
+            <tr>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Product ID
+              </th>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Product Details
+              </th>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Price
+              </th>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Image Count
+              </th>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Stock Status
+              </th>
+              <th className="text-center px-3 py-3 bg-[#F8FAFC] text-[#64748B] text-[12px] font-bold border-b border-[#E5E7EB]">
+                Actions
+              </th>
             </tr>
           </thead>
 
           <tbody>
-            {products.map((product, index) => (
+            {safeProducts.map((product, index) => (
               <tr
                 key={`${product.id}-${index}`}
-                className="transition-colors hover:bg-slate-50/70"
-                style={{
-                  borderBottom: "1px solid #E8ECF4",
-                }}
+                className="hover:bg-[#f8fafc] transition-colors"
               >
-                <td
-                  className={`${columns[0].className} px-4 py-5 text-center align-middle xl:px-6`}
-                >
-                  <span
-                    className="font-mono text-xs font-medium"
-                    style={{
-                      color: "#64748B",
-                    }}
-                  >
-                    {product.sku || product.id}
-                  </span>
+                {/* PRODUCT ID */}
+                <td className="px-3 py-2 border-b border-[#E5E7EB] text-center align-middle">
+                  <div className="w-full min-w-0 max-w-full">
+                    <span className="block break-words text-[10px] text-[#64748B] font-mono">
+                      {product.sku || product.id}
+                    </span>
+                  </div>
                 </td>
-                <td
-                  className={`${columns[1].className} px-4 py-5 text-left align-middle xl:px-6`}
-                >
-                  <div className="flex min-w-0 items-center gap-3 xl:gap-4">
-                    <div className="shrink-0">
-                      <ProductThumb
-                        gradient={product.gradient}
-                        imageUrl={product.primaryImageUrl}
-                        isPopular={product.isPopular}
-                      />
-                    </div>
 
-                    <div className="min-w-0 max-w-[220px] text-left">
-                      <p
-                        className="truncate text-sm font-bold leading-5"
-                        style={{
-                          color: "#002B73",
-                        }}
-                        title={product.name}
-                      >
-                        {product.name}
-                      </p>
+                {/* PRODUCT DETAILS */}
+                <td className="px-3 py-1 border-b border-[#E5E7EB] align-middle">
+                  <div className="w-full min-w-0 max-w-full pl-16">
+                    <div className="flex items-center gap-2.5 min-w-0 text-left">
+                      <div className="shrink-0">
+                        <ProductThumb
+                          gradient={product.gradient}
+                          imageUrl={product.primaryImageUrl}
+                          isPopular={product.isPopular}
+                        />
+                      </div>
 
-                      {product.series && (
-                        <p
-                          className="mt-1 truncate text-xs font-medium"
-                          style={{
-                            color: "#64748B",
-                          }}
-                          title={product.series}
+                      <div className="min-w-0 max-w-full overflow-hidden">
+                        <span
+                          className="block truncate text-[12px] font-bold text-[#0F172A]"
+                          title={product.name}
                         >
-                          {product.series}
-                        </p>
-                      )}
+                          {product.name}
+                        </span>
+
+                        {product.series && (
+                          <span
+                            className="block truncate text-[11px] text-[#64748B]"
+                            title={product.series}
+                          >
+                            {product.series}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </td>
-                <td
-                  className={`${columns[2].className} px-4 py-5 text-center align-middle xl:px-6`}
-                >
-                  <span
-                    className="whitespace-nowrap text-sm font-bold"
-                    style={{
-                      color: "#1A1C1F",
-                    }}
-                  >
-                    LKR {Number(product.price ?? 0).toFixed(2)}
-                  </span>
+
+                {/* PRICE */}
+                <td className="px-3 py-2 border-b border-[#E5E7EB] align-middle">
+                  <div className="w-full min-w-0 max-w-full text-center">
+                    <span className="block break-words text-[12px] font-bold text-[#0F172A]">
+                      LKR {Number(product.price ?? 0).toFixed(2)}
+                    </span>
+                  </div>
                 </td>
-                <td
-                  className={`${columns[3].className} px-4 py-5 text-center align-middle xl:px-6`}
-                >
-                  <span
-                    className="inline-flex min-w-8 items-center justify-center rounded-md bg-slate-100 px-2 py-1 text-xs font-bold"
-                    style={{
-                      color: "#334155",
-                    }}
-                  >
-                    {product.imagecount ?? 0}
-                  </span>
+
+                {/* IMAGE COUNT */}
+                <td className="px-3 py-2 border-b border-[#E5E7EB] align-middle">
+                  <div className="w-full min-w-0 max-w-full text-center">
+                    <span className="inline-flex min-w-8 items-center justify-center rounded-md bg-slate-100 px-2 py-1 text-[12px] font-bold text-[#334155]">
+                      {product.imagecount ?? 0}
+                    </span>
+                  </div>
                 </td>
-                <td
-                  className={`${columns[4].className} px-4 py-5 text-center align-middle xl:px-6`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => onView(product)}
-                    className="inline-flex rounded-full transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#002B73]/20"
-                    aria-label={`View ${product.name} stock details`}
-                  >
-                    <StockBadge
-                      status={product.stockStatus}
-                      count={product.stockCount}
-                    />
-                  </button>
+
+                {/* STOCK STATUS */}
+                <td className="px-3 py-2 border-b border-[#E5E7EB] align-middle">
+                  <div className="w-full min-w-0 max-w-full flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => onView(product)}
+                      className="inline-flex rounded-full transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#002B73]/20"
+                      aria-label={`View ${product.name} stock details`}
+                    >
+                      <StockBadge
+                        status={product.stockStatus}
+                        count={product.stockCount}
+                      />
+                    </button>
+                  </div>
                 </td>
-                <td
-                  className={`${columns[5].className} px-4 py-5 text-center align-middle xl:px-6`}
-                >
-                  <div className="flex items-center justify-center gap-1.5">
+
+                {/* ACTIONS */}
+                <td className="border-b border-[#E5E7EB] text-center align-middle">
+                  <div className="flex items-center justify-center gap-1.5 py-2">
                     <ActionButton
                       label="View"
                       onClick={() => onView(product)}
-                      icon={<Eye size={18} strokeWidth={2} />}
+                      icon={<Eye size={15} strokeWidth={2} />}
                       variant="view"
                     />
 
                     <ActionButton
                       label="Edit"
                       onClick={() => onEdit(product)}
-                      icon={<Pencil size={17} strokeWidth={2} />}
+                      icon={<Pencil size={14} strokeWidth={2} />}
                       variant="edit"
                     />
 
                     <ActionButton
                       label="Delete"
                       onClick={() => onDelete(product)}
-                      icon={<Trash2 size={17} strokeWidth={2} />}
+                      icon={<Trash2 size={14} strokeWidth={2} />}
                       variant="delete"
                     />
                   </div>
@@ -203,9 +197,11 @@ export default function ProductTable({
           </tbody>
         </table>
       </div>
+
+      {/* MOBILE VIEW (original card layout, unchanged) */}
       <div className="h-full min-h-0 overflow-y-auto bg-[#F8FAFC] px-3 py-3 sm:px-5 sm:py-5 lg:hidden">
         <div className="mx-auto w-full max-w-3xl space-y-3 sm:space-y-4">
-          {products.map((product, index) => (
+          {safeProducts.map((product, index) => (
             <article
               key={`${product.id}-responsive-${index}`}
               className="overflow-hidden rounded-xl border bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)]"
@@ -337,9 +333,7 @@ export default function ProductTable({
                   </div>
                 </div>
               </div>
-              <div
-                className="grid grid-cols-3 gap-2 px-3.5 pb-3.5 sm:px-5 sm:pb-4"
-              >
+              <div className="grid grid-cols-3 gap-2 px-3.5 pb-3.5 sm:px-5 sm:pb-4">
                 <ResponsiveActionButton
                   label="View"
                   onClick={() => onView(product)}
@@ -357,7 +351,7 @@ export default function ProductTable({
                 <ResponsiveActionButton
                   label="Delete"
                   onClick={() => onDelete(product)}
-                  icon={<Trash2 size={15} strokeWidth={2} />}
+                  icon={<Trash2 size={16} strokeWidth={2} />}
                   variant="delete"
                 />
               </div>
@@ -368,6 +362,7 @@ export default function ProductTable({
     </div>
   );
 }
+
 interface ActionButtonProps {
   label: string;
   onClick: () => void;
@@ -375,12 +370,7 @@ interface ActionButtonProps {
   variant: "view" | "edit" | "delete";
 }
 
-function ActionButton({
-  label,
-  onClick,
-  icon,
-  variant,
-}: ActionButtonProps) {
+function ActionButton({ label, onClick, icon, variant }: ActionButtonProps) {
   const variantClasses = {
     view: "text-[#002B73] hover:bg-blue-50",
     edit: "text-slate-600 hover:bg-slate-100",
@@ -394,7 +384,7 @@ function ActionButton({
       title={label}
       aria-label={label}
       className={[
-        "flex h-10 w-10 items-center justify-center rounded-lg",
+        "flex h-9 w-9 items-center justify-center rounded-lg",
         "transition-colors duration-150",
         "focus:outline-none focus:ring-2 focus:ring-[#002B73]/20",
         variantClasses[variant],

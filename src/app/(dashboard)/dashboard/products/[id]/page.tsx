@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+
 import type { Product } from '@/types/product';
+
 import ViewProductModal from '@/components/dashboard/products/ViewProductModal';
 import { apiV1Url } from '@/lib/backendUrl';
 import { useToastStore } from '@/store/toastStore';
@@ -35,21 +37,46 @@ const getErrorMessage = (responseText: string) => {
   }
 };
 
-const toStockStatus = (status?: string, stock = 0): Product['stockStatus'] => {
-  if (status === 'Out of Stock' || stock <= 4) return 'out-of-stock';
-  if (status === 'Low Stock' || stock <= 10) return 'low-stock';
+const toStockStatus = (
+  status?: string,
+  stock = 0,
+): Product['stockStatus'] => {
+  if (status === 'Out of Stock' || stock <= 4) {
+    return 'out-of-stock';
+  }
+
+  if (status === 'Low Stock' || stock <= 10) {
+    return 'low-stock';
+  }
+
   return 'in-stock';
 };
 
 const getApiProduct = (data: unknown): ApiProduct | null => {
-  if (!data || typeof data !== 'object') return null;
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
 
-  const payload = data as { data?: ApiProduct; product?: ApiProduct };
+  const payload = data as {
+    data?: ApiProduct;
+    product?: ApiProduct;
+  };
+
   return payload.data || payload.product || (data as ApiProduct);
 };
 
 const mapProduct = (product: ApiProduct): Product => {
   const stockCount = Number(product.stock ?? 0);
+
+  const primaryImageUrl = product.primaryImage?.secure_url;
+
+  const galleryImageUrls =
+    product.galleryImages
+      ?.map((image) => image.secure_url || '')
+      .filter(Boolean) || [];
+
+  const imagecount =
+    (primaryImageUrl ? 1 : 0) + galleryImageUrls.length;
 
   return {
     id: product._id || product.id || product.productId || '',
@@ -60,10 +87,15 @@ const mapProduct = (product: ApiProduct): Product => {
     stockCount,
     stockStatus: toStockStatus(product.status, stockCount),
     gradient: 'from-slate-100 to-slate-300',
-    primaryImageUrl: product.primaryImage?.secure_url,
-    galleryImageUrls:
-      product.galleryImages?.map((image) => image.secure_url || '').filter(Boolean) || [],
+
+    primaryImageUrl,
+
+    galleryImageUrls,
+
+    imagecount,
+
     description: product.description,
+
     lastUpdatedDate: product.updatedAt,
   };
 };
@@ -72,9 +104,12 @@ export default function ProductDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const params = useParams();
   const router = useRouter();
+
   const { addToast } = useToastStore();
+
   const productId = params.id as string;
 
   useEffect(() => {
@@ -86,9 +121,12 @@ export default function ProductDetailPage() {
       try {
         // BUG-013 fix: fetch the real product from the backend by ID
         // instead of reading from the static mock @/data/products array.
-        const response = await fetch(apiV1Url(`/api/products/${productId}`), {
-          cache: 'no-store',
-        });
+        const response = await fetch(
+          apiV1Url(`/api/products/${productId}`),
+          {
+            cache: 'no-store',
+          },
+        );
 
         const responseText = await response.text();
 
@@ -96,7 +134,9 @@ export default function ProductDetailPage() {
           throw new Error(getErrorMessage(responseText));
         }
 
-        const apiProduct = getApiProduct(JSON.parse(responseText));
+        const apiProduct = getApiProduct(
+          JSON.parse(responseText),
+        );
 
         if (!apiProduct) {
           throw new Error('Product data not found');
@@ -107,7 +147,12 @@ export default function ProductDetailPage() {
         }
       } catch (error) {
         if (!isCancelled) {
-          addToast(error instanceof Error ? error.message : 'Failed to load product', 'error');
+          addToast(
+            error instanceof Error
+              ? error.message
+              : 'Failed to load product',
+            'error',
+          );
         }
       } finally {
         if (!isCancelled) {
@@ -120,8 +165,9 @@ export default function ProductDetailPage() {
       fetchProduct();
     }
 
-    // BUG-013 fix: guards against a slow request from a previously-clicked
-    // product resolving AFTER the user has already navigated to a new one.
+    // BUG-013 fix: guards against a slow request from a
+    // previously-clicked product resolving AFTER the user
+    // has already navigated to a new one.
     return () => {
       isCancelled = true;
     };
@@ -133,11 +179,19 @@ export default function ProductDetailPage() {
   };
 
   if (isLoading) {
-    return <div className="p-8">Loading product...</div>;
+    return (
+      <div className="p-8">
+        Loading product...
+      </div>
+    );
   }
 
   if (!product) {
-    return <div className="p-8">Product not found.</div>;
+    return (
+      <div className="p-8">
+        Product not found.
+      </div>
+    );
   }
 
   return (

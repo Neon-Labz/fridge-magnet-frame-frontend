@@ -9,6 +9,10 @@ interface ViewProductModalProps {
   isOpen: boolean;
   product: Product | null;
   onClose: () => void;
+  onUpdate?: (
+    product: Product,
+    newStock: string,
+  ) => Promise<boolean>;
 }
 
 type StockLogEntry = {
@@ -22,14 +26,14 @@ export default function ViewProductModal({
   isOpen,
   product,
   onClose,
+  onUpdate,
 }: ViewProductModalProps) {
   const [showLog, setShowLog] = useState(false);
   const [stockLog, setStockLog] = useState<StockLogEntry[]>([]);
   const [isLoadingLog, setIsLoadingLog] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
-  const [activeGalleryImage, setActiveGalleryImage] = useState<string | null>(
-    null,
-  );
+  const [activeGalleryImage, setActiveGalleryImage] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -76,7 +80,9 @@ export default function ViewProductModal({
       setStockLog(json.data ?? []);
     } catch (err) {
       setLogError(
-        err instanceof Error ? err.message : 'Failed to fetch stock log',
+        err instanceof Error
+          ? err.message
+          : 'Failed to fetch stock log',
       );
     } finally {
       setIsLoadingLog(false);
@@ -184,7 +190,9 @@ export default function ViewProductModal({
                         <button
                           key={`${url}-${idx}`}
                           type="button"
-                          onClick={() => setActiveGalleryImage(url)}
+                          onClick={() =>
+                            setActiveGalleryImage(url)
+                          }
                           className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 transition hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#002B73]/20"
                           aria-label={`View gallery image ${idx + 1}`}
                         >
@@ -262,7 +270,9 @@ export default function ViewProductModal({
                 onClick={handleViewLog}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 text-xs font-bold text-[#002B73] shadow-sm transition hover:bg-slate-50 sm:w-auto sm:text-sm"
               >
-                <span>{showLog ? 'Hide Log' : 'View Log'}</span>
+                <span>
+                  {showLog ? 'Hide Log' : 'View Log'}
+                </span>
 
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F1F5FF]">
                   <History size={15} />
@@ -278,11 +288,15 @@ export default function ViewProductModal({
 
                 {isLoadingLog ? (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-center">
-                    <p className="text-sm text-slate-500">Loading...</p>
+                    <p className="text-sm text-slate-500">
+                      Loading...
+                    </p>
                   </div>
                 ) : logError ? (
                   <div className="rounded-xl border border-red-100 bg-red-50 p-5">
-                    <p className="text-sm text-red-600">{logError}</p>
+                    <p className="text-sm text-red-600">
+                      {logError}
+                    </p>
                   </div>
                 ) : stockLog.length === 0 ? (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-center">
@@ -295,10 +309,14 @@ export default function ViewProductModal({
                     <div className="divide-y divide-slate-100 sm:hidden">
                       {stockLog.map((entry, idx) => {
                         const change =
-                          entry.newStock - entry.previousStock;
+                          entry.newStock -
+                          entry.previousStock;
 
                         return (
-                          <div key={idx} className="space-y-3 p-4">
+                          <div
+                            key={idx}
+                            className="space-y-3 p-4"
+                          >
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-semibold text-slate-500">
                                 {new Date(
@@ -314,19 +332,25 @@ export default function ViewProductModal({
                                     : 'text-red-600',
                                 ].join(' ')}
                               >
-                                {change >= 0 ? `+${change}` : change}
+                                {change >= 0
+                                  ? `+${change}`
+                                  : change}
                               </span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                               <HistoryValue
                                 label="Previous"
-                                value={String(entry.previousStock)}
+                                value={String(
+                                  entry.previousStock,
+                                )}
                               />
 
                               <HistoryValue
                                 label="New Stock"
-                                value={String(entry.newStock)}
+                                value={String(
+                                  entry.newStock,
+                                )}
                               />
 
                               <HistoryValue
@@ -373,7 +397,8 @@ export default function ViewProductModal({
                         <tbody>
                           {stockLog.map((entry, idx) => {
                             const change =
-                              entry.newStock - entry.previousStock;
+                              entry.newStock -
+                              entry.previousStock;
 
                             return (
                               <tr
@@ -398,7 +423,9 @@ export default function ViewProductModal({
                                       : 'text-red-600',
                                   ].join(' ')}
                                 >
-                                  {change >= 0 ? `+${change}` : change}
+                                  {change >= 0
+                                    ? `+${change}`
+                                    : change}
                                 </td>
 
                                 <td className="px-4 py-3 font-medium text-slate-800">
@@ -440,7 +467,10 @@ interface ProductInfoProps {
   value: string;
 }
 
-function ProductInfo({ label, value }: ProductInfoProps) {
+function ProductInfo({
+  label,
+  value,
+}: ProductInfoProps) {
   return (
     <div className="min-w-0 rounded-xl border border-slate-200 bg-[#F5F6FB] p-4">
       <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
@@ -459,7 +489,10 @@ interface HistoryValueProps {
   value: string;
 }
 
-function HistoryValue({ label, value }: HistoryValueProps) {
+function HistoryValue({
+  label,
+  value,
+}: HistoryValueProps) {
   return (
     <div className="min-w-0">
       <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
