@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import TopCards from '@/components/dashboard/TopCards';
-import CustomerTable from '@/components/dashboard/Customer/CustomerTable';
-import AddCustomerModal from '@/components/dashboard/Customer/AddCustomerModal';
+import { useState } from "react";
+import CustomerTable from "@/components/dashboard/Customer/CustomerTable";
+import AddCustomerModal from "@/components/dashboard/Customer/AddCustomerModal";
 
 export default function CustomersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,38 +15,28 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="h-full w-full overflow-y-auto px-6 py-5 sm:px-8">
-      <div className="mb-5 flex items-start justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold leading-tight text-[#002B73]">
-            Customer Management
-          </h1>
+    <div className="h-full w-full overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+      {/* Heading row with Add Customer button inline - single row */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+        <h1 className="text-[26px] sm:text-[28px] font-bold leading-tight text-[#002B73]">
+          Customer Management
+        </h1>
+      </div>
 
-          {/* <p className="mt-1 text-sm text-[#64748B]">
-            Oversee and track all customer interactions and delivery status.
-          </p> */}
-        </div>
-
+      <div className="flex justify-end pb-3 pt-2">
         <button
           type="button"
           onClick={openAddCustomerForm}
-          className="rounded-md bg-[#b91c1c] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#991b1b]"
+          className="whitespace-nowrap flex-shrink-0 rounded-lg bg-[#b91c1c] px-5 py-2.5 text-sm sm:text-[15px] font-bold text-white shadow-sm hover:bg-[#991b1b] transition-colors"
         >
           + Add Customer
         </button>
       </div>
 
-      {/* <TopCards
-        key={`customer-stats-${customerStatsVersion}`}
-        onAddCustomer={openAddCustomerForm}
-      /> */}
-
-      <div>
-        <CustomerTable
-          key={`customer-table-${customerListVersion}`}
-          onCustomersChanged={refreshCustomerStats}
-        />
-      </div>
+      <CustomerTable
+        key={`customer-table-${customerListVersion}`}
+        onCustomersChanged={refreshCustomerStats}
+      />
 
       <AddCustomerModal
         isOpen={isModalOpen}

@@ -1,29 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import DeleteOrderModal from '@/components/dashboard/orders/DeleteOrderModal';
+import { useEffect, useState } from "react";
+import DeleteOrderModal from "@/components/dashboard/orders/DeleteOrderModal";
+import OrderStatus from "@/components/dashboard/orders/OrderStatus";
 import OrderFilters, {
   type OrderFilterStatus,
   type OrderSortBy,
-} from '@/components/dashboard/orders/OrderFilters';
-import OrderHeader from '@/components/dashboard/orders/OrderHeader';
-import OrderPagination from '@/components/dashboard/orders/OrderPagination';
-import OrderStats from '@/components/dashboard/orders/OrderStats';
-import OrderTable from '@/components/dashboard/orders/OrderTable';
-import { fetchOrders } from '@/lib/orders';
-import { apiV1Url } from '@/lib/backendUrl';
-import type { Order } from '@/types/order';
+} from "@/components/dashboard/orders/OrderFilters";
+import OrderHeader from "@/components/dashboard/orders/OrderHeader";
+import OrderPagination from "@/components/dashboard/orders/OrderPagination";
+import OrderStats from "@/components/dashboard/orders/OrderStats";
+import OrderTable from "@/components/dashboard/orders/OrderTable";
+import { fetchOrders } from "@/lib/orders";
+import { apiV1Url } from "@/lib/backendUrl";
+import type { Order } from "@/types/order";
 
 const PAGE_SIZE = 10;
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [viewTarget, setViewTarget] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [filterStatus, setFilterStatus] = useState<OrderFilterStatus>('all');
-  const [sortBy, setSortBy] = useState<OrderSortBy>('default');
+  const [filterStatus, setFilterStatus] = useState<OrderFilterStatus>("all");
+  const [sortBy, setSortBy] = useState<OrderSortBy>("default");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
@@ -35,7 +37,7 @@ export default function OrdersPage() {
       setOrders(await fetchOrders());
     } catch (err) {
       setOrders([]);
-      setError(err instanceof Error ? err.message : 'Failed to load orders');
+      setError(err instanceof Error ? err.message : "Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -50,25 +52,31 @@ export default function OrdersPage() {
   }, []);
 
   const filteredOrders =
-    filterStatus === 'all'
+    filterStatus === "all"
       ? orders
       : orders.filter((order) => order.status === filterStatus);
 
   const tableOrders = [...filteredOrders].sort((a, b) => {
-    if (sortBy === 'id-asc') return a.orderId.localeCompare(b.orderId);
-    if (sortBy === 'id-desc') return b.orderId.localeCompare(a.orderId);
-    if (sortBy === 'name-asc') return a.customerName.localeCompare(b.customerName);
-    if (sortBy === 'name-desc') return b.customerName.localeCompare(a.customerName);
-    if (sortBy === 'qty-asc') return a.qty - b.qty;
-    if (sortBy === 'qty-desc') return b.qty - a.qty;
+    if (sortBy === "id-asc") return a.orderId.localeCompare(b.orderId);
+    if (sortBy === "id-desc") return b.orderId.localeCompare(a.orderId);
+    if (sortBy === "name-asc")
+      return a.customerName.localeCompare(b.customerName);
+    if (sortBy === "name-desc")
+      return b.customerName.localeCompare(a.customerName);
+    if (sortBy === "qty-asc") return a.qty - b.qty;
+    if (sortBy === "qty-desc") return b.qty - a.qty;
     return 0;
   });
 
   const totalPages = Math.max(1, Math.ceil(tableOrders.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pagedOrders = tableOrders.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pagedOrders = tableOrders.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
-  const startItem = tableOrders.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const startItem =
+    tableOrders.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
   const endItem = Math.min(safePage * PAGE_SIZE, tableOrders.length);
 
   const handleFilterSelect = (nextFilter: OrderFilterStatus) => {
@@ -88,7 +96,7 @@ export default function OrdersPage() {
 
     try {
       const response = await fetch(apiV1Url(`/orders/${deleteTarget.id}`), {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
@@ -98,7 +106,7 @@ export default function OrdersPage() {
 
       setOrders((prevOrders) => {
         const nextOrders = prevOrders.filter(
-          (order) => order.id !== deleteTarget.id
+          (order) => order.id !== deleteTarget.id,
         );
 
         if (page > Math.ceil(nextOrders.length / PAGE_SIZE)) {
@@ -109,7 +117,7 @@ export default function OrdersPage() {
       });
       setDeleteTarget(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete order');
+      setError(err instanceof Error ? err.message : "Failed to delete order");
     }
   };
 
@@ -122,18 +130,29 @@ export default function OrdersPage() {
         onConfirm={confirmDelete}
       />
 
-<div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
-          <OrderHeader />
+      <OrderStatus
+        isOpen={Boolean(viewTarget)}
+        order={viewTarget}
+        onClose={() => setViewTarget(null)}
+        onUpdated={(updated) => {
+          setOrders((prev) =>
+            prev.map((o) => (o.id === updated.id ? updated : o)),
+          );
+        }}
+      />
+
+      <div className="flex h-full flex-col px-6 pb-0 pt-6 sm:px-10 sm:pt-8 lg:px-12">
+        <OrderHeader />
         <OrderStats orders={tableOrders} />
 
         <div
           className="flex flex-1 flex-col min-h-0"
           style={{
-            background: '#fff',
-            border: '1px solid #C3C6D4',
+            background: "#fff",
+            border: "1px solid #C3C6D4",
             borderRadius: 12,
             boxShadow:
-              '0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)',
+              "0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)",
           }}
         >
           {(filterOpen || sortOpen) && (
@@ -146,34 +165,41 @@ export default function OrdersPage() {
             />
           )}
 
-        <div className="relative z-50">
-          <OrderFilters
-            filterStatus={filterStatus}
-            sortBy={sortBy}
-            filterOpen={filterOpen}
-            sortOpen={sortOpen}
-            onFilterToggle={() => {
-              setFilterOpen((current) => !current);
-              setSortOpen(false);
-            }}
-            onSortToggle={() => {
-              setSortOpen((current) => !current);
-              setFilterOpen(false);
-            }}
-            onFilterSelect={handleFilterSelect}
-            onSortSelect={handleSortSelect}
-            startItem={startItem}
-            endItem={endItem}
-            totalItems={tableOrders.length}
-          />
-        </div>
+          <div className="relative z-50">
+            <OrderFilters
+              filterStatus={filterStatus}
+              sortBy={sortBy}
+              filterOpen={filterOpen}
+              sortOpen={sortOpen}
+              onFilterToggle={() => {
+                setFilterOpen((current) => !current);
+                setSortOpen(false);
+              }}
+              onSortToggle={() => {
+                setSortOpen((current) => !current);
+                setFilterOpen(false);
+              }}
+              onFilterSelect={handleFilterSelect}
+              onSortSelect={handleSortSelect}
+              startItem={startItem}
+              endItem={endItem}
+              totalItems={tableOrders.length}
+            />
+          </div>
 
           {loading || error ? (
-            <div className="flex flex-1 items-center justify-center p-10 text-sm font-medium" style={{ color: error ? '#BC0000' : '#434652' }}>
-              {error || 'Loading orders...'}
+            <div
+              className="flex flex-1 items-center justify-center p-10 text-sm font-medium"
+              style={{ color: error ? "#BC0000" : "#434652" }}
+            >
+              {error || "Loading orders..."}
             </div>
           ) : (
-            <OrderTable orders={pagedOrders} onDelete={setDeleteTarget} />
+            <OrderTable
+              orders={pagedOrders}
+              onView={setViewTarget}
+              onDelete={setDeleteTarget}
+            />
           )}
 
           <OrderPagination

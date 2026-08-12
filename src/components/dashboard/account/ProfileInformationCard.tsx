@@ -33,7 +33,6 @@ export default function ProfileInformationCard({
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    // Reset the input so selecting the same file again still fires onChange.
     event.target.value = '';
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
@@ -52,18 +51,18 @@ export default function ProfileInformationCard({
   };
 
   return (
-    <section className="flex-1 rounded-xl border border-[#C3C6D4] bg-white p-6 shadow-sm sm:p-8">
-      <div className="mb-6 flex items-center gap-3">
-        <Contact className="h-6 w-6 text-[#0040A1]" />
-        <h2 className="text-[22px] font-semibold text-[#1A1C1F]">
+    <section className="w-full min-w-0 flex-1 rounded-xl border border-[#C3C6D4] bg-white p-5 shadow-sm sm:p-6 lg:p-8">
+      <div className="mb-5 flex items-center gap-3 sm:mb-6">
+        <Contact className="h-5 w-5 shrink-0 text-[#0040A1] sm:h-6 sm:w-6" />
+        <h2 className="text-[18px] font-semibold text-[#1A1C1F] sm:text-[20px] lg:text-[22px]">
           Profile Information
         </h2>
       </div>
 
-      <div className="flex flex-col gap-6 border-b border-[#E8E8ED] pb-8 sm:flex-row sm:items-center">
-        <div className="relative h-[109px] w-[109px] shrink-0">
+      <div className="flex flex-col items-center gap-5 border-b border-[#E8E8ED] pb-6 text-center sm:flex-row sm:items-center sm:gap-6 sm:pb-8 sm:text-left">
+        <div className="relative h-[90px] w-[90px] min-w-[90px] shrink-0 sm:h-[100px] sm:w-[100px] sm:min-w-[100px] lg:h-[109px] lg:w-[109px] lg:min-w-[109px]">
           <div
-            className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl bg-[#1A1C1F] text-2xl font-semibold text-white"
+            className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl bg-[#1A1C1F] text-xl font-semibold text-white sm:text-2xl"
             style={{ boxShadow: '0 0 0 4.5px #EDEDF2' }}
           >
             {profile.avatar ? (
@@ -88,10 +87,10 @@ export default function ProfileInformationCard({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="absolute -bottom-2 -right-2 flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#0040A1] shadow-md disabled:opacity-60"
+            // className="absolute bottom-0 right-0 flex h-[40px] w-[40px] items-center justify-center rounded-lg bg-[#0040A1] shadow-md disabled:opacity-60"
             aria-label="Change profile picture"
           >
-            <Pencil className="h-3 w-3 text-white" />
+            {/* <Pencil className="h-3 w-3 text-white" /> */}
           </button>
           <input
             ref={fileInputRef}
@@ -103,16 +102,18 @@ export default function ProfileInformationCard({
         </div>
 
         <div className="flex-1">
-          <h3 className="text-[20px] font-semibold text-[#1A1C1F]">Your Photo</h3>
-          <p className="mt-1 text-[15px] text-[#434652]">
+          <h3 className="text-[18px] font-semibold text-[#1A1C1F] sm:text-[20px]">
+            Your Photo
+          </h3>
+          <p className="mt-1 text-[14px] text-[#434652] sm:text-[15px]">
             This will be displayed on your profile and internal communications.
           </p>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-2 sm:justify-start">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="rounded-lg bg-[#DAE2FF] px-4 py-2 text-[15px] font-semibold text-[#002B73] hover:bg-[#c9d6ff] disabled:opacity-60"
+              className="rounded-lg bg-[#DAE2FF] px-4 py-2 text-[14px] font-semibold text-[#002B73] hover:bg-[#c9d6ff] disabled:opacity-60 sm:text-[15px]"
             >
               {uploading ? 'Uploading...' : 'Upload New'}
             </button>
@@ -120,7 +121,7 @@ export default function ProfileInformationCard({
               type="button"
               onClick={() => onChange({ avatar: '' })}
               disabled={uploading || !profile.avatar}
-              className="rounded-lg px-4 py-2 text-[15px] font-semibold text-[#BA1A1A] hover:bg-red-50 disabled:opacity-50"
+              className="rounded-lg px-4 py-2 text-[14px] font-semibold text-[#BA1A1A] hover:bg-red-50 disabled:opacity-50 sm:text-[15px]"
             >
               Remove
             </button>
@@ -128,9 +129,9 @@ export default function ProfileInformationCard({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
         <div className="flex flex-col gap-2">
-          <label htmlFor="fullName" className="text-[15px] font-semibold text-[#1A1C1F]">
+          <label htmlFor="fullName" className="text-[14px] font-semibold text-[#1A1C1F] sm:text-[15px]">
             Full Name
           </label>
           <input
@@ -140,12 +141,12 @@ export default function ProfileInformationCard({
             onChange={(e) => onChange({ fullName: e.target.value })}
             placeholder={loading ? 'Loading...' : 'Your full name'}
             disabled={loading}
-            className="rounded-lg border border-[#C3C6D4] px-4 py-3 text-[17px] text-[#1A1C1F] outline-none focus:border-[#0040A1]"
+            className="rounded-lg border border-[#C3C6D4] px-4 py-3 text-[16px] text-[#1A1C1F] outline-none focus:border-[#0040A1] sm:text-[17px]"
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-[15px] font-semibold text-[#1A1C1F]">
+          <label htmlFor="email" className="text-[14px] font-semibold text-[#1A1C1F] sm:text-[15px]">
             Email Address
           </label>
           <input
@@ -155,25 +156,10 @@ export default function ProfileInformationCard({
             onChange={(e) => onChange({ email: e.target.value })}
             placeholder={loading ? 'Loading...' : 'you@example.com'}
             disabled={loading}
-            className="rounded-lg border border-[#C3C6D4] px-4 py-3 text-[17px] text-[#1A1C1F] outline-none focus:border-[#0040A1]"
+            className="rounded-lg border border-[#C3C6D4] px-4 py-3 text-[16px] text-[#1A1C1F] outline-none focus:border-[#0040A1] sm:text-[17px]"
           />
         </div>
       </div>
-
-      {/* <div className="mt-6 flex flex-col gap-2">
-        <label htmlFor="bio" className="text-[15px] font-semibold text-[#1A1C1F]">
-          Bio
-        </label>
-        <textarea
-          id="bio"
-          value={profile.bio}
-          onChange={(e) => onChange({ bio: e.target.value })}
-          rows={4}
-          disabled={loading}
-          placeholder="Tell us a little about yourself."
-          className="resize-none rounded-lg border border-[#C3C6D4] px-4 py-3 text-[17px] leading-7 text-[#1A1C1F] outline-none focus:border-[#0040A1]"
-        />
-      </div> */}
     </section>
   );
 }
