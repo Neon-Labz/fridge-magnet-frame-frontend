@@ -378,7 +378,7 @@ export default function AddProductModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Primary Product Image</label>
+              <label className="block text-sm font-semibold">Primary Image</label>
 
               {primaryImagePreviewUrl ? (
                 <div
