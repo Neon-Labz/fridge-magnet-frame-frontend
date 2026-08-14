@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import OrderStatus from '@/components/dashboard/orders/OrderStatus';
 import { fetchOrder } from '@/lib/orders';
 import type { Order } from '@/types/order';
 
 export default function OrderStatusPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,5 +47,5 @@ export default function OrderStatusPage() {
   );
 }
 
-return <OrderStatus order={order} />;
+return <OrderStatus order={order} isOpen onClose={() => router.push('/dashboard/orders')} />;
 }

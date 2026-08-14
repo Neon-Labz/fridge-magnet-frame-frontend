@@ -65,7 +65,7 @@ export const useCustomers = () => {
   const [page, setPage] = useState(1);
   // The customer directory design shows four complete rows per page so the
   // table footer and pagination remain visible inside the dashboard viewport.
-  const [limit] = useState(4);
+  const [limit] = useState(6);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 

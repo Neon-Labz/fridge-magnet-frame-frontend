@@ -25,7 +25,6 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate the editable form once the profile has loaded.
   useEffect(() => {
     if (isLoaded && !hydrated) {
       setForm(profile);
@@ -45,7 +44,6 @@ export default function AccountPage() {
 
   const handleUploadAvatar = async (file: File) => {
     const next = await uploadAvatar(file);
-    // The avatar is persisted immediately; reflect it in the form only.
     updateForm({ avatar: next.avatar });
     addToast('Profile photo updated.', 'success');
   };
@@ -110,10 +108,10 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-white px-6 py-5 sm:px-8">
+    <div className="h-full w-full overflow-y-auto bg-white px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
       <AccountHeader />
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-start">
         <ProfileInformationCard
           profile={form}
           loading={!isLoaded}
