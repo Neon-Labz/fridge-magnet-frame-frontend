@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import type { Product, ProductFormData } from '@/types/product';
 
 import AddProductModal from '@/components/dashboard/products/AddProductModal';
+
 import { apiV1Url } from '@/lib/backendUrl';
 import { useToastStore } from '@/store/toastStore';
 
@@ -79,10 +80,9 @@ const mapProduct = (product: ApiProduct): Product => {
       ?.map((image) => image.secure_url || '')
       .filter(Boolean) || [];
 
-  const primaryImageUrl = product.primaryImage?.secure_url;
-
-  const imagecount =
-    (primaryImageUrl ? 1 : 0) + galleryImageUrls.length;
+  const imageCount =
+    (product.primaryImage?.secure_url ? 1 : 0) +
+    galleryImageUrls.length;
 
   return {
     id: product._id || product.id || product.productId || '',
@@ -92,11 +92,18 @@ const mapProduct = (product: ApiProduct): Product => {
     price: Number(product.price ?? 0),
     stockCount,
     stockStatus: toStockStatus(product.status, stockCount),
+
+    // Total number of product images
+    imagecount: imageCount,
+
     gradient: 'from-slate-100 to-slate-300',
-    primaryImageUrl,
+
+    primaryImageUrl: product.primaryImage?.secure_url,
+
     galleryImageUrls,
-    imagecount,
+
     description: product.description,
+
     lastUpdatedDate: product.updatedAt,
   };
 };
@@ -108,6 +115,7 @@ export default function EditProductPage() {
 
   const router = useRouter();
   const params = useParams();
+
   const { addToast } = useToastStore();
 
   const productId = params.id as string;
@@ -190,6 +198,7 @@ export default function EditProductPage() {
       }
 
       setIsModalOpen(false);
+
       router.push('/dashboard/products');
 
       return true;
