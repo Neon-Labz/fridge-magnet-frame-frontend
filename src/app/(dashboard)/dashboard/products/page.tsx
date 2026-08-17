@@ -1,26 +1,28 @@
 'use client';
-
-import { useEffect, useMemo, useState } from 'react';
-import DeleteProductModal from '@/components/dashboard/products/DeleteProductModal';
-import AddProductModal from '@/components/dashboard/products/AddProductModal';
-import ViewProductModal from '@/components/dashboard/products/ViewProductModal';
-import ProductHeader from '@/components/dashboard/products/ProductHeader';
-import ProductStats from '@/components/dashboard/products/ProductStats';
-import ProductFilters, { type FilterStatus, type SortBy } from '@/components/dashboard/products/ProductFilters';
-import ProductTable from '@/components/dashboard/products/ProductTable';
-import Pagination from '@/components/dashboard/shared/Pagination';
-import { useProducts } from '@/hooks/useProducts';
-import type { Product, ProductFormData } from '@/types/product';
-import { apiV1Url } from '@/lib/backendUrl';
-import { useToastStore } from '@/store/toastStore';
+import { useEffect, useMemo, useState } from "react";
+import DeleteProductModal from "@/components/dashboard/products/DeleteProductModal";
+import AddProductModal from "@/components/dashboard/products/AddProductModal";
+import ViewProductModal from "@/components/dashboard/products/ViewProductModal";
+import ProductHeader from "@/components/dashboard/products/ProductHeader";
+import ProductStats from "@/components/dashboard/products/ProductStats";
+import ProductFilters, {
+  type FilterStatus,
+  type SortBy,
+} from "@/components/dashboard/products/ProductFilters";
+import ProductTable from "@/components/dashboard/products/ProductTable";
+import Pagination from "@/components/dashboard/shared/Pagination";
+import { useProducts } from "@/hooks/useProducts";
+import type { Product, ProductFormData } from "@/types/product";
+import { apiV1Url } from "@/lib/backendUrl";
+import { useToastStore } from "@/store/toastStore";
 
 const PAGE_SIZE = 4;
-const ID_PREFIX = 'MG-';
+const ID_PREFIX = "MG-";
 
 const getProductStatus = (stock: number) => {
-  if (stock > 10) return 'In Stock';
-  if (stock > 0) return 'Low Stock';
-  return 'Out of Stock';
+  if (stock > 10) return "In Stock";
+  if (stock > 0) return "Low Stock";
+  return "Out of Stock";
 };
 
 const getErrorMessage = (responseText: string) => {
@@ -28,7 +30,7 @@ const getErrorMessage = (responseText: string) => {
     const parsed = JSON.parse(responseText);
     return parsed.message || parsed.error || responseText;
   } catch {
-    return responseText || 'Something went wrong';
+    return responseText || "Something went wrong";
   }
 };
 const computeNextProductId = (products: Product[]): string => {
@@ -36,7 +38,7 @@ const computeNextProductId = (products: Product[]): string => {
   let padLength = 2;
 
   products.forEach((product) => {
-    const match = /^MG-(\d+)$/i.exec(product.sku ?? '');
+    const match = /^MG-(\d+)$/i.exec(product.sku ?? "");
     if (!match) return;
 
     const num = parseInt(match[1], 10);
@@ -47,7 +49,7 @@ const computeNextProductId = (products: Product[]): string => {
   });
 
   const nextNumber = maxNumber + 1;
-  return `${ID_PREFIX}${String(nextNumber).padStart(padLength, '0')}`;
+  return `${ID_PREFIX}${String(nextNumber).padStart(padLength, "0")}`;
 };
 
 export default function ProductsPage() {
@@ -72,27 +74,30 @@ export default function ProductsPage() {
     return () => window.clearTimeout(timer);
   }, [productMessage]);
   const [page, setPage] = useState(1);
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
-  const [sortBy, setSortBy] = useState<SortBy>('default');
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("default");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
   const safeProducts = Array.isArray(products) ? products : [];
 
-  const autoProductId = useMemo(() => computeNextProductId(safeProducts), [safeProducts]);
+  const autoProductId = useMemo(
+    () => computeNextProductId(safeProducts),
+    [safeProducts],
+  );
 
   const filtered =
-    filterStatus === 'all'
+    filterStatus === "all"
       ? safeProducts
       : safeProducts.filter((product) => product.stockStatus === filterStatus);
 
   const sorted = [...filtered].sort((a, b) => {
-    if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
-    if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-    if (sortBy === 'price-asc') return a.price - b.price;
-    if (sortBy === 'price-desc') return b.price - a.price;
-    if (sortBy === 'stock-asc') return a.stockCount - b.stockCount;
-    if (sortBy === 'stock-desc') return b.stockCount - a.stockCount;
+    if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+    if (sortBy === "name-desc") return b.name.localeCompare(a.name);
+    if (sortBy === "price-asc") return a.price - b.price;
+    if (sortBy === "price-desc") return b.price - a.price;
+    if (sortBy === "stock-asc") return a.stockCount - b.stockCount;
+    if (sortBy === "stock-desc") return b.stockCount - a.stockCount;
     return 0;
   });
 
@@ -120,31 +125,27 @@ export default function ProductsPage() {
     try {
       const data = new FormData();
 
-      data.append('productName', formData.name);
-      data.append('productId', formData.productId);
-      data.append('stock', String(formData.stock));
-      data.append('description', formData.description);
-      data.append('status', getProductStatus(formData.stock));
+      data.append("productName", formData.name);
+      data.append("productId", formData.productId);
+      data.append("stock", String(formData.stock));
+      data.append("description", formData.description);
+      data.append("status", getProductStatus(formData.stock));
 
-      data.append('price', String(formData.price));
-      data.append('imagecount', String(formData.imagecount));
-
+      data.append("price", String(formData.price));
+      data.append("imagecount", String(formData.imagecount));
 
       if (formData.primaryImage) {
-        data.append('primaryImage', formData.primaryImage);
+        data.append("primaryImage", formData.primaryImage);
       }
 
       formData.galleryImages.forEach((file) => {
-        data.append('galleryImages', file);
+        data.append("galleryImages", file);
       });
 
-      const res = await fetch(
-        apiV1Url('/api/products'),
-        {
-          method: 'POST',
-          body: data,
-        }
-      );
+      const res = await fetch(apiV1Url("/api/products"), {
+        method: "POST",
+        body: data,
+      });
 
       const result = await res.text();
 
@@ -152,20 +153,22 @@ export default function ProductsPage() {
         throw new Error(getErrorMessage(result));
       }
 
-      addToast('Product added successfully', 'success');
-      setProductMessage('Product added successfully');
+      addToast("Product added successfully", "success");
+      setProductMessage("Product added successfully");
 
       await refreshProducts();
       setAddOpen(false);
 
       setPage(1);
-      setFilterStatus('all');
-      setSortBy('default');
+      setFilterStatus("all");
+      setSortBy("default");
 
       return true;
-
     } catch (error) {
-      addToast(error instanceof Error ? error.message : 'Something went wrong', 'error');
+      addToast(
+        error instanceof Error ? error.message : "Something went wrong",
+        "error",
+      );
       return false;
     }
   };
@@ -176,20 +179,20 @@ export default function ProductsPage() {
     try {
       const data = new FormData();
 
-      data.append('productName', formData.name);
-      data.append('productId', formData.productId);
-      data.append('stock', String(formData.stock));
-      data.append('price', String(formData.price));
-      data.append('imagecount', String(formData.imagecount));
-      data.append('description', formData.description);
-      data.append('status', getProductStatus(formData.stock));
+      data.append("productName", formData.name);
+      data.append("productId", formData.productId);
+      data.append("stock", String(formData.stock));
+      data.append("price", String(formData.price));
+      data.append("imagecount", String(formData.imagecount));
+      data.append("description", formData.description);
+      data.append("status", getProductStatus(formData.stock));
 
       if (formData.primaryImage) {
-        data.append('primaryImage', formData.primaryImage);
+        data.append("primaryImage", formData.primaryImage);
       }
 
       const res = await fetch(apiV1Url(`/api/products/${editTarget.id}`), {
-        method: 'PUT',
+        method: "PUT",
         body: data,
       });
 
@@ -208,8 +211,10 @@ export default function ProductsPage() {
           toDelete.map(async (img) => {
             const encodedPublicId = encodeURIComponent(img.public_id);
             const deleteRes = await fetch(
-              apiV1Url(`/api/products/${editTarget.id}/image/${encodedPublicId}`),
-              { method: 'DELETE' },
+              apiV1Url(
+                `/api/products/${editTarget.id}/image/${encodedPublicId}`,
+              ),
+              { method: "DELETE" },
             );
             if (!deleteRes.ok) {
               const text = await deleteRes.text();
@@ -222,13 +227,13 @@ export default function ProductsPage() {
       if (formData.galleryImages.length > 0) {
         const galleryData = new FormData();
         formData.galleryImages.forEach((file) => {
-          galleryData.append('galleryImages', file);
+          galleryData.append("galleryImages", file);
         });
 
         const galleryRes = await fetch(
           apiV1Url(`/api/products/${editTarget.id}/gallery`),
           {
-            method: 'POST',
+            method: "POST",
             body: galleryData,
           },
         );
@@ -238,45 +243,42 @@ export default function ProductsPage() {
           throw new Error(getErrorMessage(text));
         }
       }
-      addToast('Product updated successfully', 'success');
-      setProductMessage('Product updated successfully');
+      addToast("Product updated successfully", "success");
+      setProductMessage("Product updated successfully");
       await refreshProducts();
       setEditTarget(null);
       return true;
     } catch (error) {
-      addToast(error instanceof Error ? error.message : 'Failed to update product', 'error');
+      addToast(
+        error instanceof Error ? error.message : "Failed to update product",
+        "error",
+      );
       return false;
     }
   };
 
-  const handleUpdateProduct = async (
-    product: Product,
-    newStock: string,
-  ) => {
+  const handleUpdateProduct = async (product: Product, newStock: string) => {
     try {
       const updatedStock = Number(newStock);
 
-      let status = 'Out of Stock';
+      let status = "Out of Stock";
 
       if (updatedStock > 10) {
-        status = 'In Stock';
+        status = "In Stock";
       } else if (updatedStock > 4) {
-        status = 'Low Stock';
+        status = "Low Stock";
       }
 
-      const res = await fetch(
-        apiV1Url(`/api/products/${product.id}`),
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            stock: updatedStock,
-            status,
-          }),
+      const res = await fetch(apiV1Url(`/api/products/${product.id}`), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          stock: updatedStock,
+          status,
+        }),
+      });
 
       const result = await res.text();
 
@@ -284,8 +286,8 @@ export default function ProductsPage() {
         throw new Error(getErrorMessage(result));
       }
 
-      addToast('Stock updated successfully', 'success');
-      setProductMessage('Stock updated successfully');
+      addToast("Stock updated successfully", "success");
+      setProductMessage("Stock updated successfully");
 
       await refreshProducts();
 
@@ -293,8 +295,9 @@ export default function ProductsPage() {
 
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update stock';
-      addToast(message, 'error');
+      const message =
+        error instanceof Error ? error.message : "Failed to update stock";
+      addToast(message, "error");
       setProductMessage(message);
 
       return false;
@@ -309,7 +312,7 @@ export default function ProductsPage() {
 
     try {
       const res = await fetch(apiV1Url(`/api/products/${deleteTarget.id}`), {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       const result = await res.text();
@@ -318,12 +321,14 @@ export default function ProductsPage() {
         throw new Error(getErrorMessage(result));
       }
 
-      addToast('Product deleted successfully', 'success');
-      setProductMessage('Product deleted successfully');
+      addToast("Product deleted successfully", "success");
+      setProductMessage("Product deleted successfully");
       await refreshProducts();
       setDeleteTarget(null);
     } catch (error) {
-      setDeleteError(error instanceof Error ? error.message : 'Failed to delete product');
+      setDeleteError(
+        error instanceof Error ? error.message : "Failed to delete product",
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -339,20 +344,23 @@ export default function ProductsPage() {
         <ProductHeader onAddClick={() => setAddOpen(true)} />
 
         <section
-          className="mb-0 flex flex-1 flex-col overflow-hidden"
+          className="mb-0 flex flex-col overflow-hidden"
           style={{
-            background: '#fff',
-            border: '1px solid #C3C6D4',
+            background: "#fff",
+            border: "1px solid #C3C6D4",
             borderRadius: 12,
             boxShadow:
-              '0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)',
+              "0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)",
           }}
         >
-
           {productMessage && (
             <div
               className="mx-8 mt-5 rounded-lg px-4 py-3 text-sm font-semibold"
-              style={{ background: '#F1F7FF', color: '#002B73', border: '1px solid rgba(0, 43, 115, 0.14)' }}
+              style={{
+                background: "#F1F7FF",
+                color: "#002B73",
+                border: "1px solid rgba(0, 43, 115, 0.14)",
+              }}
             >
               {productMessage}
             </div>
@@ -368,15 +376,17 @@ export default function ProductsPage() {
             onEdit={setEditTarget}
           />
 
-          <Pagination
-            currentPage={safePage}
-            totalPages={totalPages}
-            startItem={startItem}
-            endItem={endItem}
-            totalItems={sorted.length}
-            label="products"
-            onPageChange={setPage}
-          />
+          <div className="sticky bottom-0 z-10 border-t border-[#E5E7EB] bg-white">
+            <Pagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              startItem={startItem}
+              endItem={endItem}
+              totalItems={sorted.length}
+              label="products"
+              onPageChange={setPage}
+            />
+          </div>
         </section>
       </div>
 

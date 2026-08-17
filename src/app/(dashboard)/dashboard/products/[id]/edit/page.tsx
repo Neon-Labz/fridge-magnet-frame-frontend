@@ -160,7 +160,9 @@ export default function EditProductPage() {
     fetchProduct();
   }, [addToast, productId]);
 
-  const handleSubmit = async (formData: ProductFormData) => {
+  const handleSubmit = async (
+    formData: ProductFormData,
+  ) => {
     try {
       const data = new FormData();
 
