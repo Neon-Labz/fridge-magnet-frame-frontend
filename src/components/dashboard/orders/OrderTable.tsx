@@ -86,7 +86,7 @@ export default function OrderTable({
                       letterSpacing: "0.5px",
                     }}
                   >
-                    Date
+                    Order Date
                   </th>
 
                   <th

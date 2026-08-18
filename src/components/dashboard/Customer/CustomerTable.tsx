@@ -25,6 +25,9 @@ const getInitials = (name: string) =>
     .slice(0, 2)
     .toUpperCase();
 
+const normalizeCustomerId = (value: unknown) =>
+  String(value ?? "").replace(/^#+/, "");
+
 const normalizeCustomer = (customer: any): CustomerRow => {
   const name =
     customer.customerName ||
@@ -33,7 +36,7 @@ const normalizeCustomer = (customer: any): CustomerRow => {
     "Unknown";
 
   return {
-    id: String(
+    id: normalizeCustomerId(
       customer.customerId ||
         customer.id ||
         customer._id ||
@@ -535,7 +538,7 @@ const CustomerTable = ({ onCustomersChanged }: CustomerTableProps) => {
                     <td className="px-3 py-3 border-b border-[#E5E7EB] text-center align-middle">
                       <div className="w-full min-w-0 max-w-full">
                         <span className="block break-words text-[10px] text-[#64748B] font-mono">
-                          #{customer.id}
+                          {customer.id}
                         </span>
                       </div>
                     </td>

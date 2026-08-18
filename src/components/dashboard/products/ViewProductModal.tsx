@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, History, Images } from 'lucide-react';
+import { X, History, Images, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { apiV1Url } from '@/lib/backendUrl';
 
@@ -22,6 +22,24 @@ type StockLogEntry = {
   changedAt: string;
 };
 
+// If the backend returns pagination metadata we trust it (server-side
+// pagination). If it just returns a flat array (legacy API), we fall
+// back to slicing that array on the client so the UI still only ever
+// shows PAGE_SIZE rows at a time.
+type StockLogResponse = {
+  data: StockLogEntry[];
+  total?: number;
+  page?: number;
+  totalPages?: number;
+  pagination?: {
+    total?: number;
+    page?: number;
+    totalPages?: number;
+  };
+};
+
+const PAGE_SIZE = 5;
+
 export default function ViewProductModal({
   isOpen,
   product,
@@ -29,19 +47,31 @@ export default function ViewProductModal({
   onUpdate,
 }: ViewProductModalProps) {
   const [showLog, setShowLog] = useState(false);
-  const [stockLog, setStockLog] = useState<StockLogEntry[]>([]);
   const [isLoadingLog, setIsLoadingLog] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
   const [activeGalleryImage, setActiveGalleryImage] =
     useState<string | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [isServerPaginated, setIsServerPaginated] = useState(true);
+  // Holds either the current page's rows (server-paginated) or the
+  // full record set (client-side fallback for legacy API responses).
+  const [logRecords, setLogRecords] = useState<StockLogEntry[]>([]);
+
   useEffect(() => {
     if (!isOpen) return;
 
     setShowLog(false);
-    setStockLog([]);
+    setLogRecords([]);
     setLogError(null);
     setActiveGalleryImage(null);
+    setCurrentPage(1);
+    setTotalPages(1);
+    setTotalRecords(0);
+    setIsServerPaginated(true);
   }, [isOpen, product?.id]);
 
   if (!isOpen || !product) return null;
@@ -58,26 +88,48 @@ export default function ViewProductModal({
 
   const currentStatus = getStatus(currentStock);
 
-  const handleViewLog = async () => {
-    const next = !showLog;
-    setShowLog(next);
-
-    if (!next) return;
+  const fetchStockLog = async (page: number) => {
+    if (!product) return;
 
     setIsLoadingLog(true);
     setLogError(null);
 
     try {
       const res = await fetch(
-        apiV1Url(`/api/products/${product.id}/stock-log`),
+        apiV1Url(
+          `/api/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
+        ),
       );
 
       if (!res.ok) {
         throw new Error('Failed to fetch stock log');
       }
 
-      const json = await res.json();
-      setStockLog(json.data ?? []);
+      const json: StockLogResponse = await res.json();
+      const records = json.data ?? [];
+
+      const serverTotal = json.pagination?.total ?? json.total;
+      const serverTotalPages =
+        json.pagination?.totalPages ?? json.totalPages;
+
+      if (typeof serverTotal === 'number') {
+        // Backend supports pagination - trust its metadata and the
+        // (already page-sized) records it returned.
+        setIsServerPaginated(true);
+        setLogRecords(records);
+        setTotalRecords(serverTotal);
+        setTotalPages(
+          serverTotalPages ??
+            Math.max(1, Math.ceil(serverTotal / PAGE_SIZE)),
+        );
+      } else {
+        // Legacy API - it returned everything at once. Paginate on
+        // the client so we still only render PAGE_SIZE rows.
+        setIsServerPaginated(false);
+        setLogRecords(records);
+        setTotalRecords(records.length);
+        setTotalPages(Math.max(1, Math.ceil(records.length / PAGE_SIZE)));
+      }
     } catch (err) {
       setLogError(
         err instanceof Error
@@ -88,6 +140,35 @@ export default function ViewProductModal({
       setIsLoadingLog(false);
     }
   };
+
+  const handleViewLog = async () => {
+    const next = !showLog;
+    setShowLog(next);
+
+    if (!next) return;
+
+    setCurrentPage(1);
+    await fetchStockLog(1);
+  };
+
+  const goToPage = async (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    setCurrentPage(page);
+
+    if (isServerPaginated) {
+      await fetchStockLog(page);
+    }
+    // For client-side pagination, the full list is already loaded in
+    // logRecords - `displayedLog` below handles the slicing.
+  };
+
+  const displayedLog = isServerPaginated
+    ? logRecords
+    : logRecords.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE,
+      );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-5">
@@ -298,126 +379,36 @@ export default function ViewProductModal({
                       {logError}
                     </p>
                   </div>
-                ) : stockLog.length === 0 ? (
+                ) : totalRecords === 0 ? (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-center">
                     <p className="text-sm text-slate-500">
                       No stock changes recorded yet.
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-xl border border-slate-200">
-                    <div className="divide-y divide-slate-100 sm:hidden">
-                      {stockLog.map((entry, idx) => {
-                        const change =
-                          entry.newStock -
-                          entry.previousStock;
+                  <>
+                    <div className="overflow-hidden rounded-xl border border-slate-200">
+                      <div className="divide-y divide-slate-100 sm:hidden">
+                        {displayedLog.map((entry, idx) => {
+                          const change =
+                            entry.newStock -
+                            entry.previousStock;
 
-                        return (
-                          <div
-                            key={idx}
-                            className="space-y-3 p-4"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-slate-500">
-                                {new Date(
-                                  entry.changedAt,
-                                ).toLocaleDateString()}
-                              </span>
-
-                              <span
-                                className={[
-                                  'text-sm font-bold',
-                                  change >= 0
-                                    ? 'text-green-600'
-                                    : 'text-red-600',
-                                ].join(' ')}
-                              >
-                                {change >= 0
-                                  ? `+${change}`
-                                  : change}
-                              </span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                              <HistoryValue
-                                label="Previous"
-                                value={String(
-                                  entry.previousStock,
-                                )}
-                              />
-
-                              <HistoryValue
-                                label="New Stock"
-                                value={String(
-                                  entry.newStock,
-                                )}
-                              />
-
-                              <HistoryValue
-                                label="Changed By"
-                                value={entry.changedBy}
-                              />
-
-                              <HistoryValue
-                                label="Time"
-                                value={new Date(
-                                  entry.changedAt,
-                                ).toLocaleTimeString([], {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="hidden overflow-x-auto sm:block">
-                      <table className="w-full min-w-[600px] text-sm">
-                        <thead className="bg-[#F5F6FB]">
-                          <tr>
-                            {[
-                              'Date',
-                              'Previous',
-                              'Change',
-                              'New Stock',
-                              'Changed By',
-                            ].map((heading) => (
-                              <th
-                                key={heading}
-                                className="whitespace-nowrap px-4 py-3 text-left text-xs font-bold text-[#002B73]"
-                              >
-                                {heading}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {stockLog.map((entry, idx) => {
-                            const change =
-                              entry.newStock -
-                              entry.previousStock;
-
-                            return (
-                              <tr
-                                key={idx}
-                                className="border-t border-slate-100"
-                              >
-                                <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">
+                          return (
+                            <div
+                              key={idx}
+                              className="space-y-3 p-4"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-slate-500">
                                   {new Date(
                                     entry.changedAt,
-                                  ).toLocaleString()}
-                                </td>
+                                  ).toLocaleDateString()}
+                                </span>
 
-                                <td className="px-4 py-3 font-medium text-slate-800">
-                                  {entry.previousStock}
-                                </td>
-
-                                <td
+                                <span
                                   className={[
-                                    'px-4 py-3 font-bold',
+                                    'text-sm font-bold',
                                     change >= 0
                                       ? 'text-green-600'
                                       : 'text-red-600',
@@ -426,22 +417,185 @@ export default function ViewProductModal({
                                   {change >= 0
                                     ? `+${change}`
                                     : change}
-                                </td>
+                                </span>
+                              </div>
 
-                                <td className="px-4 py-3 font-medium text-slate-800">
-                                  {entry.newStock}
-                                </td>
+                              <div className="grid grid-cols-2 gap-3">
+                                <HistoryValue
+                                  label="Previous"
+                                  value={String(
+                                    entry.previousStock,
+                                  )}
+                                />
 
-                                <td className="px-4 py-3 text-slate-500">
-                                  {entry.changedBy}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                                <HistoryValue
+                                  label="New Stock"
+                                  value={String(
+                                    entry.newStock,
+                                  )}
+                                />
+
+                                <HistoryValue
+                                  label="Changed By"
+                                  value={entry.changedBy}
+                                />
+
+                                <HistoryValue
+                                  label="Time"
+                                  value={new Date(
+                                    entry.changedAt,
+                                  ).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="hidden overflow-x-auto sm:block">
+                        <table className="w-full min-w-[600px] text-sm">
+                          <thead className="bg-[#F5F6FB]">
+                            <tr>
+                              {[
+                                'Date',
+                                'Previous',
+                                'Change',
+                                'New Stock',
+                                'Changed By',
+                              ].map((heading) => (
+                                <th
+                                  key={heading}
+                                  className="whitespace-nowrap px-4 py-3 text-left text-xs font-bold text-[#002B73]"
+                                >
+                                  {heading}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {displayedLog.map((entry, idx) => {
+                              const change =
+                                entry.newStock -
+                                entry.previousStock;
+
+                              return (
+                                <tr
+                                  key={idx}
+                                  className="border-t border-slate-100"
+                                >
+                                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">
+                                    {new Date(
+                                      entry.changedAt,
+                                    ).toLocaleString()}
+                                  </td>
+
+                                  <td className="px-4 py-3 font-medium text-slate-800">
+                                    {entry.previousStock}
+                                  </td>
+
+                                  <td
+                                    className={[
+                                      'px-4 py-3 font-bold',
+                                      change >= 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600',
+                                    ].join(' ')}
+                                  >
+                                    {change >= 0
+                                      ? `+${change}`
+                                      : change}
+                                  </td>
+
+                                  <td className="px-4 py-3 font-medium text-slate-800">
+                                    {entry.newStock}
+                                  </td>
+
+                                  <td className="px-4 py-3 text-slate-500">
+                                    {entry.changedBy}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
+
+                    {totalPages > 1 && (
+                      <div className="mt-3 flex flex-col items-center justify-between gap-3 sm:flex-row">
+                        <p className="text-xs font-medium text-slate-500">
+                          Showing{' '}
+                          <span className="font-bold text-slate-700">
+                            {(currentPage - 1) * PAGE_SIZE + 1}
+                            {'-'}
+                            {Math.min(
+                              currentPage * PAGE_SIZE,
+                              totalRecords,
+                            )}
+                          </span>{' '}
+                          of{' '}
+                          <span className="font-bold text-slate-700">
+                            {totalRecords}
+                          </span>
+                        </p>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              goToPage(currentPage - 1)
+                            }
+                            disabled={currentPage === 1}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Previous page"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+
+                          {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1,
+                          ).map((pageNum) => (
+                            <button
+                              key={pageNum}
+                              type="button"
+                              onClick={() => goToPage(pageNum)}
+                              className={[
+                                'flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition',
+                                pageNum === currentPage
+                                  ? 'bg-[#002B73] text-white'
+                                  : 'border border-slate-200 text-slate-600 hover:bg-slate-50',
+                              ].join(' ')}
+                              aria-label={`Go to page ${pageNum}`}
+                              aria-current={
+                                pageNum === currentPage
+                                  ? 'page'
+                                  : undefined
+                              }
+                            >
+                              {pageNum}
+                            </button>
+                          ))}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              goToPage(currentPage + 1)
+                            }
+                            disabled={currentPage === totalPages}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Next page"
+                          >
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}

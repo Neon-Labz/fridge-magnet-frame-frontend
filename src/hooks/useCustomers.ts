@@ -33,13 +33,16 @@ const getInitials = (name: string) =>
     .toUpperCase()
     .slice(0, 2) || '?';
 
+const normalizeCustomerId = (value: string | undefined | null) =>
+  String(value ?? '').replace(/^#+/, '');
+
 const mapCustomer = (customer: RawCustomer): Customer => {
   const name = customer.customerName || customer.name || 'Website Customer';
-  const id = customer.customerId || customer.id || customer._id || '';
+  const id = normalizeCustomerId(customer.customerId || customer.id || customer._id || '');
 
   return {
     ...customer,
-    id: String(id).replace(/^#/, ''),
+    id,
     name,
     initials: getInitials(name),
     email: customer.emailAddress || customer.email || '',
