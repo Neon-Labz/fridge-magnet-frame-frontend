@@ -1,127 +1,237 @@
-import { Eye, Mail, Trash2 } from 'lucide-react';
-import type { Order } from '@/types/order';
-import StatusBadge from './StatusBadge';
-import Link from "next/link";
+"use client";
+
+import { Eye, Trash2 } from "lucide-react";
+import type { Order } from "@/types/order";
 
 interface OrderTableProps {
   orders: Order[];
+  onView: (order: Order) => void;
   onDelete: (order: Order) => void;
 }
 
-export default function OrderTable({ orders, onDelete }: OrderTableProps) {
+function formatDate(dateInput?: string | Date) {
+  if (!dateInput) return "-";
+  const date = new Date(dateInput);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatCurrency(value?: number) {
+  if (value === undefined || value === null) return "-";
+  return `Rs. ${value.toLocaleString("en-LK")}`;
+}
+
+function getStatusStyle(status: string) {
+  switch (status) {
+    case "delivered":
+      return { bg: "#DCFCE7", text: "#15803D" };
+    case "shipped":
+      return { bg: "#DBEAFE", text: "#1D4ED8" };
+    case "processing":
+      return { bg: "#FEF3C7", text: "#B45309" };
+    case "pending":
+      return { bg: "#F1F5F9", text: "#475569" };
+    case "canceled":
+      return { bg: "#FEE2E2", text: "#B91C1C" };
+    default:
+      return { bg: "#F1F5F9", text: "#475569" };
+  }
+}
+
+export default function OrderTable({
+  orders,
+  onView,
+  onDelete,
+}: OrderTableProps) {
   return (
-    <div className="flex-1 overflow-auto">
-      <table className="w-full border-collapse text-left">
-        <thead>
-          <tr style={{ background: '#F3F3F8', borderBottom: '1px solid #C3C6D4' }}>
-            {['Order ID', 'Customer Name', 'QTY', 'Customer ID', 'Status', 'Actions'].map((h, i) => (
-              <th
-                key={h}
-                className="font-semibold text-sm uppercase"
-                style={{
-                  padding: '16px 24px',
-                  color: '#002B73',
-                  letterSpacing: '0.7px',
-                  textAlign: i === 2 ? 'center' : i === 5 ? 'right' : 'left',
-                }}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order, idx) => (
-            <tr
-              key={order.id}
-              className="transition hover:bg-slate-50/60"
-              style={{ borderTop: idx === 0 ? 'none' : '1px solid #C3C6D4' }}
-            >
-              <td className="py-[26.5px] px-6">
-                <span
-                  className="text-sm"
-                  style={{ fontFamily: 'monospace', color: '#002B73' }}
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="min-h-0 flex-1">
+        <div className="h-full overflow-auto">
+          <div className="overflow-x-auto">
+            <table className="w-full table-fixed border-collapse min-w-[980px]">
+              <thead className="sticky top-0 z-30">
+                <tr
+                  style={{
+                    background: "#F3F3F8",
+                    borderBottom: "1px solid #C3C6D4",
+                  }}
                 >
-                  {order.orderId}
-                </span>
-              </td>
-
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex items-center justify-center flex-shrink-0 font-bold text-xs"
-                    style={{ width: 32, height: 32, background: '#DAE2FF', borderRadius: 9999, color: '#002B73' }}
-                  >
-                    {order.customerInitials}
-                  </div>
-                  <span className="font-semibold text-base" style={{ color: '#1A1C1F' }}>
-                    {order.customerName}
-                  </span>
-                </div>
-              </td>
-
-              <td className="px-6 py-[26.5px] text-center">
-                <span className="font-medium text-base" style={{ color: '#1A1C1F' }}>
-                  {order.qty}
-                </span>
-              </td>
-
-              <td className="px-6 py-[26px]">
-                <span className="text-sm" style={{ color: '#434652' }}>
-                  {order.customerId}
-                </span>
-              </td>
-
-              <td className="px-6 py-[24.5px]">
-                <Link
-                    href={`/dashboard/orders/${order.id}`}
-                    className="inline-flex"
-                  >
-                    <StatusBadge status={order.status} />
-                  </Link>            
-              </td>
-
-              <td className="px-6 py-[16.5px] text-right">
-                <div className="inline-flex items-center gap-1">
-                  <Link
-                    href={`/dashboard/orders/${order.id}`}
-                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-blue-50"
-                    style={{ width: 32, height: 34 }}
-                    aria-label="View order"
-                  >
-                    <Eye size={16} color="#002B73" />
-                  </Link>
-
-                  <a
-                    href={order.email ? `mailto:${order.email}?subject=Regarding your Magnify order %23${order.orderId}` : undefined}
-                    onClick={!order.email ? (e) => e.preventDefault() : undefined}
-                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-blue-50"
+                  <th
+                    className="w-[16%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
                     style={{
-                      width: 32,
-                      height: 34,
-                      opacity: order.email ? 1 : 0.35,
-                      cursor: order.email ? 'pointer' : 'not-allowed',
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
                     }}
-                    aria-label="Message customer"
-                    aria-disabled={!order.email}
                   >
-                    <Mail size={16} color="#002B73" />
-                  </a>
+                    Order ID
+                  </th>
 
-                  <button
-                    onClick={() => onDelete(order)}
-                    className="inline-flex items-center justify-center rounded-lg transition hover:bg-red-50"
-                    style={{ width: 32, height: 34 }}
-                    aria-label="Delete order"
+                  <th
+                    className="w-[20%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
                   >
-                    <Trash2 size={16} color="#BC0000" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                    Customer Info
+                  </th>
+
+                  <th
+                    className="w-[16%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Order Date
+                  </th>
+
+                  <th
+                    className="w-[10%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    QTY
+                  </th>
+
+                  <th
+                    className="w-[12%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Status
+                  </th>
+
+                  <th
+                    className="w-[14%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Total Amount
+                  </th>
+
+                  <th
+                    className="w-[14%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    style={{
+                      color: "#002B73",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-5 py-12 text-center text-sm text-slate-500"
+                    >
+                      No orders found.
+                    </td>
+                  </tr>
+                ) : (
+                  orders.map((order) => (
+                    <tr
+                      key={order.id}
+                      className="transition-colors hover:bg-slate-50/60"
+                      style={{
+                        borderBottom: "1px solid #E2E5EC",
+                      }}
+                    >
+                      <td className="px-5 py-4 text-center align-middle">
+                        <span
+                          className="text-sm font-medium"
+                          style={{
+                            color: "#002B73",
+                            fontFamily: "monospace",
+                          }}
+                        >
+                          {order.orderId}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 text-left align-middle">
+                        <div className="flex flex-col pl-9">
+                          <span className="truncate text-sm font-medium text-[#1A1C1F]">
+                            {order.customerName}
+                          </span>
+                          <span className="truncate text-xs font-medium text-[#8A8D99]">
+                            {order.customerId}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-4 text-center align-center">
+                        <span className="text-sm font-medium text-[#1A1C1F]">
+                          {formatDate(order.createdAt)}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 text-center align-center">
+                        <span className="text-sm font-medium text-[#1A1C1F]">
+                          {order.qty}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 text-center align-center">
+                        <span
+                          className="inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize"
+                          style={{
+                            background: getStatusStyle(order.status).bg,
+                            color: getStatusStyle(order.status).text,
+                          }}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 text-center align-center">
+                        <span className="text-sm font-semibold text-[#1A1C1F]">
+                          {formatCurrency(order.totalValue)}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 text-center align-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onView(order)}
+                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-blue-50"
+                            aria-label="View order"
+                          >
+                            <Eye size={17} strokeWidth={2} color="#002B73" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => onDelete(order)}
+                            className="relative z-10 flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-red-50"
+                            aria-label="Delete order"
+                          >
+                            <Trash2 size={17} strokeWidth={2} color="#BC0000" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,31 +1,42 @@
 "use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  X,
+  ShoppingBag,
+  List,
+  Truck,
+  Mail,
+  Phone,
+  MapPin,
+  ChevronDown,
+  Check,
+  Loader2,
+} from "lucide-react";
 import { useToastStore } from "@/store/toastStore";
-import type { Order, OrderStatus as OrderStatusValue } from "@/types/order";
 import { mapApiOrder, statusToApi } from "@/lib/orders";
 import { apiV1Url } from "@/lib/backendUrl";
 import { getProductLineTotal } from "@/lib/productQuantityRules";
-import {
-  CircleEllipsis,
-  RefreshCw,
-  Truck,
-  CheckCircle2,
-  XCircle,
-  ListChecks,
-  Check,
-} from "lucide-react";
+import type { Order, OrderStatus as OrderStatusType } from "@/types/order";
+
+type OrderWithMongoId = Order & { _id?: string };
 
 type OrderStatusProps = {
-  order: Order;
+  order: Order | null;
+  isOpen: boolean;
+  onClose: () => void;
+  /** Called with the fresh order after a successful backend update, so the parent list can refresh */
+  onUpdated?: (order: Order) => void;
 };
 
-type OrderWithMongoId = Order & {
-  _id?: string;
-};
+const STATUS_OPTIONS: OrderStatusType[] = [
+  "pending",
+  "processing",
+  "shipped",
+  "delivered",
+  "canceled",
+];
 
-const STATUS_RANK: Record<OrderStatusValue, number> = {
+const STATUS_RANK: Record<OrderStatusType, number> = {
   pending: 0,
   processing: 1,
   shipped: 2,
@@ -33,49 +44,124 @@ const STATUS_RANK: Record<OrderStatusValue, number> = {
   canceled: 4,
 };
 
-export default function OrderStatus({ order }: OrderStatusProps) {
-  const router = useRouter();
-  const { addToast } = useToastStore();
-  const [currentOrder, setCurrentOrder] = useState<OrderWithMongoId>(order);
-  const [status, setStatus] = useState<OrderStatusValue>(
-    order.status || "processing"
-  );
-  const [adminNote, setAdminNote] = useState(order.adminNote || "");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [sendEmailNotification, setSendEmailNotification] = useState(true);
+const normalizeCustomerId = (value?: string | null) =>
+  String(value ?? "").replace(/^#+/, "").trim();
 
+function getStatusStyle(status: string) {
+  switch (status) {
+    case "delivered":
+      return { bg: "#DCFCE7", text: "#15803D" };
+    case "shipped":
+      return { bg: "#DBEAFE", text: "#1D4ED8" };
+    case "processing":
+      return { bg: "#FEF3C7", text: "#B45309" };
+    case "pending":
+      return { bg: "#F1F5F9", text: "#475569" };
+    case "canceled":
+      return { bg: "#FEE2E2", text: "#B91C1C" };
+    default:
+      return { bg: "#F1F5F9", text: "#475569" };
+  }
+}
+
+function formatPlacedOn(dateInput?: string) {
+  if (!dateInput) return "-";
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return "-";
+  const datePart = date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${datePart} · ${timePart}`;
+}
+
+export default function OrderStatus({
+  order,
+  isOpen,
+  onClose,
+  onUpdated,
+}: OrderStatusProps) {
+  const { addToast } = useToastStore();
+
+  const [currentOrder, setCurrentOrder] = useState<OrderWithMongoId | null>(
+    order,
+  );
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [adminNote, setAdminNote] = useState("");
+
+  // Keep local order in sync whenever a different order is opened
+  useEffect(() => {
+    setCurrentOrder(order);
+    setAdminNote(order?.adminNote || "");
+  }, [order?.id, order?._id]);
+
+  // Handle escape key to close
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      document.addEventListener("keydown", handleEsc);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen || !currentOrder) return null;
+
+  const items = currentOrder.items || [];
+
+  const subtotal = items.reduce(
+    (sum, item) =>
+      sum + getProductLineTotal(item.price, item.quantity, item.name),
+    0,
+  );
+
+  const totalAmount = currentOrder.totalValue ?? subtotal;
+  const shippingCost = Math.max(0, totalAmount - subtotal);
+
+  const itemLineCount = items.length;
+  const totalUnitsCount = items.reduce(
+    (sum, item) => sum + (item.quantity || 0),
+    0,
+  );
+
+  const statusStyle = getStatusStyle(currentOrder.status);
   const mongoOrderId = currentOrder._id || currentOrder.id;
 
-  const statuses = [
-    { label: "PENDING", value: "pending", icon: CircleEllipsis },
-    { label: "PROCESSING", value: "processing", icon: RefreshCw },
-    { label: "SHIPPED", value: "shipped", icon: Truck },
-    { label: "DELIVERED", value: "delivered", icon: CheckCircle2 },
-    { label: "CANCELED", value: "canceled", icon: XCircle },
-  ];
+  const handleStatusSelect = async (newStatus: OrderStatusType) => {
+    setStatusMenuOpen(false);
 
-  const handleUpdate = async () => {
+    if (newStatus === currentOrder.status) return;
+
     if (!mongoOrderId) {
-      setError("Order ID missing. Cannot update status.");
+      addToast("Order ID missing. Cannot update status.", "error");
       return;
     }
 
     setSaving(true);
-    setError(null);
-    setSuccess(null);
 
     try {
-      const response = await fetch(apiV1Url(`/orders/${mongoOrderId}/status`), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: statusToApi(status),
-          adminNote: adminNote.trim() || undefined,
-          sendEmailNotification,
-        }),
-      });
+      const response = await fetch(
+        apiV1Url(`/orders/${mongoOrderId}/status`),
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: statusToApi(newStatus),
+            adminNote: adminNote.trim() || undefined,
+          }),
+        },
+      );
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
@@ -83,31 +169,17 @@ export default function OrderStatus({ order }: OrderStatusProps) {
       }
 
       const rawData = await response.json();
-      const emailNotif = rawData.emailNotification as
-        | { attempted: boolean; success: boolean; error?: string }
-        | undefined;
-
       const updatedOrder = mapApiOrder(rawData);
+
       setCurrentOrder(updatedOrder);
-      setStatus(updatedOrder.status);
       setAdminNote(updatedOrder.adminNote || "");
+      onUpdated?.(updatedOrder);
 
-      if (!sendEmailNotification || !emailNotif?.attempted) {
-        addToast("Order updated successfully.", "success");
-      } else if (emailNotif.success) {
-        addToast("Order updated. Email notification sent.", "success");
-      } else {
-        addToast(
-          "Order updated, but the email notification failed to send. Please check with the customer manually.",
-          "error"
-        );
-      }
-
-      router.push("/dashboard/orders");
-    } catch (error) {
-      console.error(error);
-      setError(
-        error instanceof Error ? error.message : "Failed to update order status"
+      addToast("Order updated successfully.", "success");
+    } catch (err) {
+      addToast(
+        err instanceof Error ? err.message : "Failed to update order status",
+        "error",
       );
     } finally {
       setSaving(false);
@@ -115,305 +187,289 @@ export default function OrderStatus({ order }: OrderStatusProps) {
   };
 
   return (
-<div className="h-full overflow-y-auto bg-[#F8FAFC] px-6 py-8 lg:px-12">
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[200] bg-black/45 backdrop-blur-sm"
+        onClick={onClose}
+        role="presentation"
+      />
 
-        <div className="mb-8 text-s text-[#1A1C1F]">
-        <button onClick={() => router.back()} className="hover:text-[#002B73]">
-          Orders
-        </button>{" "}
-        › <b>Update Status</b>
-      </div>
-
-<div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
-          <section className="overflow-hidden rounded-[22px] border border-[#E1E5EE] bg-white">
-          <div className="flex items-start justify-between px-12 py-12">
-            <div>
-              <h1 className="text-[30px] font-extrabold text-[#002B73]">
-                Order #{currentOrder.orderId || "MAG-82910"}
+      {/* Modal */}
+      <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-6 sm:px-6">
+        <div
+          className="relative flex w-full max-w-[680px] max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-[0px_20px_40px_rgba(0,0,0,0.18)]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Fixed Header */}
+          <div className="shrink-0 border-b border-[#EEF1F5] px-5 py-4 sm:px-8 sm:py-5">
+            <div className="flex items-start justify-between gap-3">
+              {/* Order ID */}
+              <h1 className="min-w-0 flex-1 break-words pt-1 text-[24px] font-bold leading-6 text-[#1A1C1F] sm:text-[26px] sm:leading-7">
+                Order #{currentOrder.orderId}
               </h1>
-              <p className="mt-2 max-w-[340px] text-[14px] leading-6 text-[#434652]">
-                Modify the current stage of this order fulfillment.
-              </p>
-            </div>
 
-            <div className="text-center">
-              <div className="rounded-full border border-[#C9D9F2] bg-[#EAF3FF] px-8 py-3 text-left text-s font-bold text-[#0052B4]">
-                Status:
-                <br />
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#EEF1F5] px-12 py-10">
-            <h2 className="text-lg font-bold text-[20px] text-[#1A1C1F]">
-              Change Status
-            </h2>
-
-<div className="mt-8 flex items-center justify-between gap-4">              {statuses.map(({ label, value, icon: Icon }) => {
-                const statusValue = value as OrderStatusValue;
-                const isDisabled = STATUS_RANK[statusValue] < STATUS_RANK[currentOrder.status];
-
-                return (
-                <button
-                  key={label}
-                  onClick={() => {
-                    if (isDisabled) return;
-                    setStatus(statusValue);
-                    setSuccess(null);
-                    setError(null);
-                  }}
-                  disabled={isDisabled}
-                  className={`flex h-[120px] w-[110px] flex-col items-center justify-center rounded-[20px] border transition ${
-                    status === value
-                      ? "border-[#003CC7] bg-[#F4F8FF] shadow-sm"
-                      : isDisabled
-                        ? "cursor-not-allowed border-[#E5E7EB] bg-[#F5F6F8] opacity-50"
-                        : "border-[#D9DEE8] bg-white"
-                  }`}
-                  title={isDisabled ? "Cannot move order status backward" : undefined}
-                >
-                  <Icon
-                    size={25}
-                    strokeWidth={1.5}
-                    className={`mb-2 ${
-                      status === value ? "text-[#003CC7]" : isDisabled ? "text-[#9CA3AF]" : "text-[#3D4451]"
-                    }`}
-                  />
-
-                  <span
-                    className={`text-[12px] font-black uppercase tracking-[1.5px] ${
-                      status === value ? "text-[#003CC7]" : isDisabled ? "text-[#9CA3AF]" : "text-[#111827]"
-                    }`}
-                  >
-                    {label}
-                  </span>
-                </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-12">
-              <p className="mb-3 flex items-center gap-2 text-[16px] font-bold text-[#1A1C1F]">
-                <ListChecks size={16} className="text-[#002B73]" />
-                Internal Admin Note
-              </p>
-              <textarea
-                value={adminNote}
-                onChange={(event) => setAdminNote(event.target.value)}
-                className="h-[170px] w-full resize-none rounded-[18px] border border-[#DDE2EC] px-6 py-5 text-m outline-none placeholder:text-[#C7CBD4]"
-                placeholder="Describe the reason for this status change or add fulfillment notes..."
-              />
-            </div>
-
-            {(error || success) && (
-              <p
-                className={`mt-6 text-sm font-bold ${
-                  error ? "text-red-700" : "text-green-700"
-                }`}
+              {/* Close */}
+              {/* <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#64748B] transition hover:bg-slate-100 hover:text-[#1A1C1F]"
               >
-                {error || success}
-              </p>
-            )}
+                <X size={19} strokeWidth={1.8} />
+              </button> */}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => setSendEmailNotification((prev) => !prev)}
-              className="mt-8 flex w-full items-start gap-4 rounded-[16px] border border-[#EEF1F5] bg-[#F7F7FA] px-6 py-5 text-left"
-            >
-              <div
-                className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded"
+            {/* Status row */}
+            <div className="mt-3 flex items-center gap-2">
+              <span
+                className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-md px-3.5 text-[13px] font-bold capitalize ring-1 ring-inset sm:text-[15px]"
                 style={{
-                  background: sendEmailNotification ? '#BC0000' : '#fff',
-                  border: sendEmailNotification ? 'none' : '2px solid #DDE2EC',
+                  background: statusStyle.bg,
+                  color: statusStyle.text,
+                  boxShadow: `0 0 0 1px ${statusStyle.text}20`,
                 }}
               >
-                {sendEmailNotification && <Check size={14} className="text-white" />}
-              </div>
-              <div>
-                <p className="text-m font-bold text-[#1A1C1F]">
-                  Send email notification to customer
-                </p>
-                <p className="mt-1 text-s text-[#434652]">
-                  Recipient:{" "}
-                  <span className="text-[#002B73]">
-                    {currentOrder.email || "eleanor.h@example.com"}
-                  </span>
-                </p>
-              </div>
-            </button>
-          </div>
-
-          <div className="flex justify-end gap-5 border-t border-[#EEF1F5] bg-[#FAFAFC] px-12 py-8">
-            <button
-              onClick={() => router.back()}
-              className="h-[58px] w-[200px] rounded-[14px] border border-[#DDE2EC] text-l font-bold text-[#434652]"
-            >
-              Discard Changes
-            </button>
-
-            <button
-              onClick={handleUpdate}
-              disabled={saving}
-              className="h-[58px] w-[200px] rounded-[14px] bg-[#BC0000] font-bold text-l text-white shadow hover:bg-[#9f0000] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {saving ? "Updating..." : "Update Order Status"}
-            </button>
-          </div>
-        </section>
-
-        <aside className="space-y-8">
-          <div className="w-full  rounded-[22px] border border-[#E1E5EE] bg-white px-8 py-9">
-            <h3 className="mb-5 text-m font-extrabold tracking-[4px] text-[#002B73]">
-              • ORDER DETAILS
-            </h3>
-
-            <Detail
-              label="Customer"
-              value={currentOrder.customerName || "Eleanor Herbert"}
-              subValue={`ID: ${currentOrder.customerId || "#CUST-9921"}`}
-            />
-
-            <Detail
-              label="Email Address"
-              value={currentOrder.email || "eleanor.h@example.com"}
-            />
-
-            <Detail label="Ordered On" value="Oct 24, 2023 · 14:32" />
-
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-m font-extrabold tracking-wider text-[#1A1C1F]">
-                TOTAL
-                <br />
-                VALUE
-              </span>
-              <span className="text-xl font-extrabold text-[#002B73]">
-                LKR {Number(currentOrder.totalValue || 0).toFixed(2)}
-              </span>
-            </div>
-
-            <div className="mt-6 rounded-[18px] border border-[#EEF1F5] px-6 py-7">
-              <h4 className="mb-5 text-m font-bold tracking-[2px] text-[#002B73]">
-                SHIPPING INFORMATION
-              </h4>
-              <p className="text-m leading-6 text-[#434652]">
-                {currentOrder.shippingAddress || (
+                {saving ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
                   <>
-                    4820 Memory Lane
-                    <br />
-                    Suite 102
-                    <br />
-                    San Francisco, CA
-                    <br />
-                    94105
+                    {currentOrder.status}
+                    <Check size={12} strokeWidth={2.8} />
                   </>
                 )}
-              </p>
-              <p className="mt-2 text-m font-semibold text-[#002B73]">
-                Standard Delivery
-              </p>
+              </span>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setStatusMenuOpen((v) => !v)}
+                  disabled={saving}
+                  className="inline-flex h-9 items-center gap-1 whitespace-nowrap rounded-md bg-[#002B73] px-3.5 text-[13px] font-semibold leading-none text-white transition hover:bg-[#001F52] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {saving ? "Updating..." : "Update Status"}
+                  <ChevronDown size={12} strokeWidth={2.5} />
+                </button>
+
+                {statusMenuOpen && (
+                  <>
+                    {/* click-away layer */}
+                    <div
+                      className="fixed inset-0 z-20"
+                      onClick={() => setStatusMenuOpen(false)}
+                      role="presentation"
+                    />
+                    <div className="absolute left-0 top-full z-30 mt-1.5 w-40 overflow-hidden rounded-lg border border-[#E1E5EE] bg-white shadow-lg">
+                      {STATUS_OPTIONS.map((s) => {
+                        const isDisabled =
+                          STATUS_RANK[s] < STATUS_RANK[currentOrder.status];
+
+                        return (
+                          <button
+                            key={s}
+                            type="button"
+                            disabled={isDisabled}
+                            title={
+                              isDisabled
+                                ? "Cannot move order status backward"
+                                : undefined
+                            }
+                            onClick={() => handleStatusSelect(s)}
+                            className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs font-medium capitalize ${
+                              isDisabled
+                                ? "cursor-not-allowed text-[#B0B4BE]"
+                                : "text-[#1A1C1F] hover:bg-slate-50"
+                            }`}
+                          >
+                            {s}
+                            {currentOrder.status === s && (
+                              <Check size={13} className="text-[#002B73]" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
+
+            <p className="mt-2.5 text-xs text-[#8A8D99] sm:text-sm">
+              Order placed on {formatPlacedOn(currentOrder.createdAt)}
+            </p>
           </div>
 
-          <div className="w-full rounded-[22px] border border-[#E1E5EE] bg-white px-8 py-9">
-            <h3 className="text-m font-extrabold tracking-[4px] text-[#002B73]">
-              ITEM SUMMARY ({currentOrder.qty ?? 0})
-            </h3>
+          {/* Scrollable Content */}
+          <div className="overflow-y-auto px-5 pb-6 sm:px-8 sm:pb-8">
+            <div className="pt-6 space-y-6">
+              {/* ORDER ITEMS */}
+              <div>
+                <h3 className="mb-3 flex items-center gap-2 text-[12px] font-extrabold tracking-[1.5px] text-[#002B73] sm:text-sm">
+                  <ShoppingBag size={15} strokeWidth={2.2} />
+                  ORDER ITEMS
+                </h3>
 
-            <div className="mt-8 space-y-4">
-              {(currentOrder.items || []).map((item, index) => (
-                <div
-                  key={`${item.productId || item.name}-${index}`}
-                  className="relative rounded-[18px] border border-[#EEF1F5] bg-white p-5 shadow-sm"
-                >
-                  <div className="absolute left-0 top-0 h-full w-2 rounded-l-[18px] bg-[#BC0000]" />
-                  <div className="flex items-start gap-4 pl-4">
-                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-[14px] bg-slate-100">
-                      <img
-                        src={item.image || "/home-product-1.png"}
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
+                <div className="overflow-hidden rounded-xl border border-[#E1E5EE]">
+                  <div
+                    className="grid grid-cols-[1fr_60px_100px] gap-2 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wide text-[#8A8D99] sm:text-[11px]"
+                    style={{ background: "#F7F8FB" }}
+                  >
+                    <span>Product</span>
+                    <span className="text-center">Qty</span>
+                    <span className="text-right">Total</span>
+                  </div>
 
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-[18px] font-extrabold leading-6 text-[#1A1C1F]">
-                        {item.name}
-                      </h4>
-                      <p className="mt-2 text-[14px] leading-6 text-[#434652]">
-                        {item.frameType || "Frame"}
-                        {item.colorOption ? ` - ${item.colorOption}` : ""}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <div className="rounded-[12px] border border-[#DDE2EC] bg-[#F7F7FA] px-3 py-2 text-[14px] font-extrabold text-[#002B73]">
-                          Qty: {item.quantity}
+                  <div className="divide-y divide-[#EEF1F5]">
+                    {items.map((item, index) => (
+                      <div
+                        key={`${item.productId || item.name}-${index}`}
+                        className="grid grid-cols-[1fr_60px_100px] items-center gap-2 px-4 py-3"
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                            <img
+                              src={item.image || "/home-product-1.png"}
+                              alt={item.name}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-bold text-[#1A1C1F] sm:text-sm">
+                              {item.name}
+                            </p>
+                            <p className="truncate text-[10px] text-[#8A8D99] sm:text-xs">
+                              SKU: {item.sku || "-"}
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="text-right">
-                          <p className="text-[17px] font-extrabold text-[#1A1C1F]">
-                            LKR {getProductLineTotal(item.price, item.quantity, item.name).toFixed(2)}
-                          </p>
-                          <p className="text-[13px] font-bold text-[#434652]">
-                            LKR {item.price.toFixed(2)} 
-                          </p>
-                        </div>
+                        <span className="text-center text-xs font-semibold text-[#1A1C1F] sm:text-sm">
+                          {item.quantity}
+                        </span>
+
+                        <span className="text-right text-xs font-bold text-[#1A1C1F] sm:text-sm">
+                          Rs{" "}
+                          {getProductLineTotal(
+                            item.price,
+                            item.quantity,
+                            item.name,
+                          ).toFixed(2)}
+                        </span>
                       </div>
+                    ))}
+
+                    {!items.length && (
+                      <div className="px-4 py-6 text-center text-xs font-semibold text-[#8A8D99]">
+                        No item details saved for this order.
+                      </div>
+                    )}
+                  </div>
+
+                  {items.length > 0 && (
+                    <div
+                      className="flex items-center justify-between px-4 py-2.5 text-xs font-semibold sm:text-sm"
+                      style={{ background: "#EEF3FF", color: "#002B73" }}
+                    >
+                      <span>
+                        {itemLineCount} item{itemLineCount !== 1 ? "s" : ""} in
+                        this order
+                      </span>
+                      <span>Total Items: {totalUnitsCount}</span>
                     </div>
+                  )}
+                </div>
+              </div>
+
+              {/* FINANCIAL SUMMARY */}
+              <div>
+                <h3 className="mb-3 flex items-center gap-2 text-[12px] font-extrabold tracking-[1.5px] text-[#002B73] sm:text-sm">
+                  <List size={15} strokeWidth={2.2} />
+                  FINANCIAL SUMMARY
+                </h3>
+
+                <div className="rounded-xl border border-[#E1E5EE] px-4 py-4 sm:px-5 sm:py-5">
+                  <div className="flex items-center justify-between py-1.5 text-xs sm:text-sm">
+                    <span className="text-[#64748B]">Subtotal</span>
+                    <span className="font-semibold text-[#1A1C1F]">
+                      Rs {subtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-1.5 text-xs sm:text-sm">
+                    <span className="text-[#64748B]">Shipping Cost</span>
+                    <span className="font-semibold text-[#1A1C1F]">
+                      Rs {shippingCost.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between border-t border-[#EEF1F5] pt-3">
+                    <span className="text-sm font-bold text-[#1A1C1F] sm:text-base">
+                      Total Amount
+                    </span>
+                    <span className="text-lg font-extrabold text-[#002B73] sm:text-xl">
+                      Rs {totalAmount.toFixed(2)}
+                    </span>
                   </div>
                 </div>
-              ))}
+              </div>
 
-              {!currentOrder.items?.length && (
-                <div className="rounded-[18px] border border-[#EEF1F5] bg-[#F7F7FA] px-5 py-6 text-sm font-semibold text-[#434652]">
-                  No item details saved for this order.
+              {/* SHIPPING DETAILS */}
+              <div>
+                <h3 className="mb-3 flex items-center gap-2 text-[12px] font-extrabold tracking-[1.5px] text-[#002B73] sm:text-sm">
+                  <Truck size={15} strokeWidth={2.2} />
+                  SHIPPING DETAILS
+                </h3>
+
+                <div className="rounded-xl border border-[#E1E5EE] px-4 py-4 sm:px-5 sm:py-5">
+                  <p className="text-sm font-bold text-[#1A1C1F] sm:text-base">
+                    {currentOrder.customerName || "-"}
+                  </p>
+
+                  <p className="mt-1 text-xs font-normal text-[#6B7280]">
+                    {normalizeCustomerId(currentOrder.customerId) || "-"}
+                  </p>
+
+                  <div className="mt-3 space-y-2.5 border-t border-[#EEF1F5] pt-3">
+                    <div className="flex items-center gap-2.5 text-xs text-[#434652] sm:text-sm">
+                      <Mail size={15} className="shrink-0 text-[#8A8D99]" />
+                      <span className="truncate">
+                        {currentOrder.email || "-"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 text-xs text-[#434652] sm:text-sm">
+                      <Phone size={15} className="shrink-0 text-[#8A8D99]" />
+                      <span>{currentOrder.phone || "-"}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2.5 text-xs text-[#434652] sm:text-sm">
+                    <MapPin
+                      size={15}
+                      className="mt-0.5 shrink-0 text-[#8A8D99]"
+                    />
+                    <span className="break-words">
+                      {currentOrder.shippingAddress || "-"}
+                    </span>
+                  </div>
+                  </div>   
                 </div>
-              )}
+              </div>
             </div>
+          </div>
 
+          {/* Fixed Footer */}
+          <div className="shrink-0 flex justify-end border-t border-[#EEF1F5] px-5 py-4 sm:px-8">
             <button
-              onClick={() => router.push('/dashboard/orders')}
-              className="mt-6 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50"
+              type="button"
+              onClick={onClose}
+              className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition"
+              style={{ background: "#BC0000" }}
             >
-              View Full Order History
-              <span className="text-[#6B7280]">→</span>
-            </button>
-
-            <button
-              onClick={() => {
-                if (currentOrder.email) {
-                  window.open(`mailto:${currentOrder.email}?subject=Regarding your Magnify order %23${currentOrder.orderId}`);
-                }
-              }}
-              disabled={!currentOrder.email}
-              className="mt-3 flex w-full items-center justify-between rounded-[16px] border border-[#DDE2EC] bg-white px-4 py-4 text-left font-bold text-[#000000] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Message Customer
-              <span className="text-[#6B7280]">💬</span>
+              Close
             </button>
           </div>
-        </aside>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function Detail({
-  label,
-  value,
-  subValue,
-}: {
-  label: string;
-  value: string;
-  subValue?: string;
-}) {
-  return (
-    <div className="flex justify-between gap-4 border-b border-[#EEF1F5] py-5 text-m">
-      <p className="text-[#434652]">{label}</p>
-      <div className="text-right">
-        <p className="font-bold text-[#1A1C1F]">{value}</p>
-        {subValue && <p className="text-xs text-[#434652]">{subValue}</p>}
-      </div>
-    </div>
+    </>
   );
 }

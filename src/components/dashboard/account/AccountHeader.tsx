@@ -2,7 +2,7 @@ export default function AccountHeader() {
   return (
     <section className="mb-7">
       <h1
-        className="text-[32px] font-bold leading-none sm:text-[40px]"
+        className="text-[26px] font-bold leading-tight"
         style={{
           fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
           color: '#002B73',

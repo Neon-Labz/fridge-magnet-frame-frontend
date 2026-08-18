@@ -40,6 +40,7 @@ export interface OrderRecord {
   shipping: number;
   orderNumber: string;
   createdAt: string;
+  customerId?: string;
   customerDetails?: CustomerDetails;
 }
 
@@ -136,7 +137,7 @@ export const saveOrder = (order: OrderRecord): OrderRecord => {
     customerInitials: customer
       ? `${customer.firstName?.[0] || ""}${customer.lastName?.[0] || ""}`.toUpperCase()
       : "",
-    customerId: `CUST-${Date.now()}`,
+    customerId: String(order.customerId ?? "").replace(/^#+/, ""),
     qty: totalQuantity,
     status: "pending" as const,
     email: customer?.email || "",

@@ -333,7 +333,7 @@ export default function CheckoutScreen() {
       backendPayload: {
         orderId: orderNumber,
         customerName,
-        customerId: `CUST-${Date.now()}`,
+        customerId: "",
         email: form.email,
         phone: form.phone,
         qty: totalQuantity,
@@ -357,6 +357,7 @@ export default function CheckoutScreen() {
         shipping,
         orderNumber,
         createdAt: new Date().toISOString(),
+        customerId: user?.customerId ? String(user.customerId).replace(/^#+/, "") : "",
         customerDetails: form,
       },
     };

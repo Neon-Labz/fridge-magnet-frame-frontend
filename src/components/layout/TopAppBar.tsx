@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Menu, Package, ShoppingBag, UserCircle2 } from 'lucide-react';
-import Link from 'next/link';
-import { apiV1Url } from '@/lib/backendUrl';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Bell, Menu, Package, ShoppingBag, UserCircle2 } from "lucide-react";
+import Link from "next/link";
+import { apiV1Url } from "@/lib/backendUrl";
 
 type NotifItem = {
   id: string;
-  type: 'order' | 'stock-low' | 'stock-out';
+  type: "order" | "stock-low" | "stock-out";
   title: string;
   sub: string;
   href: string;
@@ -30,16 +30,16 @@ type ApiProduct = {
   stock: number;
 };
 
-const LAST_SEEN_KEY = 'admin_notif_last_seen';
+const LAST_SEEN_KEY = "admin_notif_last_seen";
 
 function getLastSeenTimestamp(): number {
-  if (typeof window === 'undefined') return 0;
+  if (typeof window === "undefined") return 0;
   const val = localStorage.getItem(LAST_SEEN_KEY);
   return val ? parseInt(val, 10) : 0;
 }
 
 function setLastSeenTimestamp(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   localStorage.setItem(LAST_SEEN_KEY, Date.now().toString());
 }
 
@@ -48,9 +48,13 @@ async function fetchNotifications(): Promise<NotifItem[]> {
 
   try {
     const [ordersRes, lowRes, outRes] = await Promise.all([
-      fetch(apiV1Url('/orders?status=PENDING'), { cache: 'no-store' }),
-      fetch(apiV1Url('/api/products?status=Low+Stock&limit=5'), { cache: 'no-store' }),
-      fetch(apiV1Url('/api/products?status=Out+of+Stock&limit=5'), { cache: 'no-store' }),
+      fetch(apiV1Url("/orders?status=PENDING"), { cache: "no-store" }),
+      fetch(apiV1Url("/api/products?status=Low+Stock&limit=5"), {
+        cache: "no-store",
+      }),
+      fetch(apiV1Url("/api/products?status=Out+of+Stock&limit=5"), {
+        cache: "no-store",
+      }),
     ]);
 
     if (ordersRes.ok) {
@@ -59,7 +63,7 @@ async function fetchNotifications(): Promise<NotifItem[]> {
       for (const o of recent) {
         items.push({
           id: `order-${o._id || o.orderId}`,
-          type: 'order',
+          type: "order",
           title: `New order #${o.orderId}`,
           sub: `${o.customerName} · ${o.status.charAt(0) + o.status.slice(1).toLowerCase()}`,
           href: `/dashboard/orders`,
@@ -83,7 +87,7 @@ async function fetchNotifications(): Promise<NotifItem[]> {
     for (const p of outProducts.slice(0, 3)) {
       items.push({
         id: `stock-out-${p._id || p.productId}`,
-        type: 'stock-out',
+        type: "stock-out",
         title: `Out of stock: ${p.productName}`,
         sub: `SKU ${p.productId} · 0 units remaining`,
         href: `/dashboard/products`,
@@ -93,7 +97,7 @@ async function fetchNotifications(): Promise<NotifItem[]> {
     for (const p of lowProducts.slice(0, 3)) {
       items.push({
         id: `stock-low-${p._id || p.productId}`,
-        type: 'stock-low',
+        type: "stock-low",
         title: `Low stock: ${p.productName}`,
         sub: `SKU ${p.productId} · ${p.stock} units left`,
         href: `/dashboard/products`,
@@ -106,22 +110,26 @@ async function fetchNotifications(): Promise<NotifItem[]> {
   return items;
 }
 
-const iconFor = (type: NotifItem['type']) => {
-  if (type === 'order') return <ShoppingBag size={15} color="#002B73" />;
-  if (type === 'stock-out') return <Package size={15} color="#BC0000" />;
+const iconFor = (type: NotifItem["type"]) => {
+  if (type === "order") return <ShoppingBag size={15} color="#002B73" />;
+  if (type === "stock-out") return <Package size={15} color="#BC0000" />;
   return <Package size={15} color="#D97706" />;
 };
 
-const dotColor = (type: NotifItem['type']) => {
-  if (type === 'order') return '#DAE2FF';
-  if (type === 'stock-out') return '#FFE4E4';
-  return '#FEF3C7';
+const dotColor = (type: NotifItem["type"]) => {
+  if (type === "order") return "#DAE2FF";
+  if (type === "stock-out") return "#FFE4E4";
+  return "#FEF3C7";
 };
 
 /** Polling interval in ms — check for new notifications every 15 seconds */
 const POLL_INTERVAL = 15_000;
 
-export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void }) {
+export default function TopAppBar({
+  onMenuClick,
+}: {
+  onMenuClick?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notifs, setNotifs] = useState<NotifItem[]>([]);
@@ -246,33 +254,29 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
 
       {/* Backdrop — closes dropdown on outside click */}
       {open && (
-        <div
-          className="fixed inset-0 z-30"
-          onClick={() => setOpen(false)}
-        />
+        <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
       )}
 
       <header className="topappbar fixed top-0 right-0 z-40 flex items-center justify-between px-4 sm:px-6 left-0 lg:left-[252px]">
         <button
           onClick={onMenuClick}
           className="flex items-center justify-center rounded-lg transition hover:bg-slate-100 lg:hidden"
-          style={{ width: 40, height: 40 }}
+          style={{ width: 50, height: 50 }}
           aria-label="Toggle menu"
         >
           <Menu size={22} color="#475569" />
         </button>
 
         <div className="flex items-center gap-3 sm:gap-6 ml-auto">
-
           <div className="relative">
             <button
               onClick={handleBellClick}
               className="flex items-center justify-center rounded-full transition hover:bg-slate-100"
-              style={{ width: 36, height: 40 }}
+              style={{ width: 50, height: 50 }}
               aria-label="Notifications"
               aria-expanded={open}
             >
-              <Bell size={20} color={open ? '#002B73' : '#64748B'} />
+              <Bell size={20} color={open ? "#002B73" : "#64748B"} />
               {unreadCount > 0 && (
                 <span
                   className="absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full bg-red-500 text-white font-bold"
@@ -280,92 +284,118 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
                     minWidth: 18,
                     height: 18,
                     fontSize: 10,
-                    padding: '0 4px',
+                    padding: "0 4px",
                     lineHeight: 1,
                   }}
                   aria-label={`${unreadCount} new notifications`}
                 >
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
             </button>
 
             {open && (
               <div
-                className="absolute right-0 top-full mt-3 z-50 flex flex-col overflow-hidden"
+                className="
+      absolute right-0 top-full mt-3
+      z-[99999]
+      flex w-[calc(100vw-2rem)] max-w-[250px]
+      flex-col
+      overflow-hidden
+      rounded-2xl
+      bg-white
+      opacity-100
+      shadow-[0px_12px_32px_rgba(0,0,0,0.18)]
+      sm:w-[360px]
+    "
                 style={{
-                  width: 360,
-                  background: '#fff',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: 16,
-                  boxShadow: '0px 12px 32px rgba(0,0,0,0.12)',
-                  maxHeight: 480,
+                  border: "1px solid #E2E8F0",
+                  maxHeight: "min(480px, calc(100vh - 90px))",
+                  backgroundColor: "#FFFFFF",
+                  opacity: 1,
+                  isolation: "isolate",
                 }}
               >
+                {/* Header */}
                 <div
-                  className="flex items-center justify-between px-5 py-4 flex-shrink-0"
-                  style={{ borderBottom: '1px solid #F1F5F9' }}
+                  className="flex shrink-0 items-center justify-between px-5 py-4"
+                  style={{
+                    borderBottom: "1px solid #F1F5F9",
+                    backgroundColor: "#FFFFFF",
+                  }}
                 >
-                  <span className="font-bold text-sm" style={{ color: '#002B73' }}>
+                  <span className="text-sm font-bold text-[#002B73]">
                     Notifications
                   </span>
+
                   {notifs.length > 0 && (
-                    <span
-                      className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                      style={{ background: '#EEF2FF', color: '#002B73' }}
-                    >
+                    <span className="rounded-full bg-[#EEF2FF] px-2 py-0.5 text-xs font-semibold text-[#002B73]">
                       {notifs.length}
                     </span>
                   )}
                 </div>
 
-                <div className="overflow-y-auto flex-1">
+                {/* Notification list */}
+                <div
+                  className="
+                  min-h-0
+                  flex-1
+                  overflow-y-auto
+                  bg-white
+                  max-h-[110px]
+                  sm:max-h-[360px]
+                "
+                >
                   {loading ? (
-                    <div className="flex items-center justify-center py-10">
-                      <span className="text-sm font-medium" style={{ color: '#94A3B8' }}>
+                    <div className="flex items-center justify-center bg-white py-10">
+                      <span className="text-sm font-medium text-[#94A3B8]">
                         Loading…
                       </span>
                     </div>
                   ) : notifs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 bg-white px-6 py-10 text-center">
                       <Bell size={28} color="#CBD5E1" />
-                      <p className="text-sm font-semibold" style={{ color: '#94A3B8' }}>
+
+                      <p className="text-sm font-semibold text-[#94A3B8]">
                         All caught up — no new notifications
                       </p>
                     </div>
                   ) : (
-                    <ul>
+                    <ul className="bg-white">
                       {notifs.map((n, idx) => (
                         <li
                           key={n.id}
-                          style={{ borderTop: idx === 0 ? 'none' : '1px solid #F1F5F9' }}
+                          className="bg-white"
+                          style={{
+                            borderTop: idx === 0 ? "none" : "1px solid #F1F5F9",
+                          }}
                         >
                           <Link
                             href={n.href}
                             onClick={() => setOpen(false)}
-                            className="flex items-start gap-3 px-5 py-4 transition hover:bg-slate-50"
+                            className="
+                  flex items-start gap-3
+                  bg-white
+                  px-5 py-4
+                  transition
+                  hover:bg-slate-50
+                "
                           >
                             <span
-                              className="flex-shrink-0 flex items-center justify-center rounded-full mt-0.5"
+                              className="mt-0.5 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full"
                               style={{
-                                width: 30,
-                                height: 30,
                                 background: dotColor(n.type),
                               }}
                             >
                               {iconFor(n.type)}
                             </span>
-                            <div className="min-w-0">
-                              <p
-                                className="text-sm font-semibold leading-snug truncate"
-                                style={{ color: '#1A1C1F' }}
-                              >
+
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-semibold leading-snug text-[#1A1C1F]">
                                 {n.title}
                               </p>
-                              <p
-                                className="text-xs font-medium mt-0.5 truncate"
-                                style={{ color: '#64748B' }}
-                              >
+
+                              <p className="mt-0.5 truncate text-xs font-medium text-[#64748B]">
                                 {n.sub}
                               </p>
                             </div>
@@ -376,21 +406,20 @@ export default function TopAppBar({ onMenuClick }: { onMenuClick?: () => void })
                   )}
                 </div>
 
-                {notifs.length > 0 && (
-                  <div
-                    className="flex-shrink-0 px-5 py-3 text-center"
-                    style={{ borderTop: '1px solid #F1F5F9' }}
+                {/* Footer */}
+                <div
+                  className="z-[99999] flex shrink-0 items-center justify-center bg-white px-2 py-1"
+                  style={{
+                    borderTop: "1px solid #F1F5F9",
+                  }}
+                >
+                  <Link
+                    href="/dashboard/orders"
+                    className="text-xs font-bold text-[#002B73]"
                   >
-                    <Link
-                      href="/dashboard/orders"
-                      onClick={() => setOpen(false)}
-                      className="text-xs font-bold"
-                      style={{ color: '#002B73' }}
-                    >
-                      View all orders →
-                    </Link>
-                  </div>
-                )}
+                    View all orders →
+                  </Link>
+                </div>
               </div>
             )}
           </div>

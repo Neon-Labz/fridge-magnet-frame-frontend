@@ -17,6 +17,7 @@ type ApiProduct = {
   category?: string;
   price?: number;
   stock?: number;
+  imagecount?: number;   // <-- ADD THIS
   status?: string;
   primaryImage?: ApiImage | null;
   galleryImages?: ApiImage[];
@@ -39,6 +40,7 @@ const mapProduct = (product: ApiProduct): Product => {
     name: product.productName || 'Untitled product',
     series: product.category?.trim() || '',
     price: Number(product.price ?? 0),
+    imagecount: Number(product.imagecount ?? 0), // <-- ADD THIS
     stockCount,
     stockStatus: toStockStatus(product.status, stockCount),
     gradient: 'from-slate-100 to-slate-300',

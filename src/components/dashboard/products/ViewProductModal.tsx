@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Package, MapPin, History, Images } from 'lucide-react';
+import { X, History, Images, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { apiV1Url } from '@/lib/backendUrl';
 
@@ -12,7 +12,7 @@ interface ViewProductModalProps {
   onUpdate?: (
     product: Product,
     newStock: string,
-  ) => boolean | void | Promise<boolean | void>;
+  ) => Promise<boolean>;
 }
 
 type StockLogEntry = {
@@ -22,42 +22,63 @@ type StockLogEntry = {
   changedAt: string;
 };
 
+// If the backend returns pagination metadata we trust it (server-side
+// pagination). If it just returns a flat array (legacy API), we fall
+// back to slicing that array on the client so the UI still only ever
+// shows PAGE_SIZE rows at a time.
+type StockLogResponse = {
+  data: StockLogEntry[];
+  total?: number;
+  page?: number;
+  totalPages?: number;
+  pagination?: {
+    total?: number;
+    page?: number;
+    totalPages?: number;
+  };
+};
+
+const PAGE_SIZE = 5;
+
 export default function ViewProductModal({
   isOpen,
   product,
   onClose,
   onUpdate,
 }: ViewProductModalProps) {
-  const [extraStock, setExtraStock] = useState(0);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [showLog, setShowLog] = useState(false);
-  const [stockLog, setStockLog] = useState<StockLogEntry[]>([]);
   const [isLoadingLog, setIsLoadingLog] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
+  const [activeGalleryImage, setActiveGalleryImage] =
+    useState<string | null>(null);
 
-  // BUG-013 fix: gallery images are shown independently of the primary
-  // image, so they need their own "which one is active" state.
-  const [activeGalleryImage, setActiveGalleryImage] = useState<string | null>(null);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [isServerPaginated, setIsServerPaginated] = useState(true);
+  // Holds either the current page's rows (server-paginated) or the
+  // full record set (client-side fallback for legacy API responses).
+  const [logRecords, setLogRecords] = useState<StockLogEntry[]>([]);
 
   useEffect(() => {
-    if (isOpen) {
-      setExtraStock(0);
-      setShowLog(false);
-      setStockLog([]);
-      setLogError(null);
-      setActiveGalleryImage(null);
-    }
+    if (!isOpen) return;
+
+    setShowLog(false);
+    setLogRecords([]);
+    setLogError(null);
+    setActiveGalleryImage(null);
+    setCurrentPage(1);
+    setTotalPages(1);
+    setTotalRecords(0);
+    setIsServerPaginated(true);
   }, [isOpen, product?.id]);
 
   if (!isOpen || !product) return null;
 
   const currentStock = Number(product.stockCount ?? 0);
-  const updatedStock = currentStock + extraStock;
-
-  // BUG-013 fix: gallery images render regardless of whether a primary
-  // image exists — the two are independent, not a fallback chain.
+  const imageCount = Number(product.imagecount ?? 0);
   const galleryImages = product.galleryImageUrls ?? [];
-  const hasGallery = galleryImages.length > 0;
 
   const getStatus = (stock: number) => {
     if (stock > 10) return 'In Stock';
@@ -65,470 +86,576 @@ export default function ViewProductModal({
     return 'Out of Stock';
   };
 
-  const currentLabel = getStatus(currentStock);
-  const updatedStatus = getStatus(updatedStock);
+  const currentStatus = getStatus(currentStock);
 
-  const handleViewLog = async () => {
-    const next = !showLog;
-    setShowLog(next);
-    if (!next) return;
+  const fetchStockLog = async (page: number) => {
+    if (!product) return;
+
     setIsLoadingLog(true);
     setLogError(null);
+
     try {
-      const res = await fetch(apiV1Url(`/api/products/${product.id}/stock-log`));
-      if (!res.ok) throw new Error('Failed to fetch stock log');
-      const json = await res.json();
-      setStockLog(json.data ?? []);
+      const res = await fetch(
+        apiV1Url(
+          `/api/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
+        ),
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch stock log');
+      }
+
+      const json: StockLogResponse = await res.json();
+      const records = json.data ?? [];
+
+      const serverTotal = json.pagination?.total ?? json.total;
+      const serverTotalPages =
+        json.pagination?.totalPages ?? json.totalPages;
+
+      if (typeof serverTotal === 'number') {
+        // Backend supports pagination - trust its metadata and the
+        // (already page-sized) records it returned.
+        setIsServerPaginated(true);
+        setLogRecords(records);
+        setTotalRecords(serverTotal);
+        setTotalPages(
+          serverTotalPages ??
+            Math.max(1, Math.ceil(serverTotal / PAGE_SIZE)),
+        );
+      } else {
+        // Legacy API - it returned everything at once. Paginate on
+        // the client so we still only render PAGE_SIZE rows.
+        setIsServerPaginated(false);
+        setLogRecords(records);
+        setTotalRecords(records.length);
+        setTotalPages(Math.max(1, Math.ceil(records.length / PAGE_SIZE)));
+      }
     } catch (err) {
-      setLogError(err instanceof Error ? err.message : 'Failed to fetch stock log');
+      setLogError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to fetch stock log',
+      );
     } finally {
       setIsLoadingLog(false);
     }
   };
 
-  const cardRadius = 16;
+  const handleViewLog = async () => {
+    const next = !showLog;
+    setShowLog(next);
+
+    if (!next) return;
+
+    setCurrentPage(1);
+    await fetchStockLog(1);
+  };
+
+  const goToPage = async (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    setCurrentPage(page);
+
+    if (isServerPaginated) {
+      await fetchStockLog(page);
+    }
+    // For client-side pagination, the full list is already loaded in
+    // logRecords - `displayedLog` below handles the slicing.
+  };
+
+  const displayedLog = isServerPaginated
+    ? logRecords
+    : logRecords.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE,
+      );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-
-      {/* Full-size preview overlay for a clicked gallery image */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-5">
       {activeGalleryImage && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-8"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
           onClick={() => setActiveGalleryImage(null)}
         >
+          <button
+            type="button"
+            onClick={() => setActiveGalleryImage(null)}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
+            aria-label="Close image preview"
+          >
+            <X size={20} />
+          </button>
+
           <img
             src={activeGalleryImage}
             alt="Gallery preview"
-            className="max-h-full max-w-full rounded-xl object-contain"
+            className="max-h-[90vh] max-w-[94vw] rounded-xl object-contain"
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
 
-      <div
-        className="relative flex flex-col w-full overflow-y-auto"
-        style={{
-          maxWidth: 1200,
-          maxHeight: '92vh',
-          background: '#FFFFFF',
-          borderRadius: 16,
-          boxShadow: '0px 20px 50px rgba(0,0,0,0.2)',
-        }}
-      >
-        <div
-          className="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6"
-          style={{ borderBottom: '1px solid #F1F5F9' }}
-        >
+      <div className="flex max-h-[94vh] w-full max-w-[760px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6 sm:py-5">
           <div>
-            <h2
-              className="font-bold text-2xl"
-              style={{
-                color: '#002B73',
-                fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
-              }}
-            >
-              Manage Stock Level
+            <h2 className="text-lg font-bold text-[#002B73] sm:text-xl">
+              View Product
             </h2>
 
-            <p className="text-sm mt-1" style={{ color: '#64748B' }}>
-              Add extra stock for this product. Status will update automatically.
+            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+              Product details and stock information
             </p>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="flex items-center justify-center rounded-full hover:bg-slate-100"
-            style={{ width: 32, height: 32 }}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            aria-label="Close modal"
           >
-            <X size={18} color="#94A3B8" />
+            <X size={19} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-20 py-6">
-          <div className="grid grid-cols-[650px_350px] gap-[22px]">
-            <div
-              className="flex flex-col p-8 md:p-10"
-              style={{
-                border: '1.2px solid #E2E4ED',
-                borderRadius: cardRadius,
-                background: '#fff',
-              }}
-            >
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div
-                  className="flex-shrink-0 flex items-center justify-center bg-[#F8F8FB] rounded-2xl p-4"
-                  style={{
-                    width: 200,
-                    height: 200,
-                    border: '1px solid #EDEDF2',
-                  }}
-                >
-                  {product.primaryImageUrl ? (
-                    <img
-                      src={product.primaryImageUrl}
-                      alt={product.name}
-                      className="h-full w-full rounded-2xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-white border-[12px] border-[#A67C52]" />
-                  )}
-                </div>
+        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5">
+            <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[180px_minmax(0,1fr)] sm:p-5">
+              <div className="flex h-[180px] w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-[#F8F8FB] sm:h-[180px]">
+                {product.primaryImageUrl ? (
+                  <img
+                    src={product.primaryImageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-[70%] w-[70%] border-[8px] border-[#A67C52] bg-white" />
+                )}
+              </div>
 
-                <div className="flex flex-col gap-3 min-w-0">
-                  <p
-                    className="text-xs font-bold uppercase tracking-[0.15em]"
-                    style={{ color: '#0040A1' }}
-                  >
-                    SKU: {product.sku}
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#0040A1] sm:text-xs">
+                  SKU: {product.sku || product.id}
+                </p>
+
+                <h3 className="mt-2 break-words text-xl font-bold leading-7 text-[#002B73] sm:text-2xl">
+                  {product.name}
+                </h3>
+
+                {product.series && (
+                  <p className="mt-1 text-xs font-semibold text-slate-500 sm:text-sm">
+                    {product.series}
                   </p>
+                )}
 
-                  <h2
-                    className="font-bold leading-tight"
-                    style={{
-                      fontSize: 32,
-                      color: '#002B73',
-                    }}
-                  >
-                    {product.name}
-                  </h2>
-
-                  <p
-                    className="text-base leading-relaxed font-medium"
-                    style={{ color: '#5C5F6C' }}
-                  >
+                {product.description && (
+                  <p className="mt-3 line-clamp-5 text-xs font-medium leading-5 text-slate-500 sm:text-sm sm:leading-6">
                     {product.description}
                   </p>
-                </div>
+                )}
+
+                {galleryImages.length > 0 && (
+                  <div className="mt-4 border-t border-slate-100 pt-4">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Images
+                        size={16}
+                        className="shrink-0 text-[#0040A1]"
+                      />
+
+                      <h4 className="text-xs font-bold uppercase tracking-wide text-[#002B73]">
+                        Product Gallery ({galleryImages.length})
+                      </h4>
+                    </div>
+
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {galleryImages.map((url, idx) => (
+                        <button
+                          key={`${url}-${idx}`}
+                          type="button"
+                          onClick={() =>
+                            setActiveGalleryImage(url)
+                          }
+                          className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 transition hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#002B73]/20"
+                          aria-label={`View gallery image ${idx + 1}`}
+                        >
+                          <img
+                            src={url}
+                            alt={`${product.name} gallery ${idx + 1}`}
+                            className="h-full w-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* BUG-013 fix: Gallery Images — independent of Primary Image.
-                  Renders whenever gallery images exist, whether or not a
-                  primary image is set. */}
-              {hasGallery && (
-                <div className="mt-8 pt-6" style={{ borderTop: '1px solid #F1F5F9' }}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Images size={18} color="#0040A1" />
-                    <h4 className="text-sm font-bold uppercase tracking-wide" style={{ color: '#002B73' }}>
-                      Product Gallery ({galleryImages.length})
-                    </h4>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    {galleryImages.map((url, idx) => (
-                      <button
-                        key={`${url}-${idx}`}
-                        type="button"
-                        onClick={() => setActiveGalleryImage(url)}
-                        className="flex-shrink-0 overflow-hidden rounded-xl transition hover:opacity-80"
-                        style={{
-                          width: 84,
-                          height: 84,
-                          border: '1px solid #E2E4ED',
-                          background: '#F8F8FB',
-                        }}
-                      >
-                        <img
-                          src={url}
-                          alt={`${product.name} gallery ${idx + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            <div
-              className="flex flex-col justify-between p-8 md:p-10"
-              style={{
-                background: '#002B73',
-                borderRadius: cardRadius,
-                boxShadow: '0px 10px 25px -5px rgba(0, 43, 115, 0.2)',
-              }}
-            >
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center gap-3">
-                  <Package size={28} color="#DAE2FF" strokeWidth={2.5} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <ProductInfo
+                label="Price"
+                value={`LKR ${Number(product.price ?? 0).toFixed(2)}`}
+              />
 
-                  <span className="text-2xl font-bold text-white">
-                    Add Extra Stock
-                  </span>
-                </div>
+              <ProductInfo
+                label="Stock"
+                value={String(currentStock)}
+              />
 
-                <p className="text-lg font-medium" style={{ color: '#98B3FF' }}>
-                  Current Availability:{' '}
-                  <span className="font-bold text-white uppercase ml-1">
-                    {currentLabel}
-                  </span>
+              <ProductInfo
+                label="Image Count"
+                value={String(imageCount)}
+              />
+
+              <div className="rounded-xl border border-slate-200 bg-[#F5F6FB] p-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                  Stock Status
                 </p>
 
-                <p className="text-lg font-medium" style={{ color: '#98B3FF' }}>
-                  Current Stock:{' '}
-                  <span className="font-bold text-white">
-                    {currentStock}
-                  </span>
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 mt-8">
-                <label
-                  className="text-[11px] font-bold uppercase tracking-[0.2em]"
-                  style={{ color: '#98B3FF' }}
+                <p
+                  className={[
+                    'mt-2 text-sm font-bold sm:text-base',
+                    currentStatus === 'In Stock'
+                      ? 'text-green-600'
+                      : currentStatus === 'Low Stock'
+                        ? 'text-orange-500'
+                        : 'text-red-600',
+                  ].join(' ')}
                 >
-                  Extra Stock Quantity
-                </label>
-
-                <input
-                  type="number"
-                  min={0}
-                  value={extraStock}
-                  onChange={(e) =>
-                    setExtraStock(Number(e.target.value) || 0)
-                  }
-                  className="w-full px-6 text-white font-bold text-lg outline-none"
-                  style={{
-                    height: 60,
-                    background: '#0040A1',
-                    borderRadius: 12,
-                  }}
-                />
-
-                <p className="text-lg font-medium mt-3" style={{ color: '#98B3FF' }}>
-                  Updated Stock:{' '}
-                  <span className="font-bold text-white">
-                    {updatedStock}
-                  </span>
-                </p>
-
-                <p className="text-lg font-medium" style={{ color: '#98B3FF' }}>
-                  Auto Status:{' '}
-                  <span className="font-bold text-white uppercase">
-                    {updatedStatus}
-                  </span>
+                  {currentStatus}
                 </p>
               </div>
             </div>
 
-            <div className="col-span-2 mt-[12px] grid grid-cols-[350px_650px] gap-[25px]">
-              <div
-                className="flex items-center gap-4"
-                style={{
-                  height: 110,
-                  borderRadius: cardRadius,
-                  background: '#F5F6FB',
-                  border: '1px solid #E5E7EB',
-                  padding: '24px 28px',
-                }}
-              >
-                <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-white rounded-full shadow-sm">
-                  <MapPin size={22} color="#0040A1" strokeWidth={2.5} />
-                </div>
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-[#F5F6FB] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+              <div className="min-w-0">
+                <h4 className="text-sm font-bold text-[#002B73] sm:text-base">
+                  Last Updated
+                </h4>
 
-                <div>
-                  <h4
-                    className="text-lg font-bold"
-                    style={{ color: '#002B73' }}
-                  >
-                    Warehouse Location
-                  </h4>
-
-                  <p
-                    className="text-[19px] font-bold leading-tight"
-                    style={{ color: '#1A1C1F' }}
-                  >
-                    {product.warehouseLocation || 'Kokuvil'}
-                  </p>
-
-                  <p
-                    className="text-sm font-medium mt-0.5"
-                    style={{ color: '#5C5F6C' }}
-                  >
-                    {product.warehouseCenter || 'west,Jaffna'}
-                  </p>
-                </div>
+                <p className="mt-1 text-xs font-medium leading-5 text-slate-500 sm:text-sm">
+                  Updated by{' '}
+                  <span className="font-bold text-[#1A1C1F]">
+                    {product.lastUpdatedBy || 'Admin'}
+                  </span>{' '}
+                  on{' '}
+                  {product.lastUpdatedDate
+                    ? new Date(
+                        product.lastUpdatedDate,
+                      ).toLocaleDateString()
+                    : 'Today'}
+                </p>
               </div>
 
-              <div
-                className="flex items-center justify-between"
-                style={{
-                  height: 110,
-                  borderRadius: cardRadius,
-                  background: '#F5F6FB',
-                  border: '1px solid #E5E7EB',
-                  padding: '24px 28px',
-                }}
+              <button
+                type="button"
+                onClick={handleViewLog}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 text-xs font-bold text-[#002B73] shadow-sm transition hover:bg-slate-50 sm:w-auto sm:text-sm"
               >
-                <div>
-                  <h4
-                    className="text-lg font-bold"
-                    style={{ color: '#002B73' }}
-                  >
-                    Last Updated
-                  </h4>
-
-                  <p
-                    className="text-lg font-medium"
-                    style={{ color: '#5C5F6C' }}
-                  >
-                    Adjusted by{' '}
-                    <span className="font-bold text-[#1A1C1F]">
-                      {product.lastUpdatedBy || 'Admin'}
-                    </span>{' '}
-                   on {product.lastUpdatedDate
-                      ? new Date(product.lastUpdatedDate).toLocaleDateString()
-                      : 'Today'}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleViewLog}
-                  className="flex items-center gap-2 text-base font-bold"
-                  style={{ color: '#002B73' }}
-                >
+                <span>
                   {showLog ? 'Hide Log' : 'View Log'}
+                </span>
 
-                  <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
-                    <History size={16} />
-                  </div>
-                </button>
-              </div>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F1F5FF]">
+                  <History size={15} />
+                </span>
+              </button>
             </div>
 
             {showLog && (
-              <div className="col-span-2 mt-2">
-                <h3
-                  className="font-bold text-lg mb-4"
-                  style={{ color: '#002B73' }}
-                >
+              <div>
+                <h3 className="mb-3 text-base font-bold text-[#002B73] sm:text-lg">
                   Stock Modification History
                 </h3>
 
                 {isLoadingLog ? (
-                  <p className="text-sm" style={{ color: '#64748B' }}>
-                    Loading...
-                  </p>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-center">
+                    <p className="text-sm text-slate-500">
+                      Loading...
+                    </p>
+                  </div>
                 ) : logError ? (
-                  <p className="text-sm text-red-500">{logError}</p>
-                ) : stockLog.length === 0 ? (
-                  <p className="text-sm" style={{ color: '#64748B' }}>
-                    No stock changes recorded yet.
-                  </p>
+                  <div className="rounded-xl border border-red-100 bg-red-50 p-5">
+                    <p className="text-sm text-red-600">
+                      {logError}
+                    </p>
+                  </div>
+                ) : totalRecords === 0 ? (
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-center">
+                    <p className="text-sm text-slate-500">
+                      No stock changes recorded yet.
+                    </p>
+                  </div>
                 ) : (
-                  <div
-                    style={{
-                      border: '1px solid #E5E7EB',
-                      borderRadius: 12,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <table className="w-full text-sm">
-                      <thead style={{ background: '#F5F6FB' }}>
-                        <tr>
-                          {['Date', 'Previous', 'Change', 'New Stock', 'Changed By'].map((h) => (
-                            <th
-                              key={h}
-                              className="text-left px-5 py-3 font-bold"
-                              style={{ color: '#002B73' }}
-                            >
-                              {h}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stockLog.map((entry, idx) => {
-                          const change = entry.newStock - entry.previousStock;
+                  <>
+                    <div className="overflow-hidden rounded-xl border border-slate-200">
+                      <div className="divide-y divide-slate-100 sm:hidden">
+                        {displayedLog.map((entry, idx) => {
+                          const change =
+                            entry.newStock -
+                            entry.previousStock;
+
                           return (
-                            <tr
+                            <div
                               key={idx}
-                              style={{
-                                borderTop: idx > 0 ? '1px solid #F1F5F9' : undefined,
-                              }}
+                              className="space-y-3 p-4"
                             >
-                              <td className="px-5 py-3" style={{ color: '#5C5F6C' }}>
-                                {new Date(entry.changedAt).toLocaleString()}
-                              </td>
-                              <td className="px-5 py-3 font-medium" style={{ color: '#1A1C1F' }}>
-                                {entry.previousStock}
-                              </td>
-                              <td
-                                className="px-5 py-3 font-bold"
-                                style={{ color: change >= 0 ? '#008000' : '#BC0000' }}
-                              >
-                                {change >= 0 ? `+${change}` : change}
-                              </td>
-                              <td className="px-5 py-3 font-medium" style={{ color: '#1A1C1F' }}>
-                                {entry.newStock}
-                              </td>
-                              <td className="px-5 py-3" style={{ color: '#5C5F6C' }}>
-                                {entry.changedBy}
-                              </td>
-                            </tr>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-slate-500">
+                                  {new Date(
+                                    entry.changedAt,
+                                  ).toLocaleDateString()}
+                                </span>
+
+                                <span
+                                  className={[
+                                    'text-sm font-bold',
+                                    change >= 0
+                                      ? 'text-green-600'
+                                      : 'text-red-600',
+                                  ].join(' ')}
+                                >
+                                  {change >= 0
+                                    ? `+${change}`
+                                    : change}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <HistoryValue
+                                  label="Previous"
+                                  value={String(
+                                    entry.previousStock,
+                                  )}
+                                />
+
+                                <HistoryValue
+                                  label="New Stock"
+                                  value={String(
+                                    entry.newStock,
+                                  )}
+                                />
+
+                                <HistoryValue
+                                  label="Changed By"
+                                  value={entry.changedBy}
+                                />
+
+                                <HistoryValue
+                                  label="Time"
+                                  value={new Date(
+                                    entry.changedAt,
+                                  ).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                />
+                              </div>
+                            </div>
                           );
                         })}
-                      </tbody>
-                    </table>
-                  </div>
+                      </div>
+
+                      <div className="hidden overflow-x-auto sm:block">
+                        <table className="w-full min-w-[600px] text-sm">
+                          <thead className="bg-[#F5F6FB]">
+                            <tr>
+                              {[
+                                'Date',
+                                'Previous',
+                                'Change',
+                                'New Stock',
+                                'Changed By',
+                              ].map((heading) => (
+                                <th
+                                  key={heading}
+                                  className="whitespace-nowrap px-4 py-3 text-left text-xs font-bold text-[#002B73]"
+                                >
+                                  {heading}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {displayedLog.map((entry, idx) => {
+                              const change =
+                                entry.newStock -
+                                entry.previousStock;
+
+                              return (
+                                <tr
+                                  key={idx}
+                                  className="border-t border-slate-100"
+                                >
+                                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">
+                                    {new Date(
+                                      entry.changedAt,
+                                    ).toLocaleString()}
+                                  </td>
+
+                                  <td className="px-4 py-3 font-medium text-slate-800">
+                                    {entry.previousStock}
+                                  </td>
+
+                                  <td
+                                    className={[
+                                      'px-4 py-3 font-bold',
+                                      change >= 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600',
+                                    ].join(' ')}
+                                  >
+                                    {change >= 0
+                                      ? `+${change}`
+                                      : change}
+                                  </td>
+
+                                  <td className="px-4 py-3 font-medium text-slate-800">
+                                    {entry.newStock}
+                                  </td>
+
+                                  <td className="px-4 py-3 text-slate-500">
+                                    {entry.changedBy}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {totalPages > 1 && (
+                      <div className="mt-3 flex flex-col items-center justify-between gap-3 sm:flex-row">
+                        <p className="text-xs font-medium text-slate-500">
+                          Showing{' '}
+                          <span className="font-bold text-slate-700">
+                            {(currentPage - 1) * PAGE_SIZE + 1}
+                            {'-'}
+                            {Math.min(
+                              currentPage * PAGE_SIZE,
+                              totalRecords,
+                            )}
+                          </span>{' '}
+                          of{' '}
+                          <span className="font-bold text-slate-700">
+                            {totalRecords}
+                          </span>
+                        </p>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              goToPage(currentPage - 1)
+                            }
+                            disabled={currentPage === 1}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Previous page"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+
+                          {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1,
+                          ).map((pageNum) => (
+                            <button
+                              key={pageNum}
+                              type="button"
+                              onClick={() => goToPage(pageNum)}
+                              className={[
+                                'flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition',
+                                pageNum === currentPage
+                                  ? 'bg-[#002B73] text-white'
+                                  : 'border border-slate-200 text-slate-600 hover:bg-slate-50',
+                              ].join(' ')}
+                              aria-label={`Go to page ${pageNum}`}
+                              aria-current={
+                                pageNum === currentPage
+                                  ? 'page'
+                                  : undefined
+                              }
+                            >
+                              {pageNum}
+                            </button>
+                          ))}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              goToPage(currentPage + 1)
+                            }
+                            disabled={currentPage === totalPages}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Next page"
+                          >
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
           </div>
         </div>
 
-        <div
-          className="flex-shrink-0 flex items-center justify-end gap-4 px-8 py-6"
-          style={{
-            borderTop: '1px solid #F1F5F9',
-            background: '#FAFAFA',
-          }}
-        >
+        <div className="flex shrink-0 justify-end border-t border-slate-100 bg-[#FAFAFA] px-5 py-4 sm:px-6">
           <button
+            type="button"
             onClick={onClose}
-            className="flex items-center justify-center font-bold text-lg"
-            style={{
-              width: 140,
-              height: 60,
-              border: '2px solid #002B73',
-              borderRadius: 12,
-              color: '#002B73',
-            }}
+            className="flex h-10 w-full items-center justify-center rounded-lg border-2 border-[#002B73] px-6 text-sm font-bold text-[#002B73] transition hover:bg-[#002B73]/5 sm:w-auto sm:min-w-[110px]"
           >
-            Cancel
-          </button>
-
-          <button
-            onClick={async () => {
-              setIsUpdating(true);
-
-              try {
-                const shouldStayOpen = await onUpdate?.(
-                  product,
-                  String(updatedStock),
-                );
-
-                if (shouldStayOpen !== false) {
-                  onClose();
-                }
-              } finally {
-                setIsUpdating(false);
-              }
-            }}
-            disabled={isUpdating || extraStock <= 0}
-            className="flex items-center justify-center font-bold text-lg text-white"
-            style={{
-              width: 280,
-              height: 60,
-              background: '#BC0000',
-              borderRadius: 12,
-            }}
-          >
-            {isUpdating ? 'Updating...' : 'Confirm Stock Update'}
+            Close
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+interface ProductInfoProps {
+  label: string;
+  value: string;
+}
+
+function ProductInfo({
+  label,
+  value,
+}: ProductInfoProps) {
+  return (
+    <div className="min-w-0 rounded-xl border border-slate-200 bg-[#F5F6FB] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+        {label}
+      </p>
+
+      <p className="mt-2 truncate text-sm font-bold text-[#1A1C1F] sm:text-base">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+interface HistoryValueProps {
+  label: string;
+  value: string;
+}
+
+function HistoryValue({
+  label,
+  value,
+}: HistoryValueProps) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
+
+      <p className="mt-0.5 truncate text-xs font-semibold text-slate-700">
+        {value}
+      </p>
     </div>
   );
 }
