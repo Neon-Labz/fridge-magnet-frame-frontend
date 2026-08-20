@@ -251,7 +251,7 @@ export default function AddProductModal({
   const canAddMoreGallery = totalGalleryCount < MAX_GALLERY;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div
@@ -281,14 +281,14 @@ export default function AddProductModal({
 
         <form onSubmit={handleSubmit} className="flex-1 space-y-5 overflow-y-auto px-8 py-6">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Product Name</label>
+            <label className="block text-sm font-semibold text-[#1A1C1F]">Product Name</label>
             <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="e.g. Vintage Walnut Frame" style={{ ...inputStyle, border: fieldErrors.name ? '1px solid #BC0000' : inputStyle.border }} />
             {fieldErrors.name && <p className="text-xs font-semibold text-red-700">{fieldErrors.name}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Product ID</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Product ID</label>
 
               <input
                 type="text"
@@ -303,7 +303,7 @@ export default function AddProductModal({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Stock</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Stock</label>
               <input 
               type="number" 
               name="stock" 
@@ -319,7 +319,7 @@ export default function AddProductModal({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Price</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Price</label>
               <input
                 type="number"
                 name="price"
@@ -337,7 +337,7 @@ export default function AddProductModal({
             </div>
 
              <div className="space-y-2">
-              <label className="block text-sm font-semibold">Image Count</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Image Count</label>
               <input
                 type="number"
                 name="imagecount"
@@ -356,7 +356,7 @@ export default function AddProductModal({
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Product Description</label>
+            <label className="block text-sm font-semibold text-[#1A1C1F]">Product Description</label>
             <textarea
               name="description"
               value={form.description}
@@ -378,7 +378,7 @@ export default function AddProductModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Primary Image</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Primary Image</label>
 
               {primaryImagePreviewUrl ? (
                 <div
@@ -417,7 +417,7 @@ export default function AddProductModal({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Product Gallery</label>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Product Gallery</label>
 
               {totalGalleryCount > 0 ? (
                 <div
