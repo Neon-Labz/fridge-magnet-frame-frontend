@@ -70,6 +70,7 @@ export default function CreateProductPage() {
       data.append("description", formData.description);
       data.append("status", getProductStatus(formData.stock));
       data.append("price", String(formData.price));
+      data.append("imagecount", String(formData.imagecount));
 
       if (formData.primaryImage) {
         data.append("primaryImage", formData.primaryImage);

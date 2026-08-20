@@ -171,6 +171,7 @@ export default function EditProductPage() {
       data.append('stock', String(formData.stock));
       data.append('price', String(formData.price));
       data.append('description', formData.description);
+      data.append('imagecount', String(formData.imagecount));
       data.append(
         'status',
         getProductStatus(formData.stock),
