@@ -134,14 +134,14 @@ export default function LoginForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-[288px] mx-auto flex flex-col sm:gap-8 lg:gap-6  text-gray-950"
+      className="w-full max-w-[288px] mx-auto flex flex-col gap-[-20px] sm:gap-5 text-gray-950"
     >
-      <h2 className="text-center text-[30px] font-bold leading-[38px] mb-1">
+      <h2 className="text-center text-[24px] sm:text-[28px] font-bold leading-tight sm:leading-[38px]">
         Login
       </h2>
 
-      <div className="relative border-b-2 border-gray-700 py-2 pl-5">
-        <Mail className="absolute left-0 top-1/2 -translate-y-1/2  w-5 h-5 text-gray-950" />
+      <div className="relative border-b-2 border-gray-700 py-0.5 sm:py-2 pl-5">
+        <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-950" />
         <input
           {...register("email")}
           placeholder="Email"
@@ -149,7 +149,7 @@ export default function LoginForm({
         />
       </div>
 
-      <div className="relative border-b-2 border-gray-700 py-2 pl-5">
+      <div className="relative border-b-2 border-gray-700 py-0.5 sm:py-2 pl-5">
         <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-950" />
         <input
           {...register("password")}
@@ -161,18 +161,18 @@ export default function LoginForm({
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-0 top-3 w-[26px] h-[26px] cursor-pointer text-gray-950"
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-[26px] h-[26px] cursor-pointer text-gray-950"
         >
           {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
         </button>
       </div>
 
       {showSecondaryActions && (
-        <div className="text-right">
+        <div className="text-right -mt-1 sm:mt-0">
           <button
             type="button"
             onClick={() => openModal("forgot-password")}
-            className="text-[14px] font-semibold text-blue-600 hover:underline"
+            className="text-[12px] sm:text-[14px] font-semibold text-blue-600 hover:underline"
           >
             Forgot password?
           </button>
@@ -180,7 +180,7 @@ export default function LoginForm({
       )}
 
       {error && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-1.5 sm:py-2 text-[13px] sm:text-sm font-medium text-red-700">
           {error}
         </p>
       )}
@@ -188,7 +188,7 @@ export default function LoginForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full h-[48px] bg-[#BC0101] text-white rounded-lg font-semibold hover:bg-[#a00000] disabled:opacity-60"
+        className="w-full h-[36px] sm:h-[48px] bg-[#BC0101] text-white rounded-lg font-semibold hover:bg-[#a00000] disabled:opacity-60"
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>
@@ -196,21 +196,21 @@ export default function LoginForm({
       {showSecondaryActions && (
         <>
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-[2px] bg-gray-300" />
+            <div className="flex-1 h-[1px] sm:h-[2px] bg-gray-300" />
             <span className="text-[12px] text-gray-500">OR</span>
-            <div className="flex-1 h-[2px] bg-gray-300" />
+            <div className="flex-1 h-[1px] sm:h-[2px] bg-gray-300" />
           </div>
 
           <button
             type="button"
             disabled
-            className="flex items-center justify-center gap-2 w-full h-[48px] border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center justify-center gap-2 w-full h-[36px] sm:h-[48px] border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <GoogleIcon />
-            <span>Sign in with Google</span>
+            <span className="text-[13px] sm:text-base">Sign in with Google</span>
           </button>
 
-          <p className="text-center text-[14px]">
+          <p className="text-center text-[12px] sm:text-[14px]">
             Don't have an account?{" "}
             <button
               type="button"
