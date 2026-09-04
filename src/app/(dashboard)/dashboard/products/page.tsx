@@ -142,7 +142,7 @@ export default function ProductsPage() {
         data.append("galleryImages", file);
       });
 
-      const res = await fetch(apiV1Url("/api/products"), {
+      const res = await fetch(apiV1Url("/products"), {
         method: "POST",
         body: data,
       });
@@ -191,7 +191,7 @@ export default function ProductsPage() {
         data.append("primaryImage", formData.primaryImage);
       }
 
-      const res = await fetch(apiV1Url(`/api/products/${editTarget.id}`), {
+      const res = await fetch(apiV1Url(`/products/${editTarget.id}`), {
         method: "PUT",
         body: data,
       });
@@ -212,7 +212,7 @@ export default function ProductsPage() {
             const encodedPublicId = encodeURIComponent(img.public_id);
             const deleteRes = await fetch(
               apiV1Url(
-                `/api/products/${editTarget.id}/image/${encodedPublicId}`,
+                `/products/${editTarget.id}/image/${encodedPublicId}`,
               ),
               { method: "DELETE" },
             );
@@ -231,7 +231,7 @@ export default function ProductsPage() {
         });
 
         const galleryRes = await fetch(
-          apiV1Url(`/api/products/${editTarget.id}/gallery`),
+          apiV1Url(`/products/${editTarget.id}/gallery`),
           {
             method: "POST",
             body: galleryData,
@@ -269,7 +269,7 @@ export default function ProductsPage() {
         status = "Low Stock";
       }
 
-      const res = await fetch(apiV1Url(`/api/products/${product.id}`), {
+      const res = await fetch(apiV1Url(`/products/${product.id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -311,7 +311,7 @@ export default function ProductsPage() {
     setIsDeleting(true);
 
     try {
-      const res = await fetch(apiV1Url(`/api/products/${deleteTarget.id}`), {
+      const res = await fetch(apiV1Url(`/products/${deleteTarget.id}`), {
         method: "DELETE",
       });
 

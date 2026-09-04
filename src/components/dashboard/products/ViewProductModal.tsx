@@ -108,7 +108,7 @@ export default function ViewProductModal({
     try {
       const res = await fetch(
         apiV1Url(
-          `/api/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
+          `/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
         ),
       );
 
