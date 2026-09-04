@@ -1,2 +1,4 @@
-export const apiV1Url = (path: string) =>
-  `/api/v1/${path.replace(/^\//, '')}`;
+export const apiV1Url = (path: string) => {
+  const cleaned = path.replace(/^\//, '').replace(/^api\//, '');
+  return `/api/v1/${cleaned}`;
+};

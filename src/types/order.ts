@@ -23,6 +23,8 @@ export interface OrderItem {
   sku?: string | null;
   name: string;
   price: number;
+   primaryImage?: string;
+  uploadedImages?: string[];
   quantity: number;
   image?: string;
   frameType?: string;
