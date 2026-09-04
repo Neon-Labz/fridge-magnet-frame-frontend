@@ -49,10 +49,10 @@ async function fetchNotifications(): Promise<NotifItem[]> {
   try {
     const [ordersRes, lowRes, outRes] = await Promise.all([
       fetch(apiV1Url("/orders?status=PENDING"), { cache: "no-store" }),
-      fetch(apiV1Url("/api/products?status=Low+Stock&limit=5"), {
+      fetch(apiV1Url("/products?status=Low+Stock&limit=5"), {
         cache: "no-store",
       }),
-      fetch(apiV1Url("/api/products?status=Out+of+Stock&limit=5"), {
+      fetch(apiV1Url("/products?status=Out+of+Stock&limit=5"), {
         cache: "no-store",
       }),
     ]);

@@ -44,7 +44,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-100 flex flex-col bg-white transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-100 flex flex-col bg-[#071C40] transition-transform duration-300 ${
         open ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}
       style={{
@@ -54,20 +54,21 @@ export default function Sidebar({
       }}
     >
       <div
-        className="flex flex-shrink-0 items-center justify-center"
+        className="flex flex-shrink-0 items-center justify-left"
         style={{
           height: 89,
-          borderBottom: '1px solid #F1F5F9',
+          borderBottom: '1px solid #071C40',
           padding: '0 24px',
         }}
       >
         <Link href="/dashboard/products">
           <Image
-            src="/new_logo.png"
+            src="/magnifybg.png"
             alt="Magnify"
-            width={140}
-            height={48}
+            width={130}
+            height={28}
             priority
+            className="rounded-lg"
             style={{ width: 'auto', height: 'auto' }}
           />
         </Link>
@@ -85,7 +86,7 @@ export default function Sidebar({
               onClick={onClose}
               className="flex w-full items-center gap-3 px-6 py-4 transition-colors"
               style={{
-                background: isActive ? '#EFF6FF' : 'transparent',
+                background: isActive ? '#123D87' : 'transparent',
                 borderRight: isActive
                   ? '4px solid #1E3A8A'
                   : '4px solid transparent',
@@ -93,7 +94,7 @@ export default function Sidebar({
             >
               <Icon
                 size={20}
-                color={isActive ? '#1E3A8A' : '#475569'}
+                color={isActive ? '#FFFFFF' : '#FFFFFF'}
                 className="flex-shrink-0"
               />
 
@@ -101,7 +102,7 @@ export default function Sidebar({
                 className="text-[14px]"
                 style={{
                   fontWeight: isActive ? 600 : 500,
-                  color: isActive ? '#1E3A8A' : '#475569',
+                  color: isActive ? '#FFFFFF' : '#FFFFFF',
                 }}
               >
                 {label}
@@ -114,13 +115,13 @@ export default function Sidebar({
       <div className="px-4 py-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 transition hover:bg-slate-50"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 transition hover:bg-[#D83223]"
         >
-          <LogOut size={18} color="#475569" style={{ flexShrink: 0 }} />
+          <LogOut size={18} color="#FFFFFF" style={{ flexShrink: 0 }} />
 
           <span
             className="text-[14px] font-semibold"
-            style={{ color: '#475569' }}
+            style={{ color: '#FFFFFF' }}
           >
             Logout
           </span>
