@@ -9,7 +9,6 @@ export default function OrderNowSection() {
   return (
     <section className="px-3 pb-8 sm:px-6">
 
-      {/* FEATURES */}
       <div className="mx-auto mt-6 max-w-[1270px] rounded-[20px] border border-[#E2E8F0] bg-white px-3 py-5 shadow-sm sm:px-6 sm:py-8">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -31,7 +30,6 @@ export default function OrderNowSection() {
         </div>
       </div>
 
-      {/* CONTACT */}
       <div className="pt-6">
         <div className="mx-auto max-w-[1280px] rounded-[24px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-8 text-center sm:rounded-[36px] sm:p-12">
 

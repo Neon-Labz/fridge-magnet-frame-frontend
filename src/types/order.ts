@@ -20,6 +20,7 @@ export interface Order {
 
 export interface OrderItem {
   productId?: string;
+  sku?: string | null;
   name: string;
   price: number;
   quantity: number;

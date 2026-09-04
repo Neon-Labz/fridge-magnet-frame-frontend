@@ -86,9 +86,7 @@ export default function RegisterForm() {
         Create Account
       </h2>
 
-      {/* FORM */}
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* FULL NAME */}
         <div className="relative">
           <User className="absolute left-0 top-3 w-5 h-5" />
           <input
@@ -99,7 +97,6 @@ export default function RegisterForm() {
           <p className="text-red-500 text-xs">{errors.fullName?.message}</p>
         </div>
 
-        {/* EMAIL */}
         <div className="relative">
           <Mail className="absolute left-0 top-3 w-5 h-5" />
           <input
@@ -110,7 +107,6 @@ export default function RegisterForm() {
           <p className="text-red-500 text-xs">{errors.email?.message}</p>
         </div>
 
-        {/* PASSWORD */}
         <div className="relative">
           <Lock className="absolute left-0 top-3 w-5 h-5" />
           <input
@@ -135,11 +131,9 @@ export default function RegisterForm() {
           <p className="text-red-500 text-xs">{errors.password?.message}</p>
         </div>
 
-        {/* ERROR / SUCCESS */}
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {success && <p className="text-green-600 text-sm">{success}</p>}
 
-        {/* BUTTON */}
         <button
           type="submit"
           disabled={loading}
@@ -149,14 +143,12 @@ export default function RegisterForm() {
         </button>
       </form>
 
-      {/* OR */}
       <div className="flex items-center gap-2">
         <div className="flex-1 h-[2px] bg-gray-300" />
         <span className="text-[12px] text-gray-500">OR</span>
         <div className="flex-1 h-[2px] bg-gray-300" />
       </div>
 
-      {/* GOOGLE */}
       <button
         type="button"
         disabled
@@ -166,7 +158,6 @@ export default function RegisterForm() {
         <span>Sign up with Google</span>
       </button>
 
-      {/* FOOTER */}
       <p className="text-center text-[14px]">
         Already have an account?{" "}
         <button

@@ -17,7 +17,11 @@ export default function OrderSummary({
 
   const handleCheckout = () => {
     try {
-      router.push(isAuthenticated ? "/checkout" : "/login");
+      router.push(
+        isAuthenticated
+          ? "/checkout"
+          : `/login?redirect=${encodeURIComponent("/checkout")}`,
+      );
     } catch (err) {
       console.error("Navigation to /checkout failed", err);
     }

@@ -34,7 +34,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-full w-full max-w-[1700px] items-center justify-between px-4 sm:px-6 lg:px-[120px]">
         <Link href="/" onClick={closeMenu} className="shrink-0">
           <Image
-            src="/logo.png"
+            src="/new_logo.png"
             alt="Logo"
             width={140}
             height={50}

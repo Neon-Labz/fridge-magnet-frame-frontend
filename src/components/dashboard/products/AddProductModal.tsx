@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, CSSProperties, KeyboardEvent, WheelEvent } from 'react';
 import { ImagePlus, Images, X } from 'lucide-react';
 import type { PersonalizationFormOption, Product, ProductFormData } from '@/types/product';
@@ -10,6 +10,7 @@ interface AddProductModalProps {
   onClose: () => void;
   onSubmit?: (data: ProductFormData) => boolean | void | Promise<boolean | void>;
   editingProduct?: Product | null;
+  autoProductId?: string;
 }
 
 const EMPTY: ProductFormData = {
@@ -18,6 +19,7 @@ const EMPTY: ProductFormData = {
   category: 'Wooden Frames',
   stock: 0,
   price: 0,
+  imagecount:0,
   description: '',
   personalization: false,
   primaryImage: null,
@@ -26,19 +28,23 @@ const EMPTY: ProductFormData = {
 
 const MAX_GALLERY = 5;
 
-type FieldErrors = Partial<Record<'name' | 'productId' | 'description', string>>;
+type FieldErrors = Partial<Record<'name' | 'productId' | 'description' | 'price' | 'primaryImage' | 'imagecount', string>>;
 
 export default function AddProductModal({
   isOpen,
   onClose,
   onSubmit,
   editingProduct = null,
+  autoProductId = '',
 }: AddProductModalProps) {
   const [form, setForm] = useState<ProductFormData>(EMPTY);
   const [personalizationOptions, setPersonalizationOptions] = useState<PersonalizationFormOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  const [existingGalleryUrls, setExistingGalleryUrls] = useState<string[]>([]);
+  const [removedGalleryUrls, setRemovedGalleryUrls] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -50,19 +56,56 @@ export default function AddProductModal({
         category: editingProduct.series ?? 'Wooden Frames',
         stock: Number(editingProduct.stockCount ?? 0),
         price: Number(editingProduct.price ?? 0),
+        imagecount:Number(editingProduct.imagecount ?? 0),
         description: editingProduct.description ?? '',
         personalization: false,
         primaryImage: null,
         galleryImages: [],
       });
+      setExistingGalleryUrls(editingProduct.galleryImageUrls ?? []);
     } else {
-      setForm(EMPTY);
+      setForm({ ...EMPTY, productId: autoProductId });
+      setExistingGalleryUrls([]);
     }
 
+    setRemovedGalleryUrls([]);
     setPersonalizationOptions([]);
     setGalleryError(null);
     setFieldErrors({});
-  }, [isOpen, editingProduct]);
+  }, [isOpen, editingProduct, autoProductId]);
+
+  const primaryImagePreviewUrl = useMemo(() => {
+    if (form.primaryImage) {
+      return URL.createObjectURL(form.primaryImage);
+    }
+    return editingProduct?.primaryImageUrl || null;
+  }, [form.primaryImage, editingProduct?.primaryImageUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (form.primaryImage && primaryImagePreviewUrl) {
+        URL.revokeObjectURL(primaryImagePreviewUrl);
+      }
+    };
+  }, [form.primaryImage, primaryImagePreviewUrl]);
+
+  const galleryPreviewUrls = useMemo(
+    () => form.galleryImages.map((file) => URL.createObjectURL(file)),
+    [form.galleryImages],
+  );
+
+  useEffect(() => {
+    return () => {
+      galleryPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [galleryPreviewUrls]);
+
+  const visibleExistingGalleryUrls = useMemo(
+    () => existingGalleryUrls.filter((url) => !removedGalleryUrls.includes(url)),
+    [existingGalleryUrls, removedGalleryUrls],
+  );
+
+  const totalGalleryCount = visibleExistingGalleryUrls.length + form.galleryImages.length;
 
   if (!isOpen) return null;
 
@@ -78,18 +121,25 @@ export default function AddProductModal({
     outline: 'none',
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (
+  e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
 
-    if (name in fieldErrors) {
-      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
-    }
+  if (name in fieldErrors) {
+    setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+  }
 
-    setForm(prev => ({
-      ...prev,
-      [name]: name === 'stock' || name === 'price' ? parseFloat(value) || 0 : value,
-    }));
-  };
+  setForm(prev => ({
+    ...prev,
+    [name]:
+      name === 'stock' ||
+      name === 'price' ||
+      name === 'imagecount'
+        ? Number(value) || 0
+        : value,
+  }));
+};
 
   const handleNumberWheel = (e: WheelEvent<HTMLInputElement>) => {
     e.currentTarget.blur();
@@ -105,18 +155,44 @@ export default function AddProductModal({
     if (!e.target.files) return;
 
     if (type === 'primary') {
-      setForm(prev => ({ ...prev, primaryImage: e.target.files![0] ?? null }));
+      const file = e.target.files[0] ?? null;
+      setForm(prev => ({ ...prev, primaryImage: file }));
+      if (file) {
+        setFieldErrors(prev => ({ ...prev, primaryImage: undefined }));
+      }
       return;
     }
 
-    const files = Array.from(e.target.files);
-    if (files.length > MAX_GALLERY) {
-      setGalleryError(`You can upload a maximum of ${MAX_GALLERY} gallery images.`);
+    const newFiles = Array.from(e.target.files);
+    const combinedNewFiles = [...form.galleryImages, ...newFiles];
+    const totalAfterAdd = visibleExistingGalleryUrls.length + combinedNewFiles.length;
+
+    if (totalAfterAdd > MAX_GALLERY) {
+      setGalleryError(`You can have a maximum of ${MAX_GALLERY} gallery images in total.`);
+      e.target.value = '';
       return;
     }
 
     setGalleryError(null);
-    setForm(prev => ({ ...prev, galleryImages: files }));
+    setForm(prev => ({ ...prev, galleryImages: combinedNewFiles }));
+    e.target.value = '';
+  };
+
+  const handleRemovePrimaryImage = () => {
+    setForm(prev => ({ ...prev, primaryImage: null }));
+  };
+
+  const handleRemoveExistingGalleryImage = (url: string) => {
+    setRemovedGalleryUrls(prev => [...prev, url]);
+    setGalleryError(null);
+  };
+
+  const handleRemoveNewGalleryImage = (idx: number) => {
+    setForm(prev => ({
+      ...prev,
+      galleryImages: prev.galleryImages.filter((_, i) => i !== idx),
+    }));
+    setGalleryError(null);
   };
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
@@ -127,6 +203,15 @@ export default function AddProductModal({
     if (!form.name.trim()) errors.name = 'Product name is required.';
     if (!form.productId.trim()) errors.productId = 'Product ID is required.';
     if (!form.description.trim()) errors.description = 'Description is required.';
+
+    if (!form.price || Number(form.price) <= 0) {
+      errors.price = 'Price is required.';
+    }
+
+
+    if (!form.primaryImage && !editingProduct?.primaryImageUrl) {
+      errors.primaryImage = 'Primary image is required.';
+    }
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -140,15 +225,20 @@ export default function AddProductModal({
         ...form,
         price: Number(form.price) || 0,
         stock: Number(form.stock) || 0,
+        imagecount:Number(form.imagecount) || 0,
         personalization: false,
         personalizationEnabled: false,
         personalizationOptions: [],
+        existingGalleryUrls: visibleExistingGalleryUrls,
+        removedGalleryUrls,
       };
 
       const shouldReset = await onSubmit?.(submitData);
 
       if (shouldReset !== false) {
         setForm(EMPTY);
+        setExistingGalleryUrls([]);
+        setRemovedGalleryUrls([]);
         setPersonalizationOptions([]);
         setGalleryError(null);
         setFieldErrors({});
@@ -158,8 +248,10 @@ export default function AddProductModal({
     }
   };
 
+  const canAddMoreGallery = totalGalleryCount < MAX_GALLERY;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div
@@ -189,31 +281,82 @@ export default function AddProductModal({
 
         <form onSubmit={handleSubmit} className="flex-1 space-y-5 overflow-y-auto px-8 py-6">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Product Name</label>
+            <label className="block text-sm font-semibold text-[#1A1C1F]">Product Name</label>
             <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="e.g. Vintage Walnut Frame" style={{ ...inputStyle, border: fieldErrors.name ? '1px solid #BC0000' : inputStyle.border }} />
             {fieldErrors.name && <p className="text-xs font-semibold text-red-700">{fieldErrors.name}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Product ID</label>
-              <input type="text" name="productId" value={form.productId} onChange={handleChange} placeholder="SKU-000" style={{ ...inputStyle, border: fieldErrors.productId ? '1px solid #BC0000' : inputStyle.border }} />
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Product ID</label>
+
+              <input
+                type="text"
+                name="productId"
+                value={form.productId || (editingProduct ? '' : 'Generating…')}
+                readOnly
+                disabled
+                placeholder="Auto-generated"
+                style={{ ...inputStyle, background: '#EDEEF3', color: '#64748B', cursor: 'not-allowed' }}
+              />
               {fieldErrors.productId && <p className="text-xs font-semibold text-red-700">{fieldErrors.productId}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Stock</label>
-              <input type="number" name="stock" value={form.stock === 0 ? '' : form.stock} placeholder="Enter stock" onChange={handleChange} onWheel={handleNumberWheel} onKeyDown={handleNumberKeyDown} min={0} step={1} inputMode="numeric" style={inputStyle} />
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Stock</label>
+              <input 
+              type="number" 
+              name="stock" 
+              value={form.stock === 0 ? '' : form.stock} 
+              placeholder="Enter stock" 
+              onChange={handleChange} 
+              onWheel={handleNumberWheel} 
+              onKeyDown={handleNumberKeyDown} 
+              min={0} 
+              step={1} 
+              inputMode="numeric" 
+              style={inputStyle} />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Price</label>
-              <input type="number" name="price" value={form.price === 0 ? '' : form.price} placeholder="Enter price" onChange={handleChange} onWheel={handleNumberWheel} onKeyDown={handleNumberKeyDown} min={0} step="0.01" inputMode="decimal" style={inputStyle} />
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Price</label>
+              <input
+                type="number"
+                name="price"
+                value={form.price === 0 ? '' : form.price}
+                placeholder="Enter price"
+                onChange={handleChange}
+                onWheel={handleNumberWheel}
+                onKeyDown={handleNumberKeyDown}
+                min={0}
+                step="1"
+                inputMode="decimal"
+                style={{ ...inputStyle, border: fieldErrors.price ? '1px solid #BC0000' : inputStyle.border }}
+              />
+              {fieldErrors.price && <p className="text-xs font-semibold text-red-700">{fieldErrors.price}</p>}
+            </div>
+
+             <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Image Count</label>
+              <input
+                type="number"
+                name="imagecount"
+                value={form.imagecount === 0 ? '' : form.imagecount}
+                placeholder="Enter Max image"
+                onChange={handleChange}
+                onWheel={handleNumberWheel}
+                onKeyDown={handleNumberKeyDown}
+                min={0}
+                step={1}
+                inputMode="numeric"
+                style={{ ...inputStyle, border: fieldErrors.imagecount ? '1px solid #BC0000' : inputStyle.border }}
+              />
+              {fieldErrors.imagecount && <p className="text-xs font-semibold text-red-700">{fieldErrors.imagecount}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Product Description</label>
+            <label className="block text-sm font-semibold text-[#1A1C1F]">Product Description</label>
             <textarea
               name="description"
               value={form.description}
@@ -235,31 +378,95 @@ export default function AddProductModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Primary Product Image</label>
-              <label className="block cursor-pointer">
-                <input type="file" accept="image/*" onChange={e => handleFile(e, 'primary')} className="hidden" />
-                <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#C3C6D4] bg-[#F8FAFC] p-6">
-                  <ImagePlus size={23} color="#94A3B8" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Single Upload</span>
-                  <span className="text-xs text-slate-400">
-                    {form.primaryImage ? form.primaryImage.name : editingProduct?.primaryImageUrl ? 'Current image saved' : 'Main display image'}
-                  </span>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Primary Image</label>
+
+              {primaryImagePreviewUrl ? (
+                <div
+                  className="relative overflow-hidden rounded-xl"
+                  style={{ height: 120, border: `2px solid ${fieldErrors.primaryImage ? '#BC0000' : '#C3C6D4'}` }}
+                >
+                  <img src={primaryImagePreviewUrl} alt="Primary preview" className="h-full w-full object-cover" />
+
+                  <button
+                    type="button"
+                    onClick={handleRemovePrimaryImage}
+                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 shadow hover:bg-white"
+                  >
+                    <X size={14} color="#434652" />
+                  </button>
+
+                  <label className="absolute bottom-0 left-0 right-0 cursor-pointer bg-black/50 py-1.5 text-center text-xs font-semibold text-white">
+                    Replace image
+                    <input type="file" accept="image/*" onChange={e => handleFile(e, 'primary')} className="hidden" />
+                  </label>
                 </div>
-              </label>
+              ) : (
+                <label className="block cursor-pointer">
+                  <input type="file" accept="image/*" onChange={e => handleFile(e, 'primary')} className="hidden" />
+                  <div
+                    className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6"
+                    style={{ borderColor: fieldErrors.primaryImage ? '#BC0000' : '#C3C6D4', background: '#F8FAFC' }}
+                  >
+                    <ImagePlus size={23} color="#94A3B8" />
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Single Upload</span>
+                    <span className="text-xs text-slate-400">Main display image</span>
+                  </div>
+                </label>
+              )}
+              {fieldErrors.primaryImage && <p className="text-xs font-semibold text-red-700">{fieldErrors.primaryImage}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold">Product Gallery</label>
-              <label className="block cursor-pointer">
-                <input type="file" accept="image/*" multiple onChange={e => handleFile(e, 'gallery')} className="hidden" />
-                <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#C3C6D4] bg-[#F8FAFC] p-6">
-                  <Images size={25} color="#94A3B8" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Multi Upload</span>
-                  <span className="text-xs text-slate-400">
-                    {form.galleryImages.length > 0 ? `${form.galleryImages.length} images` : `Up to ${MAX_GALLERY} images`}
-                  </span>
+              <label className="block text-sm font-semibold text-[#1A1C1F]">Product Gallery</label>
+
+              {totalGalleryCount > 0 ? (
+                <div
+                  className="flex min-h-[120px] flex-wrap content-start gap-2 rounded-xl border-2 border-dashed p-3"
+                  style={{ borderColor: '#C3C6D4', background: '#F8FAFC' }}
+                >
+                  {visibleExistingGalleryUrls.map((url) => (
+                    <div key={url} className="relative h-14 w-14 overflow-hidden rounded-lg border border-[#E2E4ED]">
+                      <img src={url} alt="Saved gallery image" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingGalleryImage(url)}
+                        className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white/90"
+                      >
+                        <X size={10} color="#434652" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {galleryPreviewUrls.map((url, idx) => (
+                    <div key={url} className="relative h-14 w-14 overflow-hidden rounded-lg border border-[#E2E4ED]">
+                      <img src={url} alt={`New gallery ${idx + 1}`} className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewGalleryImage(idx)}
+                        className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white/90"
+                      >
+                        <X size={10} color="#434652" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {canAddMoreGallery && (
+                    <label className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-lg border border-dashed border-[#C3C6D4] bg-white">
+                      <input type="file" accept="image/*" multiple onChange={e => handleFile(e, 'gallery')} className="hidden" />
+                      <Images size={18} color="#94A3B8" />
+                    </label>
+                  )}
                 </div>
-              </label>
+              ) : (
+                <label className="block cursor-pointer">
+                  <input type="file" accept="image/*" multiple onChange={e => handleFile(e, 'gallery')} className="hidden" />
+                  <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#C3C6D4] bg-[#F8FAFC] p-6">
+                    <Images size={25} color="#94A3B8" />
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Multi Upload</span>
+                    <span className="text-xs text-slate-400">Up to {MAX_GALLERY} images</span>
+                  </div>
+                </label>
+              )}
               {galleryError && <p className="mt-1 text-xs font-semibold text-red-700">{galleryError}</p>}
             </div>
           </div>

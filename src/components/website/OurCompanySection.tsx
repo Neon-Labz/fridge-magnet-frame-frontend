@@ -26,23 +26,23 @@ type SocialIcon = {
 const contactCards: ContactCard[] = [
   {
     id: "phone",
-    label: "PHONE",
-    value: "+94 75 391 2534",
-    subtext: "Mon-Fri, 9am - 6pm",
+    label: "Phone",
+    value: "+94 753 912 534",
+    subtext: "Mon – Sat, 9AM – 6PM",
     icon: Phone,
   },
   {
     id: "email",
-    label: "EMAIL",
+    label: "Email",
     value: "magnifyofficials@gmail.com",
-    subtext: "Response within 24 hours",
+    subtext: "We reply within 24 hours",
     icon: Mail,
   },
   {
     id: "address",
-    label: "ADDRESS",
-    value: "125A, KKS Road, Kokuvil, Jaffna",
-    subtext: "Find us here",
+    label: "Address",
+    value: "125A, KKS Road, Kokuvil",
+    subtext: "Jaffna, Sri Lanka",
     icon: MapPin,
   },
 ];
@@ -76,20 +76,20 @@ const socialIcons: SocialIcon[] = [
 
 function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
   return (
-    <article className="flex items-center gap-4 rounded-[12px] border border-[#C3C6D4] bg-white p-3 shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#0040A1]/10 text-[#0040A1]">
-        <Icon className="h-5 w-5" aria-hidden="true" />
+    <article className="mb-4 flex w-full flex-row items-center gap-4 rounded-[16px] border border-[#F9FAFB] bg-white p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] sm:p-6">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-[#FEF2F2]">
+        <Icon className="h-6 w-6 text-[#D10A0A]" aria-hidden="true" />
       </div>
 
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className="font-inter text-[14px] font-medium uppercase tracking-[0.02em] text-[#747784]">
+      <div className="flex min-w-0 flex-col">
+        <p className="font-inter text-[14px] font-medium text-[#9CA3AF]">
           {label}
         </p>
-        <p className="font-inter text-[16px] font-semibold leading-[1.35] text-[#1B1E2A]">
+        <p className="break-words font-manrope text-[18px] font-bold leading-[1.35] text-[#001E50]">
           {value}
         </p>
         {subtext && (
-          <p className="font-inter text-[14px] leading-[1.45] text-[#747784]">
+          <p className="break-words font-inter text-[12px] leading-[1.4] text-[#9CA3AF]">
             {subtext}
           </p>
         )}
@@ -100,31 +100,28 @@ function CompanyInfoCard({ label, value, subtext, icon: Icon }: ContactCard) {
 
 export default function OurCompanySection() {
   return (
-    <div
-      className="w-full px-0 sm:px-2 md:pl-4 lg:pl-6"
-      aria-labelledby="our-company-title"
-    >
-      <header className="flex flex-col gap-2">
+    <div className="w-full" aria-labelledby="our-company-title">
+      <header>
         <h1
           id="our-company-title"
-          className="font-manrope text-[30px] font-bold leading-[1.2] text-[#002B73]"
+          className="font-manrope text-[24px] font-bold leading-[1.2] text-[#001E50]"
         >
           Our Company
         </h1>
 
-        <p className="font-inter text-[16px] leading-[29px] text-[#434652]">
+        <p className="mb-8 mt-4 font-inter text-[16px] leading-[26px] text-[#6B7280]">
           We are here to support your business inquiries and partnerships.
           Reach out through phone, email, or visit us in person.
         </p>
       </header>
 
-      <div className="mt-6 flex flex-col gap-2">
+      <div className="flex flex-col">
         {contactCards.map((card) => (
           <CompanyInfoCard key={card.id} {...card} />
         ))}
       </div>
 
-      <div className="flex flex-col gap-4 pt-6">
+      <div className="flex flex-col gap-4 pt-4">
         <p className="font-inter text-[14px] font-medium uppercase tracking-[0.04em] text-[#747784]">
           FOLLOW US
         </p>

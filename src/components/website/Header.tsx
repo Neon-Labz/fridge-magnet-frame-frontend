@@ -24,6 +24,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
+    { name: "Gallery", href: "/gallery" },
     { name: "Contact", href: "/contact" },
     //{ name: "Price", href: "/price" },
   ];
@@ -45,7 +46,7 @@ export default function Navbar() {
 
           <Link href="/" onClick={closeMenu} className="lg:-ml-3">
             <Image
-              src="/logo.png"
+              src="/new_logo.png"
               alt="Logo"
               width={140}
               height={50}

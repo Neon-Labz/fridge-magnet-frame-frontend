@@ -78,6 +78,70 @@ function clampQuantity(quantity: number, stock?: number, title?: string): number
   return normalizeProductQuantity(quantity, title, stock);
 }
 
+function mergeCartItems(base: CartItem[], incoming: CartItem[]): CartItem[] {
+  const merged = [...base];
+
+  for (const item of incoming) {
+    const existingIndex = merged.findIndex(
+      (i) =>
+        i.id === item.id &&
+        i.frameType === item.frameType &&
+        i.colorOption === item.colorOption,
+    );
+
+    if (existingIndex >= 0) {
+      const existing = merged[existingIndex];
+      merged[existingIndex] = {
+        ...existing,
+        stock: item.stock ?? existing.stock,
+        quantity: clampQuantity(
+          existing.quantity + item.quantity,
+          item.stock ?? existing.stock,
+          existing.title,
+        ),
+      };
+    } else {
+      merged.push({
+        ...item,
+        quantity: clampQuantity(item.quantity, item.stock, item.title),
+      });
+    }
+  }
+
+  return merged;
+}
+
+
+function migrateGuestCartIfNeeded(userStorageKey: string): void {
+  if (typeof window === "undefined") return;
+  if (userStorageKey === GUEST_CART_KEY) return;
+
+  let guestItems: CartItem[] = [];
+  try {
+    guestItems = readCartItems(GUEST_CART_KEY);
+  } catch {
+    guestItems = [];
+  }
+
+  if (guestItems.length === 0) return;
+
+  let userItems: CartItem[] = [];
+  try {
+    userItems = readCartItems(userStorageKey);
+  } catch {
+    userItems = [];
+  }
+
+  const merged = mergeCartItems(userItems, guestItems);
+
+  try {
+    localStorage.setItem(userStorageKey, JSON.stringify(merged));
+    localStorage.removeItem(GUEST_CART_KEY);
+  } catch (err) {
+    console.error("Failed to migrate guest cart", err);
+  }
+}
+
 function reducer(state: State, action: Action): State {
   const currentItems = getSafeItems(state.items);
 
@@ -184,6 +248,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const refreshCart = () => {
       const nextStorageKey = getCartStorageKey();
+      migrateGuestCartIfNeeded(nextStorageKey);
       setCartStorageKey(nextStorageKey);
 
       try {

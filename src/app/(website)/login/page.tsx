@@ -1,11 +1,20 @@
 'use client'
 
-import React from 'react'
+import React, { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useAuthModal } from '@/hooks/useAuthModal'
 import AuthModal from '@/components/auth/AuthModal'
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { openModal } = useAuthModal()
+  const searchParams = useSearchParams()
+
+  const rawRedirect = searchParams.get('redirect')
+  // Only allow internal, same-origin paths to avoid open-redirect issues.
+  const redirectTo =
+    rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+      ? rawRedirect
+      : undefined
 
   React.useEffect(() => {
     openModal('login')
@@ -13,7 +22,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <AuthModal />
+      <AuthModal redirectTo={redirectTo} />
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   )
 }

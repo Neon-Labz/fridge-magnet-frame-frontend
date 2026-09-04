@@ -6,6 +6,7 @@ import { apiV1Url } from '@/lib/backendUrl';
 
 type ApiImage = {
   secure_url?: string;
+  public_id?: string;
 };
 
 type ApiProduct = {
@@ -16,6 +17,7 @@ type ApiProduct = {
   category?: string;
   price?: number;
   stock?: number;
+  imagecount?: number;   // <-- ADD THIS
   status?: string;
   primaryImage?: ApiImage | null;
   galleryImages?: ApiImage[];
@@ -38,12 +40,20 @@ const mapProduct = (product: ApiProduct): Product => {
     name: product.productName || 'Untitled product',
     series: product.category?.trim() || '',
     price: Number(product.price ?? 0),
+    imagecount: Number(product.imagecount ?? 0), // <-- ADD THIS
     stockCount,
     stockStatus: toStockStatus(product.status, stockCount),
     gradient: 'from-slate-100 to-slate-300',
     primaryImageUrl: product.primaryImage?.secure_url,
     galleryImageUrls:
       product.galleryImages?.map((image) => image.secure_url || '').filter(Boolean) || [],
+    galleryImagesRaw:
+      product.galleryImages
+        ?.filter((image) => image.secure_url && image.public_id)
+        .map((image) => ({
+          secure_url: image.secure_url as string,
+          public_id: image.public_id as string,
+        })) || [],
     description: product.description,
     lastUpdatedDate: product.updatedAt,
   };
@@ -98,7 +108,6 @@ export const useProducts = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, []);
 

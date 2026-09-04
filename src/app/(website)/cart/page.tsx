@@ -59,7 +59,7 @@ function CartItem({
   };
 
   return (
-<article className="relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-9 bg-white border border-[#E2E8F0] rounded-xl w-full max-w-[1220px]">      {/* DELETE */}
+<article className="relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-9 bg-white border border-[#E2E8F0] rounded-xl w-full max-w-[1220px]">
       <button
         type="button"
         onClick={() =>
@@ -71,7 +71,6 @@ function CartItem({
         <Trash2 size={16} />
       </button>
 
-      {/* IMAGE */}
       <div className="w-[90px] h-[90px] bg-[#F3F3F8] rounded-lg flex items-center justify-center overflow-hidden shrink-0">
         <Image
           src={
@@ -85,23 +84,18 @@ function CartItem({
         />
       </div>
 
-      {/* CONTENT */}
       <div className="flex-1 flex flex-col justify-between gap-[18px]">
-        {/* TITLE */}
         <div>
           <h3 className="text-[16px] sm:text-[18px] font-semibold text-[#002B73]">
             {item.title}
           </h3>
 
-          {/* SUBTITLE */}
           <p className="text-[14px] sm:text-[15px] text-gray-600">
             {item.subtitle}
           </p>
         </div>
 
-        {/* BOTTOM ROW */}
         <div className="flex items-center justify-between">
-          {/* QUANTITY */}
           <div className="grid h-[34px] w-[130px] grid-cols-3 items-center overflow-hidden rounded-md border border-gray-300 sm:w-28">
             <button
               type="button"
@@ -145,7 +139,6 @@ function CartItem({
             </button>
           </div>
 
-          {/* PRICE */}
           <div className="font-semibold text-[#1A1C1F]">
             Rs {getProductLineTotal(item.price, item.quantity, item.title).toFixed(2)}
           </div>
@@ -189,7 +182,6 @@ export default function CartPage() {
   return (
     <div className="bg-[#F9F9FE]">
       <main className="mx-auto w-full max-w-[1600px] px-4 pb-10 pt-[112px] sm:px-6 sm:pt-[124px] lg:px-[120px] lg:pb-25 lg:pt-[132px]">
-        {/* HEADER */}
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1C1F]">
             Your Gallery Bag
@@ -200,9 +192,7 @@ export default function CartPage() {
           </p>
         </header>
 
-        {/* GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8 items-start">
-          {/* LEFT */}
           <section className="space-y-5 w-full">
             {items.map((it) => {
               const item: CartItemData = {
@@ -238,7 +228,6 @@ export default function CartPage() {
             </Link>
           </section>
 
-          {/* RIGHT */}
           <OrderSummary
             subtotal={subtotal}
             quantity={totalQuantity}

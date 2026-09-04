@@ -48,12 +48,10 @@ export default function OrderSummary({
 
   return (
     <div className="flex w-full flex-col gap-6 rounded-[25px] bg-[#D9D9D9]/25 px-6 pb-12 pt-8 sm:px-8">
-      {/* Heading */}
       <h2 className="border-b border-[#C3C6D4] pb-4 font-manrope text-[32px] font-semibold leading-10 tracking-[-0.32px] text-[#1A1C1F]">
         Order Summary
       </h2>
 
-      {/* Items List */}
       <div className="flex flex-col gap-6 pt-2">
         {hasItems ? (
           items.map((item, index) => (
@@ -97,7 +95,6 @@ export default function OrderSummary({
         )}
       </div>
 
-      {/* Calculation */}
       <div className="flex flex-col gap-4 border-t border-[#C3C6D4] pb-2 pt-8">
         <div className="flex items-start justify-between text-base leading-6 text-[#434652]">
           <span>Subtotal</span>
@@ -119,7 +116,6 @@ export default function OrderSummary({
         </div>
       </div>
 
-     {/* Payment */}
 <div className="mx-auto mb-6 w-full max-w-[560px] rounded-lg border border-[#C3C6D4] bg-white p-4 md:max-w-[700px] lg:max-w-[560px]">
 
   <h3 className="mb-3 text-base font-semibold text-[#002B73]">
@@ -168,7 +164,6 @@ export default function OrderSummary({
   </div>
 </div>
 
-      {/* Place Order Button */}
       <div className="flex flex-col gap-3">
         <Button
           type="button"
@@ -193,7 +188,6 @@ export default function OrderSummary({
         )} */}
       </div>
 
-      {/* SSL note */}
       <div className="flex items-center justify-center gap-2 text-xs leading-4 text-[#434652]">
         <ShieldCheck className="h-3 w-3" />
         <span>SSL Encrypted Checkout</span>

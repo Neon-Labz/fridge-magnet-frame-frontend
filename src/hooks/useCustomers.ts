@@ -33,13 +33,16 @@ const getInitials = (name: string) =>
     .toUpperCase()
     .slice(0, 2) || '?';
 
+const normalizeCustomerId = (value: string | undefined | null) =>
+  String(value ?? '').replace(/^#+/, '');
+
 const mapCustomer = (customer: RawCustomer): Customer => {
   const name = customer.customerName || customer.name || 'Website Customer';
-  const id = customer.customerId || customer.id || customer._id || '';
+  const id = normalizeCustomerId(customer.customerId || customer.id || customer._id || '');
 
   return {
     ...customer,
-    id: String(id).replace(/^#/, ''),
+    id,
     name,
     initials: getInitials(name),
     email: customer.emailAddress || customer.email || '',
@@ -65,7 +68,7 @@ export const useCustomers = () => {
   const [page, setPage] = useState(1);
   // The customer directory design shows four complete rows per page so the
   // table footer and pagination remain visible inside the dashboard viewport.
-  const [limit] = useState(4);
+  const [limit] = useState(6);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 

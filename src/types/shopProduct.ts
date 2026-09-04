@@ -15,6 +15,7 @@ export interface ShopProduct {
   productId?: string;
   productName?: string;
   price?: number | string;
+  imagecount?:number;
   description?: string;
   status?: string;
   stock?: number | string;

@@ -98,19 +98,16 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-[288px] mx-auto flex flex-col gap-6 py-4">
-      {/* TITLE */}
       <div className="text-center">
         <h2 className="text-[28px] font-bold">
           Reset Password
         </h2>
       </div>
 
-      {/* FORM */}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-5"
       >
-        {/* NEW PASSWORD */}
         <div className="relative border-b-2 border-gray-700 pb-2">
           <Lock className="absolute left-0 top-0 w-5 h-5" />
 
@@ -140,7 +137,6 @@ export default function ResetPasswordForm() {
           </p>
         )}
 
-        {/* CONFIRM PASSWORD */}
         <div className="relative border-b-2 border-gray-700 pb-2">
           <Lock className="absolute left-0 top-0 w-5 h-5" />
 
@@ -172,14 +168,12 @@ export default function ResetPasswordForm() {
           </p>
         )}
 
-        {/* ERROR */}
         {error && (
           <p className="text-[12px] text-red-600">
             {error}
           </p>
         )}
 
-        {/* BUTTON */}
         <button
           type="submit"
           disabled={loading}
@@ -189,7 +183,6 @@ export default function ResetPasswordForm() {
         </button>
       </form>
 
-      {/* BACK */}
       <button
         onClick={() => switchView("login")}
         className="text-[14px] text-blue-600 hover:underline cursor-pointer text-center"

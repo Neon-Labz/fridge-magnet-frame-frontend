@@ -44,7 +44,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 flex flex-col bg-white transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-100 flex flex-col bg-white transition-transform duration-300 ${
         open ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}
       style={{
@@ -53,7 +53,6 @@ export default function Sidebar({
         borderRight: '1px solid #F1F5F9',
       }}
     >
-      {/* Logo section */}
       <div
         className="flex flex-shrink-0 items-center justify-center"
         style={{
@@ -64,7 +63,7 @@ export default function Sidebar({
       >
         <Link href="/dashboard/products">
           <Image
-            src="/logo.png"
+            src="/new_logo.png"
             alt="Magnify"
             width={140}
             height={48}
@@ -74,7 +73,6 @@ export default function Sidebar({
         </Link>
       </div>
 
-      {/* Nav items */}
       <nav className="flex flex-1 flex-col gap-1 pt-[25px]">
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
           const isActive =
@@ -113,7 +111,6 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Logout */}
       <div className="px-4 py-4">
         <button
           onClick={handleLogout}

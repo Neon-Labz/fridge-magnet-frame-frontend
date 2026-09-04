@@ -10,7 +10,11 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
-export default function AuthModal() {
+interface AuthModalProps {
+  redirectTo?: string;
+}
+
+export default function AuthModal({ redirectTo }: AuthModalProps = {}) {
   const router = useRouter();
   const { isOpen, view, closeModal } = useAuthModal();
 
@@ -36,26 +40,23 @@ export default function AuthModal() {
 
   const renderForm = () => {
     switch (view) {
-      case "login": return <LoginForm />;
+      case "login": return <LoginForm redirectTo={redirectTo} />;
       case "register": return <RegisterForm />;
       case "forgot-password": return <ForgotPasswordForm />;
       case "reset-password": return <ResetPasswordForm />;
-      default: return <LoginForm />;
+      default: return <LoginForm redirectTo={redirectTo} />;
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-      {/* Modal */}
       <div className="relative w-full max-w-[388px] max-h-[90vh] overflow-y-auto bg-[#F5F5F5] rounded-[25px] shadow-2xl px-6 sm:px-10 pb-10 flex flex-col">
 
-        {/* ✅ iPhone SE: pt-2, iPad Air & Nest Hub Max: pt-4 மேலே */}
         <div className="flex justify-end items-center w-full pt-2 sm:pt-5 pb-0">
           <button
             onClick={handleClose}
@@ -69,7 +70,6 @@ export default function AuthModal() {
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 flex flex-col justify-center pt-2">
           {renderForm()}
         </div>
