@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     const backendUrl =
-      process.env.NEXT_BACKEND_URL || "http://localhost:5000";
+      process.env.NEXT_BACKEND_URL || "http://localhost:4000";
 
     return [
       {

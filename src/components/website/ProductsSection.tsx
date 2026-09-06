@@ -30,7 +30,7 @@ export default function ProductsSection() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch(apiV1Url('/api/products?page=1&limit=1000'), { cache: 'no-store' });
+        const res = await fetch(apiV1Url('/products?page=1&limit=1000'), { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           const extractedProducts = Array.isArray(json?.data?.products)

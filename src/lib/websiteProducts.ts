@@ -19,7 +19,7 @@ function normalizeBackendBase(value: string): string {
   const trimmed = value.trim().replace(/\/+$/, '');
 
   return trimmed
-    .replace(/\/api\/v1\/api$/i, '')
+    .replace(/\/api\/v1\//i, '')
     .replace(/\/api\/v1$/i, '');
 }
 
@@ -38,7 +38,7 @@ function getProductsApiUrl(): string {
     limit: String(PRODUCT_LIST_LIMIT),
   });
 
-  return `${getBackendBase()}/api/v1/api/products?${params.toString()}`;
+  return `${getBackendBase()}/api/v1/products?${params.toString()}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

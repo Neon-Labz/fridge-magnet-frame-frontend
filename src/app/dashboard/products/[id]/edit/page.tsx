@@ -124,7 +124,7 @@ export default function EditProductPage() {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          apiV1Url(`/api/products/${productId}`),
+          apiV1Url(`/products/${productId}`),
           {
             cache: 'no-store',
           },
@@ -171,6 +171,7 @@ export default function EditProductPage() {
       data.append('stock', String(formData.stock));
       data.append('price', String(formData.price));
       data.append('description', formData.description);
+      data.append('imagecount', String(formData.imagecount));
       data.append(
         'status',
         getProductStatus(formData.stock),
@@ -184,7 +185,7 @@ export default function EditProductPage() {
       }
 
       const response = await fetch(
-        apiV1Url(`/api/products/${productId}`),
+        apiV1Url(`/products/${productId}`),
         {
           method: 'PUT',
           body: data,

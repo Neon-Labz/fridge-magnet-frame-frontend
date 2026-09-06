@@ -64,6 +64,17 @@ export default function ViewProductModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
     setShowLog(false);
     setLogRecords([]);
     setLogError(null);
@@ -97,7 +108,7 @@ export default function ViewProductModal({
     try {
       const res = await fetch(
         apiV1Url(
-          `/api/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
+          `/products/${product.id}/stock-log?page=${page}&limit=${PAGE_SIZE}`,
         ),
       );
 
@@ -171,10 +182,10 @@ export default function ViewProductModal({
       );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-5">
+    <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-5">
       {activeGalleryImage && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4"
           onClick={() => setActiveGalleryImage(null)}
         >
           <button
@@ -195,7 +206,7 @@ export default function ViewProductModal({
         </div>
       )}
 
-      <div className="flex max-h-[94vh] w-full max-w-[760px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="relative z-200 flex max-h-[94vh] w-full max-w-[760px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6 sm:py-5">
           <div>
             <h2 className="text-lg font-bold text-[#002B73] sm:text-xl">

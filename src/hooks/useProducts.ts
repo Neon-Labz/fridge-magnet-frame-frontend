@@ -88,7 +88,7 @@ export const useProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(apiV1Url('/api/products?page=1&limit=1000'), {
+      const res = await fetch(apiV1Url('/products?page=1&limit=1000'), {
         cache: 'no-store',
       });
 

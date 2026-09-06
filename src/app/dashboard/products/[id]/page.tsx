@@ -168,7 +168,7 @@ export default function ProductDetailPage() {
         // by ID instead of using static mock data.
         const response = await fetch(
           apiV1Url(
-            `/api/products/${productId}`,
+            `/products/${productId}`,
           ),
           {
             cache: 'no-store',

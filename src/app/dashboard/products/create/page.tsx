@@ -44,7 +44,7 @@ export default function CreateProductPage() {
   useEffect(() => {
     const loadNextId = async () => {
       try {
-        const response = await fetch(apiV1Url('/api/products'), { cache: 'no-store' });
+        const response = await fetch(apiV1Url('/products'), { cache: 'no-store' });
         const data = await response.json();
         const products = extractApiProducts(data);
         setAutoProductId(computeNextProductId(products));
@@ -70,6 +70,7 @@ export default function CreateProductPage() {
       data.append("description", formData.description);
       data.append("status", getProductStatus(formData.stock));
       data.append("price", String(formData.price));
+      data.append("imagecount", String(formData.imagecount));
 
       if (formData.primaryImage) {
         data.append("primaryImage", formData.primaryImage);
@@ -79,7 +80,7 @@ export default function CreateProductPage() {
       });
 
       const response = await fetch(
-        apiV1Url('/api/products'),
+        apiV1Url('/products'),
         {
           method: "POST",
           body: data,
