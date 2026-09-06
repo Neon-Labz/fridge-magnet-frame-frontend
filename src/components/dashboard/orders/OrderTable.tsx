@@ -60,7 +60,7 @@ export default function OrderTable({
                   }}
                 >
                   <th
-                    className="w-[16%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
+                    className="w-[26%] px-5 py-2.5 text-center text-[11px] font-semibold uppercase"
                     style={{
                       color: "#002B73",
                       letterSpacing: "0.5px",

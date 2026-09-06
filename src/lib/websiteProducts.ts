@@ -19,7 +19,7 @@ function normalizeBackendBase(value: string): string {
   const trimmed = value.trim().replace(/\/+$/, '');
 
   return trimmed
-    .replace(/\/api\/v1\/api$/i, '')
+    .replace(/\/api\/v1\//i, '')
     .replace(/\/api\/v1$/i, '');
 }
 

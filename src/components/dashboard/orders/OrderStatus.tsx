@@ -17,6 +17,7 @@ import { mapApiOrder, statusToApi } from "@/lib/orders";
 import { apiV1Url } from "@/lib/backendUrl";
 import { getProductLineTotal } from "@/lib/productQuantityRules";
 import type { Order, OrderStatus as OrderStatusType } from "@/types/order";
+import Image from "next/image";
 
 type OrderWithMongoId = Order & { _id?: string };
 
@@ -321,40 +322,75 @@ export default function OrderStatus({
 
                   <div className="divide-y divide-[#EEF1F5]">
                     {items.map((item, index) => (
+
                       <div
                         key={`${item.productId || item.name}-${index}`}
-                        className="grid grid-cols-[1fr_60px_100px] items-center gap-2 px-4 py-3"
+                        className="px-4 py-3"
                       >
-                        <div className="flex min-w-0 items-center gap-3">
-                          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                            <img
-                              src={item.image || "/home-product-1.png"}
-                              alt={item.name}
-                              className="h-full w-full object-cover"
-                            />
+
+                        <div className="grid grid-cols-[1fr_60px_100px] items-center gap-2">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                              <Image
+                                src={item.primaryImage|| "/home-product-1.png"}
+                                alt={item.name}
+                                width={44}
+                                height={44}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold text-[#1A1C1F] sm:text-sm">
+                                {item.name}
+                              </p>
+                              <p className="truncate text-[10px] text-[#8A8D99] sm:text-xs">
+                                SKU: {item.sku || "-"}
+                              </p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="truncate text-xs font-bold text-[#1A1C1F] sm:text-sm">
-                              {item.name}
-                            </p>
-                            <p className="truncate text-[10px] text-[#8A8D99] sm:text-xs">
-                              SKU: {item.sku || "-"}
-                            </p>
-                          </div>
+
+                          <span className="text-center text-xs font-semibold text-[#1A1C1F] sm:text-sm">
+                            {item.quantity}
+                          </span>
+
+                          <span className="text-right text-xs font-bold text-[#1A1C1F] sm:text-sm">
+                            Rs{" "}
+                            {getProductLineTotal(
+                              item.price,
+                              item.quantity,
+                              item.name,
+                            ).toFixed(2)}
+                          </span>
                         </div>
 
-                        <span className="text-center text-xs font-semibold text-[#1A1C1F] sm:text-sm">
-                          {item.quantity}
-                        </span>
-
-                        <span className="text-right text-xs font-bold text-[#1A1C1F] sm:text-sm">
-                          Rs{" "}
-                          {getProductLineTotal(
-                            item.price,
-                            item.quantity,
-                            item.name,
-                          ).toFixed(2)}
-                        </span>
+                        {/* Customer-uploaded images for this item */}
+                        {Array.isArray(item.uploadedImages) &&
+                          item.uploadedImages.length > 0 && (
+                            <div className="mt-2.5 flex items-start gap-2 pl-14">
+                              <span className="mt-1.5 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-[#8A8D99]">
+                                Uploaded:
+                              </span>
+                              <div className="flex flex-wrap gap-1.5">
+                                {item.uploadedImages.map((imgUrl, imgIndex) => (
+                                  <a
+                                    key={imgIndex}
+                                    href={imgUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block h-9 w-9 shrink-0 overflow-hidden rounded-md border border-[#E1E5EE] bg-slate-100 transition hover:ring-2 hover:ring-[#002B73]/40"
+                                  >
+                                    <Image
+                                      src={imgUrl}
+                                      alt={`${item.name} uploaded image ${imgIndex + 1}`}
+                                      width={36}
+                                      height={36}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                       </div>
                     ))}
 
@@ -441,17 +477,17 @@ export default function OrderStatus({
                       <Phone size={15} className="shrink-0 text-[#8A8D99]" />
                       <span>{currentOrder.phone || "-"}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2.5 text-xs text-[#434652] sm:text-sm">
-                    <MapPin
-                      size={15}
-                      className="mt-0.5 shrink-0 text-[#8A8D99]"
-                    />
-                    <span className="break-words">
-                      {currentOrder.shippingAddress || "-"}
-                    </span>
+                      <MapPin
+                        size={15}
+                        className="mt-0.5 shrink-0 text-[#8A8D99]"
+                      />
+                      <span className="break-words">
+                        {currentOrder.shippingAddress || "-"}
+                      </span>
+                    </div>
                   </div>
-                  </div>   
                 </div>
               </div>
             </div>

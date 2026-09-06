@@ -12,6 +12,7 @@ import {
   dispatchWebsiteAuthChanged,
   saveWebsiteAuthSession,
 } from "@/hooks/useWebsiteAuthSession";
+import Image from "next/image";
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -136,6 +137,7 @@ export default function LoginForm({
       onSubmit={handleSubmit(onSubmit)}
       className="w-full max-w-[288px] mx-auto flex flex-col gap-[-20px] sm:gap-5 text-gray-950"
     >
+      <Image src="/logo.png" alt="Logo" width={150} height={10} className="mx-auto" />
       <h2 className="text-center text-[24px] sm:text-[28px] font-bold leading-tight sm:leading-[38px]">
         Login
       </h2>
@@ -167,7 +169,7 @@ export default function LoginForm({
         </button>
       </div>
 
-      {showSecondaryActions && (
+      {/* {showSecondaryActions && (
         <div className="text-right -mt-1 sm:mt-0">
           <button
             type="button"
@@ -177,7 +179,7 @@ export default function LoginForm({
             Forgot password?
           </button>
         </div>
-      )}
+      )} */}
 
       {error && (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-1.5 sm:py-2 text-[13px] sm:text-sm font-medium text-red-700">
@@ -192,7 +194,7 @@ export default function LoginForm({
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>
-
+{/* 
       {showSecondaryActions && (
         <>
           {/* <div className="flex items-center gap-2">
@@ -221,7 +223,8 @@ export default function LoginForm({
             </button>
           </p>
         </>
-      )}
+      )} */}
+
     </form>
   );
 }

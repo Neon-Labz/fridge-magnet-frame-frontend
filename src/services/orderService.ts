@@ -11,6 +11,8 @@ export interface BackendOrderItem {
   productId: string | number;
   name: string;
   price: number;
+   primaryImage?: string;
+  uploadedImages?: string[];
   quantity: number;
   image?: string;
   frameType?: string;

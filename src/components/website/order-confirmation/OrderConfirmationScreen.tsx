@@ -12,6 +12,8 @@ interface OrderItem {
   id: string | number;
   name: string;
   price: number;
+  primaryImage?: string;
+  uploadedImages?: string[];
   quantity: number;
   image?: string;
 }
