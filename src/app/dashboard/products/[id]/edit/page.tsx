@@ -124,7 +124,7 @@ export default function EditProductPage() {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          apiV1Url(`/api/products/${productId}`),
+          apiV1Url(`/products/${productId}`),
           {
             cache: 'no-store',
           },
@@ -185,7 +185,7 @@ export default function EditProductPage() {
       }
 
       const response = await fetch(
-        apiV1Url(`/api/products/${productId}`),
+        apiV1Url(`/products/${productId}`),
         {
           method: 'PUT',
           body: data,

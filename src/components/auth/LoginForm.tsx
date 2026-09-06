@@ -197,20 +197,20 @@ export default function LoginForm({
 {/* 
       {showSecondaryActions && (
         <>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <div className="flex-1 h-[1px] sm:h-[2px] bg-gray-300" />
             <span className="text-[12px] text-gray-500">OR</span>
             <div className="flex-1 h-[1px] sm:h-[2px] bg-gray-300" />
-          </div>
+          </div> */}
 
-          <button
+          {/* <button
             type="button"
             disabled
             className="flex items-center justify-center gap-2 w-full h-[36px] sm:h-[48px] border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <GoogleIcon />
             <span className="text-[13px] sm:text-base">Sign in with Google</span>
-          </button>
+          </button> */}
 
           <p className="text-center text-[12px] sm:text-[14px]">
             Don't have an account?{" "}

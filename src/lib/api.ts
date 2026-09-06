@@ -121,7 +121,7 @@ class ApiClient {
   }
 
   async getProducts(): Promise<ApiResponse<unknown>> {
-    return this.request('/api/products?page=1&limit=1000', {
+    return this.request('/products?page=1&limit=1000', {
       method: 'GET',
     })
   }

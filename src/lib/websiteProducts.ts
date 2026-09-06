@@ -38,7 +38,7 @@ function getProductsApiUrl(): string {
     limit: String(PRODUCT_LIST_LIMIT),
   });
 
-  return `${getBackendBase()}/api/v1/api/products?${params.toString()}`;
+  return `${getBackendBase()}/api/v1/products?${params.toString()}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
