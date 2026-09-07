@@ -37,12 +37,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} h-full`}
       data-scroll-behavior="smooth"
     >
-      <SpeedInsights/>
       <body className="min-h-full flex flex-col antialiased">
         <CartProvider>
           <Toast />
           {children}
         </CartProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
