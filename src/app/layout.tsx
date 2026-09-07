@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Manrope } from 'next/font/google';
 import Toast from '@/components/Toast';
 import './globals.css';
 import CartProvider from '@/context/CartContext';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,6 +37,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} h-full`}
       data-scroll-behavior="smooth"
     >
+      <SpeedInsights/>
       <body className="min-h-full flex flex-col antialiased">
         <CartProvider>
           <Toast />
