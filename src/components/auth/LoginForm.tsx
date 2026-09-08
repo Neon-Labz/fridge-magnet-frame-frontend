@@ -1,10 +1,8 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useAuthModal } from "@/hooks/useAuthModal";
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import {
   dispatchWebsiteAuthChanged,
@@ -34,69 +32,113 @@ type LoginResponseData = {
   };
 };
 
+const REMEMBER_EMAIL_KEY = "rememberedLoginEmail";
 
 export default function LoginForm({
   redirectTo,
   tokenKey = "token",
-  showSecondaryActions = true,
 }: LoginFormProps) {
-  const { openModal } = useAuthModal();
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const { register, handleSubmit } = useForm<LoginFormData>();
+  const { register, handleSubmit, setValue } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  // Load remembered email
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+
+    if (rememberedEmail) {
+      setValue("email", rememberedEmail);
+      setRememberMe(true);
+    }
+  }, [setValue]);
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     setError("");
 
     try {
+      // Remember email
+      if (rememberMe) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, data.email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+
       const response = await apiClient.login(data);
 
       if (response.success) {
         const payload = response.data as LoginResponseData | undefined;
+
         const token = payload?.token || payload?.access_token;
+
         const role = payload?.user?.role;
         const isAdmin = role === "admin";
 
-        if (token) {
-          if (tokenKey === "token" && !isAdmin && payload?.user) {
-            saveWebsiteAuthSession(token, payload.user);
-          } else {
-            localStorage.setItem(tokenKey, token);
-            localStorage.setItem("user", JSON.stringify(payload?.user));
-            document.cookie = `${tokenKey}=${encodeURIComponent(token)}; path=/; samesite=lax`;
-          }
+        if (!token) {
+          setError("Login succeeded but no auth token was returned");
+          return;
+        }
 
-          if (isAdmin) {
-            localStorage.setItem("adminToken", token);
-            document.cookie = `adminToken=${encodeURIComponent(token)}; path=/; samesite=lax`;
-          }
+        /*
+         * Normal website user
+         */
+        if (tokenKey === "token" && !isAdmin && payload?.user) {
+          saveWebsiteAuthSession(token, payload.user);
+        } else {
+          /*
+           * Admin / custom token
+           */
+          localStorage.setItem(tokenKey, token);
 
-          if (tokenKey !== "token" || isAdmin) {
-            dispatchWebsiteAuthChanged();
-          }
+          localStorage.setItem("user", JSON.stringify(payload?.user));
 
-          const finalRedirect =
-            redirectTo ||
-            (isAdmin
-              ? "/dashboard/products"
-              : tokenKey === "token"
+          document.cookie = `${tokenKey}=${encodeURIComponent(
+            token,
+          )}; path=/; samesite=lax`;
+        }
+
+        /*
+         * Admin token
+         */
+        if (isAdmin) {
+          localStorage.setItem("adminToken", token);
+
+          document.cookie = `adminToken=${encodeURIComponent(
+            token,
+          )}; path=/; samesite=lax`;
+        }
+
+        if (tokenKey !== "token" || isAdmin) {
+          dispatchWebsiteAuthChanged();
+        }
+
+        /*
+         * Redirect
+         */
+        const finalRedirect =
+          redirectTo ||
+          (isAdmin
+            ? "/dashboard/products"
+            : tokenKey === "token"
               ? "/"
               : undefined);
 
-          if (finalRedirect) {
-            if (finalRedirect.startsWith("/dashboard")) {
-              window.location.href = finalRedirect;
-            } else {
-              router.replace(finalRedirect);
-            }
+        if (finalRedirect) {
+          if (finalRedirect.startsWith("/dashboard")) {
+            window.location.href = finalRedirect;
+          } else {
+            router.replace(finalRedirect);
           }
-        } else {
-          setError("Login succeeded but no auth token was returned");
         }
       } else {
         setError(response.error || "Login failed");
@@ -109,68 +151,287 @@ export default function LoginForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-[288px] mx-auto flex flex-col gap-[-20px] sm:gap-5 text-gray-950"
-    >
-      <Image src="/logo.png" alt="Logo" width={150} height={10} className="mx-auto" />
-      <h2 className="text-center text-[24px] sm:text-[28px] font-bold leading-tight sm:leading-[38px]">
-        Login
-      </h2>
-
-      <div className="relative border-b-2 border-gray-700 py-0.5 sm:py-2 pl-5">
-        <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-950" />
-        <input
-          {...register("email")}
-          placeholder="Email"
-          className="w-full pl-8 bg-transparent outline-none text-[14px] font-semibold text-gray-950 placeholder:text-gray-400"
-        />
-      </div>
-
-      <div className="relative border-b-2 border-gray-700 py-0.5 sm:py-2 pl-5">
-        <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-950" />
-        <input
-          {...register("password")}
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
-          className="w-full pl-8 pr-8 bg-transparent outline-none text-[14px] font-semibold text-gray-950 placeholder:text-gray-400"
-        />
-
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-[26px] h-[26px] cursor-pointer text-gray-950"
-        >
-          {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-        </button>
-      </div>
-
-      {/* {showSecondaryActions && (
-        <div className="text-right -mt-1 sm:mt-0">
-          <button
-            type="button"
-            onClick={() => openModal("forgot-password")}
-            className="text-[12px] sm:text-[14px] font-semibold text-blue-600 hover:underline"
-          >
-            Forgot password?
-          </button>
-        </div>
-      )} */}
-
-      {error && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-1.5 sm:py-2 text-[13px] sm:text-sm font-medium text-red-700">
-          {error}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full h-[36px] sm:h-[48px] bg-[#BC0101] text-white rounded-lg font-semibold hover:bg-[#a00000] disabled:opacity-60"
+    <div className="relative z-10 w-full max-w-[420px]">
+      {/* Login Card */}
+      <div
+        className="
+          w-full
+          bg-white
+          rounded-3xl
+          shadow-2xl
+          px-6
+          py-7
+          sm:px-10
+          sm:py-9
+          md:px-11
+          md:py-10
+        "
       >
-        {loading ? "Signing in..." : "Sign in"}
-      </button>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full flex flex-col"
+        >
+          {/* Logo */}
+          {/* <div className="flex justify-center mb-5 sm:mb-6">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={150}
+              height={45}
+              className="
+                w-[125px]
+                sm:w-[150px]
+                h-auto
+                object-contain
+              "
+              priority
+            />
+          </div> */}
 
-    </form>
+          {/* Heading */}
+          <div className="text-center mb-7 sm:mb-8">
+            <h2
+              className="
+                text-[26px]
+                sm:text-[30px]
+                font-black
+                text-[#071C40]
+                leading-tight
+              "
+            >
+              Admin Panel
+            </h2>
+
+            <p
+              className="
+                mt-2
+                text-sm
+                sm:text-[15px]
+                text-gray-500
+              "
+            >
+              Sign in to continue to your account
+            </p>
+          </div>
+
+          {/* Email */}
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="
+                block
+                text-sm
+                font-semibold
+                text-[#071C40]
+                mb-2
+              "
+            >
+              Email address
+            </label>
+
+            <div
+              className="
+                flex
+                items-center
+                gap-3
+                bg-gray-50
+                border
+                border-gray-200
+                rounded-xl
+                px-4
+                h-[48px]
+                sm:h-[52px]
+                transition-all
+                focus-within:border-[#123D87]
+                focus-within:ring-2
+                focus-within:ring-[#123D87]/15
+              "
+            >
+              <Mail size={18} className="text-gray-400 shrink-0" />
+
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                {...register("email")}
+                placeholder="Enter your email"
+                className="
+                  w-full
+                  bg-transparent
+                  outline-none
+                  text-sm
+                  text-gray-900
+                  placeholder:text-gray-400
+                "
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="mb-4">
+            <label
+              htmlFor="password"
+              className="
+                block
+                text-sm
+                font-semibold
+                text-[#071C40]
+                mb-2
+              "
+            >
+              Password
+            </label>
+
+            <div
+              className="
+                flex
+                items-center
+                gap-3
+                bg-gray-50
+                border
+                border-gray-200
+                rounded-xl
+                px-4
+                h-[48px]
+                sm:h-[52px]
+                transition-all
+                focus-within:border-[#123D87]
+                focus-within:ring-2
+                focus-within:ring-[#123D87]/15
+              "
+            >
+              <Lock size={18} className="text-gray-400 shrink-0" />
+
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                {...register("password")}
+                placeholder="Enter your password"
+                className="
+                  w-full
+                  bg-transparent
+                  outline-none
+                  text-sm
+                  text-gray-900
+                  placeholder:text-gray-400
+                "
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="
+                  shrink-0
+                  text-gray-400
+                  hover:text-[#123D87]
+                  transition-colors
+                  cursor-pointer
+                "
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Remember Me */}
+          <div className="flex items-center mb-6 px-1">
+            <label
+              htmlFor="rememberMe"
+              className="
+                flex
+                items-center
+                gap-2.5
+                cursor-pointer
+                select-none
+              "
+            >
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="
+                  w-4
+                  h-4
+                  rounded
+                  border-gray-300
+                  cursor-pointer
+                  accent-[#123D87]
+                "
+              />
+
+              <span className="text-sm text-gray-600">Remember me</span>
+            </label>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div
+              className="
+                mb-5
+                rounded-xl
+                border
+                border-red-200
+                bg-red-50
+                px-4
+                py-3
+              "
+            >
+              <p
+                className="
+                  text-[13px]
+                  sm:text-sm
+                  font-medium
+                  text-[#D83223]
+                "
+              >
+                {error}
+              </p>
+            </div>
+          )}
+
+          {/* Sign In */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="
+              w-full
+              h-[48px]
+              sm:h-[52px]
+              bg-[#D83223]
+              hover:bg-[#b9271b]
+              active:scale-[0.99]
+              text-white
+              rounded-xl
+              font-bold
+              text-sm
+              sm:text-[15px]
+              transition-all
+              shadow-md
+              hover:shadow-lg
+              disabled:opacity-60
+              disabled:cursor-not-allowed
+              flex
+              items-center
+              justify-center
+              gap-2
+            "
+          >
+            {loading ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Sign in"
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
