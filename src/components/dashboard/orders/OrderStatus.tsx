@@ -8,6 +8,8 @@ import {
   Phone,
   MapPin,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   Loader2,
   Download,
@@ -97,6 +99,9 @@ export default function OrderStatus({
   const [downloadingProduct, setDownloadingProduct] = useState<number | null>(
     null,
   );
+  const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(
+    null,
+  );
   const [adminNote, setAdminNote] = useState("");
 
   // Keep local order in sync whenever a different order is opened
@@ -127,6 +132,9 @@ export default function OrderStatus({
   if (!isOpen || !currentOrder) return null;
 
   const items = currentOrder.items || [];
+  const uploadedImages = items.flatMap((item) =>
+    Array.isArray(item.uploadedImages) ? item.uploadedImages : [],
+  );
 
   const subtotal = items.reduce(
     (sum, item) =>
@@ -419,9 +427,16 @@ export default function OrderStatus({
                               </span>
                               <div className="flex flex-wrap gap-1.5">
                                 {item.uploadedImages.map((imgUrl, imgIndex) => (
-                                  <div
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setPreviewImageIndex(
+                                        uploadedImages.indexOf(imgUrl),
+                                      )
+                                    }
                                     key={imgIndex}
                                     className="block h-9 w-9 shrink-0 overflow-hidden rounded-md border border-[#E1E5EE] bg-slate-100 transition hover:ring-2 hover:ring-[#002B73]/40"
+                                    aria-label={`Preview ${item.name} uploaded image ${imgIndex + 1}`}
                                   >
                                     <Image
                                       src={imgUrl}
@@ -430,7 +445,7 @@ export default function OrderStatus({
                                       height={36}
                                       className="h-full w-full object-cover"
                                     />
-                                  </div>
+                                  </button>
                                 ))}
                               </div>
                               <button
@@ -572,6 +587,54 @@ export default function OrderStatus({
           </div>
         </div>
       </div>
+
+      {previewImageIndex !== null && uploadedImages[previewImageIndex] && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/75 p-4"
+          onClick={() => setPreviewImageIndex(null)}
+          role="presentation"
+        >
+          <div
+            className="relative flex max-h-[90vh] max-w-[90vw] items-center gap-3 overflow-hidden rounded-lg bg-white p-2 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setPreviewImageIndex(
+                  (previewImageIndex - 1 + uploadedImages.length) %
+                    uploadedImages.length,
+                )
+              }
+              disabled={uploadedImages.length < 2}
+              aria-label="Previous uploaded image"
+              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <Image
+              src={uploadedImages[previewImageIndex]}
+              alt="Uploaded image preview"
+              width={1200}
+              height={1200}
+              className="max-h-[85vh] max-w-[85vw] object-contain"
+            />
+            <button
+              type="button"
+              onClick={() =>
+                setPreviewImageIndex(
+                  (previewImageIndex + 1) % uploadedImages.length,
+                )
+              }
+              disabled={uploadedImages.length < 2}
+              aria-label="Next uploaded image"
+              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
