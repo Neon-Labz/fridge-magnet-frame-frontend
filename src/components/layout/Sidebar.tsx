@@ -11,7 +11,6 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { clearWebsiteAuthSession } from '@/hooks/useWebsiteAuthSession';
 
 const NAV_ITEMS = [
   { label: 'Products', icon: Package, href: '/dashboard/products' },
@@ -31,20 +30,22 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear every auth artifact so no stale session remains.
     localStorage.removeItem('adminToken');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 
-    document.cookie = 'adminToken=; path=/; max-age=0; samesite=lax';
-    document.cookie = 'token=; path=/; max-age=0; samesite=lax';
+    document.cookie =
+      'adminToken=; path=/; max-age=0; samesite=lax';
+    document.cookie =
+      'token=; path=/; max-age=0; samesite=lax';
 
+    onClose?.();
     router.replace('/login');
   };
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-100 flex flex-col bg-[#071C40] transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-40 flex flex-col bg-[#071C40] transition-transform duration-300 ${
         open ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}
       style={{
@@ -53,57 +54,80 @@ export default function Sidebar({
         borderRight: '1px solid #F1F5F9',
       }}
     >
+      {/* Logo */}
       <div
-        className="flex flex-shrink-0 items-center justify-left"
+        className="flex flex-shrink-0 items-center justify-start"
         style={{
-          height: 89,
-          borderBottom: '1px solid #071C40',
+          height: 88,
           padding: '0 24px',
         }}
       >
-        <Link href="/dashboard/products">
-          <Image
-            src="/magnifybg.png"
-            alt="Magnify"
-            width={130}
-            height={28}
-            priority
-            className="rounded-lg"
-            style={{ width: 'auto', height: 'auto' }}
-          />
+        <Link
+          href="/dashboard/products"
+          onClick={onClose}
+          className="flex items-center gap-3"
+        >
+          <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#F8FAFC] p-1.5 ring-1 ring-slate-200/60">
+            <Image
+              src="/magnifyfi.png"
+              alt="Magnify"
+              width={44}
+              height={44}
+              priority
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <p className="truncate text-lg font-bold tracking-tight text-white">
+              Magnify
+            </p>
+
+            <p className="truncate text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-400">
+              Admin Panel
+            </p>
+          </div>
         </Link>
       </div>
 
+      {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1 pt-[25px]">
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
           const isActive =
-            pathname === href || pathname.startsWith(href + '/');
+            pathname === href ||
+            pathname.startsWith(href + '/');
 
           return (
             <Link
               key={label}
               href={href}
               onClick={onClose}
-              className="flex w-full items-center gap-3 px-6 py-4 transition-colors"
+              className={`group mx-3 flex items-center gap-3 rounded-lg px-5 py-3 transition-colors ${
+                isActive
+                  ? 'text-white'
+                  : 'text-white hover:bg-white hover:text-[#D83223]'
+              }`}
               style={{
-                background: isActive ? '#123D87' : 'transparent',
-                borderRight: isActive
-                  ? '4px solid #1E3A8A'
-                  : '4px solid transparent',
+                background: isActive
+                  ? '#D83223'
+                  : 'transparent',
               }}
             >
               <Icon
                 size={20}
-                color={isActive ? '#FFFFFF' : '#FFFFFF'}
-                className="flex-shrink-0"
+                className={`flex-shrink-0 transition-colors ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-white group-hover:text-[#D83223]'
+                }`}
               />
 
               <span
-                className="text-[14px]"
-                style={{
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? '#FFFFFF' : '#FFFFFF',
-                }}
+                className={`text-[14px] transition-colors ${
+                  isActive
+                    ? 'font-semibold text-white'
+                    : 'font-medium text-white group-hover:text-[#D83223]'
+                }`}
               >
                 {label}
               </span>
@@ -112,17 +136,18 @@ export default function Sidebar({
         })}
       </nav>
 
+      {/* Logout */}
       <div className="px-4 py-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 transition hover:bg-[#D83223]"
+          className="group flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-3 transition-colors hover:border-[#D83223] hover:bg-[#D83223]/10"
         >
-          <LogOut size={18} color="#FFFFFF" style={{ flexShrink: 0 }} />
+          <LogOut
+            size={18}
+            className="flex-shrink-0 text-white transition-colors group-hover:text-[#D83223]"
+          />
 
-          <span
-            className="text-[14px] font-semibold"
-            style={{ color: '#FFFFFF' }}
-          >
+          <span className="text-[14px] font-semibold text-white transition-colors group-hover:text-[#D83223]">
             Logout
           </span>
         </button>

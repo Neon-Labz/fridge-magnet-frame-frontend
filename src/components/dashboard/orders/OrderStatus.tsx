@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  X,
   ShoppingBag,
   List,
   Truck,
@@ -9,8 +8,11 @@ import {
   Phone,
   MapPin,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   Loader2,
+  Download,
 } from "lucide-react";
 import { useToastStore } from "@/store/toastStore";
 import { mapApiOrder, statusToApi } from "@/lib/orders";
@@ -94,13 +96,23 @@ export default function OrderStatus({
   );
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [downloadingProduct, setDownloadingProduct] = useState<number | null>(
+    null,
+  );
+  const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(
+    null,
+  );
   const [adminNote, setAdminNote] = useState("");
 
   // Keep local order in sync whenever a different order is opened
   useEffect(() => {
-    setCurrentOrder(order);
-    setAdminNote(order?.adminNote || "");
-  }, [order?.id, order?._id]);
+    const frameId = requestAnimationFrame(() => {
+      setCurrentOrder(order);
+      setAdminNote(order?.adminNote || "");
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [order]);
 
   // Handle escape key to close
   useEffect(() => {
@@ -120,6 +132,9 @@ export default function OrderStatus({
   if (!isOpen || !currentOrder) return null;
 
   const items = currentOrder.items || [];
+  const uploadedImages = items.flatMap((item) =>
+    Array.isArray(item.uploadedImages) ? item.uploadedImages : [],
+  );
 
   const subtotal = items.reduce(
     (sum, item) =>
@@ -184,6 +199,42 @@ export default function OrderStatus({
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDownloadImages = async (
+    imageUrls: string[],
+    itemName: string,
+    itemIndex: number,
+  ) => {
+    setDownloadingProduct(itemIndex);
+
+    const orderName = currentOrder.orderId.replace(/[^a-z0-9]+/gi, "-");
+    const productName = itemName.replace(/[^a-z0-9]+/gi, "-");
+
+    try {
+      for (const [imageIndex, imageUrl] of imageUrls.entries()) {
+        const response = await fetch(
+          `/api/download-image?url=${encodeURIComponent(imageUrl)}`,
+        );
+        if (!response.ok) throw new Error("Image download failed");
+
+        const blob = await response.blob();
+        const extension = blob.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = `${orderName}-${productName}-image-${imageIndex + 1}.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(downloadUrl);
+      }
+      addToast("Product images downloaded successfully.", "success");
+    } catch {
+      addToast("Could not download images. Please try again.", "error");
+    } finally {
+      setDownloadingProduct(null);
     }
   };
 
@@ -332,7 +383,11 @@ export default function OrderStatus({
                           <div className="flex min-w-0 items-center gap-3">
                             <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                               <Image
-                                src={item.primaryImage|| "/home-product-1.png"}
+                                src={
+                                  item.primaryImage ||
+                                  item.image ||
+                                  "/home-product-1.png"
+                                }
                                 alt={item.name}
                                 width={44}
                                 height={44}
@@ -366,18 +421,22 @@ export default function OrderStatus({
                         {/* Customer-uploaded images for this item */}
                         {Array.isArray(item.uploadedImages) &&
                           item.uploadedImages.length > 0 && (
-                            <div className="mt-2.5 flex items-start gap-2 pl-14">
+                            <div className="mt-2.5 flex flex-wrap items-start gap-2 pl-14">
                               <span className="mt-1.5 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-[#8A8D99]">
                                 Uploaded:
                               </span>
                               <div className="flex flex-wrap gap-1.5">
                                 {item.uploadedImages.map((imgUrl, imgIndex) => (
-                                  <a
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setPreviewImageIndex(
+                                        uploadedImages.indexOf(imgUrl),
+                                      )
+                                    }
                                     key={imgIndex}
-                                    href={imgUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                     className="block h-9 w-9 shrink-0 overflow-hidden rounded-md border border-[#E1E5EE] bg-slate-100 transition hover:ring-2 hover:ring-[#002B73]/40"
+                                    aria-label={`Preview ${item.name} uploaded image ${imgIndex + 1}`}
                                   >
                                     <Image
                                       src={imgUrl}
@@ -386,9 +445,31 @@ export default function OrderStatus({
                                       height={36}
                                       className="h-full w-full object-cover"
                                     />
-                                  </a>
+                                  </button>
                                 ))}
                               </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDownloadImages(
+                                    item.uploadedImages!,
+                                    item.name,
+                                    index,
+                                  )
+                                }
+                                disabled={downloadingProduct === index}
+                                className="inline-flex h-9 items-center gap-1.5 rounded-md bg-[#002B73] px-2.5 text-[11px] font-semibold text-white transition hover:bg-[#001F52] disabled:cursor-not-allowed disabled:opacity-60"
+                                title="Download original images"
+                              >
+                                {downloadingProduct === index ? (
+                                  <Loader2 size={13} className="animate-spin" />
+                                ) : (
+                                  <Download size={13} />
+                                )}
+                                {downloadingProduct === index
+                                  ? "Downloading..."
+                                  : "Download"}
+                              </button>
                             </div>
                           )}
                       </div>
@@ -506,6 +587,54 @@ export default function OrderStatus({
           </div>
         </div>
       </div>
+
+      {previewImageIndex !== null && uploadedImages[previewImageIndex] && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/75 p-4"
+          onClick={() => setPreviewImageIndex(null)}
+          role="presentation"
+        >
+          <div
+            className="relative flex max-h-[90vh] max-w-[90vw] items-center gap-3 overflow-hidden rounded-lg bg-white p-2 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setPreviewImageIndex(
+                  (previewImageIndex - 1 + uploadedImages.length) %
+                    uploadedImages.length,
+                )
+              }
+              disabled={uploadedImages.length < 2}
+              aria-label="Previous uploaded image"
+              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <Image
+              src={uploadedImages[previewImageIndex]}
+              alt="Uploaded image preview"
+              width={1200}
+              height={1200}
+              className="max-h-[85vh] max-w-[85vw] object-contain"
+            />
+            <button
+              type="button"
+              onClick={() =>
+                setPreviewImageIndex(
+                  (previewImageIndex + 1) % uploadedImages.length,
+                )
+              }
+              disabled={uploadedImages.length < 2}
+              aria-label="Next uploaded image"
+              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

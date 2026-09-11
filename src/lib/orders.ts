@@ -31,6 +31,8 @@ type ApiOrder = {
     price?: number;
     quantity?: number;
     image?: string;
+    primaryImage?: string;
+    uploadedImages?: string[];
     frameType?: string;
     colorOption?: string;
   }[];
@@ -100,6 +102,8 @@ export const mapApiOrder = (order: ApiOrder): Order => {
       price: Number(item.price ?? 0),
       quantity: Number(item.quantity ?? 1),
       image: item.image,
+      primaryImage: item.primaryImage ?? item.image,
+      uploadedImages: item.uploadedImages,
       frameType: item.frameType,
       colorOption: item.colorOption,
     })),
